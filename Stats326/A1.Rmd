@@ -1,7 +1,10 @@
 ---
 title: "Stats 326 Assignment 1"
-author: "Name: Hasnain Cheena, ID:190411106"
-output: html_document
+author: 'Name: Hasnain Cheena, ID:190411106'
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
