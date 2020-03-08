@@ -18,11 +18,12 @@ alc.df = read.csv("Data\\NZAlcoholConsumption.csv")
 vis.df = read.csv("Data\\NZVisitorsPurpose.csv")
 ```
 
-## Question 1
+## Question 1 - Find a Time Series that exhibits cycles
+Found from: https://www.ofx.com/en-us/forex-news/historical-exchange-rates/monthly-average-rates/
 ```{r NZD AUD rate}
 #plot time vs exchange rate
 aud.ts = ts(aud.df$Rate, frequency=12, start=c(1990,1))
-plot(aud.ts, main="AUD to NZD Exchange Rate (Jan 1990 - March 2020)", 
+plot(aud.ts, main="Monthly Average AUD to NZD Exchange Rate (Jan 1990 - March 2020)", 
 xlab="Year",ylab="Monthly average exchange rate")
 ```
 ## Question 2 - Find a Stationary Time Series.
@@ -63,33 +64,31 @@ temp.df["Time"] = temp.df$dt
 
 #plot time vs temp
 temp.ts = ts(temp.df$AverageTemperature, frequency=12, start=c(2000,1))
-plot(temp.ts)
-```
-## Question  - Find a Time Series that has a seasonal component but no trend or cycle. 
-Found from: https://www.dcanz.com/UserFiles/DCANZ/File/191119%20New%20Zealand%20Milk%20Production%2019Nov2019.pdf
-```{r Milk Prod}
-milkProd.ts = ts(milkprod.df$Milk.Production, freq=12, start=c(2015,1))
-plot(milkProd.ts)
+plot(temp.ts, main="Monthly Temperature in Wuhan, China (2001 to 2013)", 
+xlab="Year", ylab="Temperature (Celcius)")
 ```
 
-## Question  - Find a Time Series that has a reasonably linear trend and has a seasonal component. 
-Found from: https://www.dcanz.com/about-the-nz-dairy-industry/
-```{r Milk Prod Long term}
-milkProdLong.ts = ts(milkprodLong.df$X.000.kg.Milksolids, freq=12, start=c(2003,6))
-plot(milkProdLong.ts)
-```
 
 ## Question 4 - Find a Time Series that has a reasonably linear trend and has a seasonal component. 
 Found from: https://new.censusatschool.org.nz/resource/time-series-data-sets-2013/
 ```{r NZ Alcohol Consumption}
 #extract years 2002 to 2006
 alc.ts = ts(alc.df$TotalWine[9:29], freq=4, start=c(2002,1))
-plot(alc.ts)
+plot(alc.ts, main="Quarterly Total Wine Consumption in New Zealand (2002 to 2007)", 
+xlab="Year", ylab="Wine consumption (Litres)")
 ```
 ## Question 4 - Find a Time Series that has a reasonably linear trend and has a seasonal component. 
 Found from: https://new.censusatschool.org.nz/resource/time-series-data-sets-2013/
 ```{r NZ Traverllers Purpose}
+travellers.ts = ts(vis.df$Friends.Relatives, freq=12, start=c(2000,1))
+plot(travellers.ts, main="Monthly Travellers coming to New Zealand with the purpose of seeing friends/family (2000 to 2013)", 
+xlab="Year", ylab="Number of Travellers")
+```
 
-alc.ts = ts(alc.df$TotalWine[9:29], freq=4, start=c(2002,1))
-plot(alc.ts)
+## Question 5  
+```{r Cape Grim CO2 Concentration}
+
+#load data
+capeGrim.df = read.csv("CapeGrim CO2 2000.1 - 2019.9.txt")
+
 ```
