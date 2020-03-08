@@ -89,6 +89,14 @@ xlab="Year", ylab="Number of Travellers")
 ```{r Cape Grim CO2 Concentration}
 
 #load data
-capeGrim.df = read.csv("CapeGrim CO2 2000.1 - 2019.9.txt")
+capeGrim.df = read.table("Data\\CapeGrim CO2 2000.1 - 2019.9.txt",header = TRUE, sep = "\t")
+
+#plot time series from January 2000 to September 2019
+capeGrim.ts = ts(capeGrim.df$CO2, freq=12, start=c(2000,1))
+plot(capeGrim.ts, main="Average Monthly CO2 Concentration at Cape Grim (Jan 2000 to Sept 2019)", xlab="Year", ylab="CO2 Concentration")
+
+#convert data into average concentration for each quarter from 2000 to 2019.3
+
+#plot the quarterly series
 
 ```
