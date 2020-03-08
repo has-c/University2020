@@ -1,5 +1,6 @@
 ---
-title: "326 A1"
+title: "Stats 326 Assignment 1"
+author: "Name: Hasnain Cheena, ID:190411106"
 output: html_document
 ---
 
@@ -26,6 +27,7 @@ aud.ts = ts(aud.df$Rate, frequency=12, start=c(1990,1))
 plot(aud.ts, main="Monthly Average AUD to NZD Exchange Rate (Jan 1990 - March 2020)", 
 xlab="Year",ylab="Monthly average exchange rate")
 ```
+
 ## Question 2 - Find a Stationary Time Series.
 Found from: https://coinmarketcap.com/currencies/xrp/
 ```{r Change in XRP value}
@@ -96,7 +98,8 @@ capeGrim.ts = ts(capeGrim.df$CO2, freq=12, start=c(2000,1))
 plot(capeGrim.ts, main="Average Monthly CO2 Concentration at Cape Grim (Jan 2000 to Sept 2019)", xlab="Year", ylab="CO2 Concentration")
 
 #convert data into average concentration for each quarter from 2000 to 2019.3
-
+capeGrimQuarterly.ts = aggregate(capeGrim.ts,  nfrequency = 4, FUN=mean)
 #plot the quarterly series
+plot(capeGrimQuarterly.ts, main="Average Quarterly CO2 Concentration at Cape Grim (Jan 2000 to Sept 2019)", xlab="Year", ylab="CO2 Concentration")
 
 ```
