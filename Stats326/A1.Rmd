@@ -14,6 +14,8 @@ xrp.df = read.csv("Data\\XRP Daily Price.csv")
 temp.df = read.csv("Data\\GlobalLandTemperaturesByMajorCity.csv")
 milkprod.df = read.csv("Data\\Milk Production.csv", nrows=58)
 milkprodLong.df = read.csv("Data\\2002 NZ Milk production data.csv")
+alc.df = read.csv("Data\\NZAlcoholConsumption.csv")
+vis.df = read.csv("Data\\NZVisitorsPurpose.csv")
 ```
 
 ## Question 1
@@ -75,4 +77,19 @@ Found from: https://www.dcanz.com/about-the-nz-dairy-industry/
 ```{r Milk Prod Long term}
 milkProdLong.ts = ts(milkprodLong.df$X.000.kg.Milksolids, freq=12, start=c(2003,6))
 plot(milkProdLong.ts)
+```
+
+## Question 4 - Find a Time Series that has a reasonably linear trend and has a seasonal component. 
+Found from: https://new.censusatschool.org.nz/resource/time-series-data-sets-2013/
+```{r NZ Alcohol Consumption}
+#extract years 2002 to 2006
+alc.ts = ts(alc.df$TotalWine[9:29], freq=4, start=c(2002,1))
+plot(alc.ts)
+```
+## Question 4 - Find a Time Series that has a reasonably linear trend and has a seasonal component. 
+Found from: https://new.censusatschool.org.nz/resource/time-series-data-sets-2013/
+```{r NZ Traverllers Purpose}
+
+alc.ts = ts(alc.df$TotalWine[9:29], freq=4, start=c(2002,1))
+plot(alc.ts)
 ```
