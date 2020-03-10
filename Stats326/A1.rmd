@@ -12,14 +12,14 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 ## Read in data
 ```{r data}
-aud.df = read.csv("Data\\NZD To AUD.csv")
-sunspot.df = read.csv("Data\\Monthly Sunspot.csv")
-xrp.df = read.csv("Data\\XRP Daily Price.csv")
-temp.df = read.csv("Data\\GlobalLandTemperaturesByMajorCity.csv")
-milkprod.df = read.csv("Data\\Milk Production.csv", nrows=58)
-milkprodLong.df = read.csv("Data\\2002 NZ Milk production data.csv")
-alc.df = read.csv("Data\\NZAlcoholConsumption.csv")
-vis.df = read.csv("Data\\NZVisitorsPurpose.csv")
+aud.df = read.csv("Data/NZD To AUD.csv")
+sunspot.df = read.csv("Data/Monthly Sunspot.csv")
+xrp.df = read.csv("Data/XRP Daily Price.csv")
+temp.df = read.csv("Data/GlobalLandTemperaturesByMajorCity.csv")
+milkprod.df = read.csv("Data/Milk Production.csv", nrows=58)
+milkprodLong.df = read.csv("Data/2002 NZ Milk production data.csv")
+alc.df = read.csv("Data/NZAlcoholConsumption.csv")
+vis.df = read.csv("Data/NZVisitorsPurpose.csv")
 ```
 
 ## Question 1 - Find a Time Series that exhibits cycles
