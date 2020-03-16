@@ -1,0 +1,90 @@
+---
+title: "Stats  330 Assignment 1"
+author: "Hasnain Cheena"
+date: "16/03/2020"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(s20x)
+```
+
+## Data Cleaning
+
+```{r Data Cleaning}
+heartHealth.df = read.csv("hearthealth.csv")
+heartHealthCleaned.df = read.csv("hearthealth_cleaned.csv")
+heartHealthCleanedCondensed.df = heartHealthCleaned.df[c("height", "weight", "sbp", "dbp")]
+heartHealthCondensed.df = heartHealth.df[c("height", "weight", "sbp", "dbp")]
+pairs20x(heartHealthCondensed.df)
+pairs20x(heartHealthCleanedCondensed.df)
+```
+From the pairs plot you can see that height has a single outlier (height = 15.1 metres).This height is not sensible and I propose the decimal point was inputted in the wrong place. This is because if we examine similar instances (females between 40-45 years old with similar other features) we can see their heights are between 1.53m and 1.65m. Therefore, I believe the outlier is a mistake and the height should be modified to 1.51m. 
+
+From the pairs plot you can see that weight has a single outlier (weight = 13.4kg). The subject is a European male of height 1.75m, therefore a weight of 13.4kg is infeasible. I believe this value is an error and as such have decided to remove the instance. 
+
+There's another outlier in the dbp. I believe the dbp and sbp values were swapped for this person upon data entry. Therefore, I have swapped the sbp and dbp values for this person. 
+
+## Eggs Exploration
+Firstly did some initial data exploration creating a box plot showing ethnicity versus number of eggs consumed per week. 
+The plot showed a massive outlier for a Maori person that ate 60 eggs a week. 
+
+Response variable is a discrete count therefore a Poisson regression model was used. 
+
+#### Interpret Model Results
+We have strong evidence to suggest that the expected number of eggs consumed per week by a Maori person is higher than a European person. 
+We have strong evidence to suggest that the expected number of eggs consumed per week by a Polynesian person is higher than a European person.
+We have no evidence to suggest that there is a difference in the expected number of eggs consumed per week between a European person and Other ethnicity person. 
+
+We estimate that the expected number of eggs conusmed per week by a European person is 1.9 to 2.5 eggs.
+We estimate that the expected number of eggs consumed per week by a Maori person is 3.3 to 5 times higher than an European person.
+We estimate that the expected number of eggs consumed per week by a Polynesian person is 1.1 to 2.5 times higher than an European person. 
+```{r Eggs Exploration}
+
+#box plot
+plot(heartHealthCleaned.df$ethnicity, heartHealthCleaned.df$eggs)
+
+#fit model
+eggs.fit = glm(eggs ~ ethnicity, data=heartHealthCleaned.df, family="poisson")
+
+#model summary
+summary(eggs.fit)
+#confidence intervals 
+exp(confint(eggs.fit))
+```
+
+## Drinking 
+a) The explanatory variables that will be used in this case are: age, sex and drinkmaxday. 
+
+b) A Poisson regression model would be most appropriate to fit. This is because the response variable drinkmaxday is a discrete count. 
+
+c) Initially fit a model with interaction but the interaction was deemed insignificant so removed it. After removal both main effects became significant. 
+
+#### Model Interpretation
+We estimate that for each additional year of age (for both males and females) the expected number of the maximum number of alcoholic drinks consumed per day (within the last 3 months) decreases by 0.97 to 0.99 times. 
+We estimate that ,for the same age, the expected number of of the maximum number of alcoholic drinks consumed per day (within the last 3 months) for male is 1.3 to 1.9 times higher than a female. 
+
+####  Is there evidence to suggest that age and/or gender are somehow related to the maximum number of alcoholic drinks consumed per day (within the last 3 months)?
+We have 
+
+
+d) 
+
+```{r Drinking}
+#fit model
+drinks.fit = glm(drinkmaxday ~ age*sex, data=heartHealthCleaned.df, family="poisson")
+#model summary
+summary(drinks.fit)
+
+#fit model
+drinks.fit = glm(drinkmaxday ~ age+sex, data=heartHealthCleaned.df, family="poisson")
+#model summary
+summary(drinks.fit)
+#confidence intervals 
+exp(confint(drinks.fit))
+
+#plot part d
+plot(drinks.fit$fitted.values, heartHealthCleaned.df$age)
+```
