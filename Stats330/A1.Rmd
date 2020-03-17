@@ -9,6 +9,7 @@ output: word_document
 knitr::opts_chunk$set(echo = TRUE)
 
 library(s20x)
+library(ggplot2)
 ```
 
 ## Data Cleaning
@@ -43,6 +44,9 @@ We estimate that the expected number of eggs consumed per week by a Maori person
 We estimate that the expected number of eggs consumed per week by a Polynesian person is 1.1 to 2.5 times higher than an European person. 
 ```{r Eggs Exploration}
 
+#remove Na rows in eggs
+  
+
 #box plot
 plot(heartHealthCleaned.df$ethnicity, heartHealthCleaned.df$eggs)
 
@@ -67,11 +71,16 @@ We estimate that for each additional year of age (for both males and females) th
 We estimate that ,for the same age, the expected number of of the maximum number of alcoholic drinks consumed per day (within the last 3 months) for male is 1.3 to 1.9 times higher than a female. 
 
 ####  Is there evidence to suggest that age and/or gender are somehow related to the maximum number of alcoholic drinks consumed per day (within the last 3 months)?
-We have 
+We have strong evidence to suggest that both age and gender are related to the maximum number of drinks consumed per day (within the last 3 months). However, there is no evidence that the relationship between age and the maximum number of drinks consumed per day (within the last 3 months) depended on gender (and vice versa). 
 
 
-d) 
+d) Plotted
+  ii) The plot show us the expected value of maximum number of alcoholic drinks consumed per day (within the last 3 months) is higher for males than females for the same age. Further, the plot shows that as a person gets older the maximum number of alcoholic drinks consumed per day (within the last 3 months) is decreases in an expoential fashion for both males and females. Further this decreasing relationship is the same for both males and females. 
+  
+e) 
+We estimate that the expected value of maximum number of alcoholic drinks consumed per day (within the last 3 months) for a 30 year old male is 8.5 drinks. In comparision we estimate that the expected value of maximum number of alcoholic drinks consumed per day (within the last 3 months) for a 50 year old male is 5.7 drinks. 
 
+We estimate the that the expected value of maximum number of alcoholic drinks consumed per day (within the last 3 months) for a 40 year old male is 6.9 drinks. In comparision we estimate that the expected value of maximum number of alcoholic drinks consumed per day (within the last 3 months) for a 40 year old female is 4.4 drinks.
 ```{r Drinking}
 #fit model
 drinks.fit = glm(drinkmaxday ~ age*sex, data=heartHealthCleaned.df, family="poisson")
@@ -86,5 +95,58 @@ summary(drinks.fit)
 exp(confint(drinks.fit))
 
 #plot part d
-plot(drinks.fit$fitted.values, heartHealthCleaned.df$age)
+ages <- data.frame(age=seq(0,200), sex="M")
+malePredictedValues <- predict(drinks.fit, newdata = ages)
+malePredictedValues <- exp(malePredictedValues)
+ages <- data.frame(age=seq(0,200), sex="F")
+femalePredictedValues <- predict(drinks.fit, newdata = ages)
+femalePredictedValues <- exp(femalePredictedValues)
+
+plot(drinkmaxday ~ age, data = heartHealthCleaned.df,col = ifelse(heartHealthCleaned.df$sex == "M" , "black", "red"))
+lines(ages$age, femalePredictedValues, col="red")
+lines(ages$age, malePredictedValues, col="black")
+
+plot(ages$age, femalePredictedValues, col="red", type="l")
+lines(ages$age, malePredictedValues, col="black", type="l")
+
+
+#e
+test1.df = data.frame(age=c(30,50), sex=c("M", "M"))
+test1.predict = exp(predict(drinks.fit, newdata = test1.df))
+test2.df = data.frame(age=c(40,40), sex=c("M", "F"))
+test2.predict = exp(predict(drinks.fit, newdata = test2.df))
+print(test1.predict)
+print(test2.predict)
+```
+
+## Exercise
+
+a) In this situation the explanatory variables are age and smoke (smoking history). The response variable is exerHoursPerWeek. This variable is a combination of exermin, exerhour and exerday. The method of calculation is shown below. 
+
+b) The response variable is continous and not a count/proportion type and thus a linear regression model is appropriate. 
+
+c) We have evidence to show that age and smoking history are related to the number of hours typical number of hours of vigorous exercise undertaken in a week. However, we have no evidence that the relationship between age and the number of hours typical number of hours of vigorous exercise undertaken in a week, depended on smoking history.
+
+Interpretation:
+We estimate that 
+
+```{r Exercise}
+exerMinsInHours = heartHealthCleaned.df$exermin/60
+exerHoursPerDay =  heartHealthCleaned.df$exerhour + exerMinsInHours
+exerHoursPerWeek = heartHealthCleaned.df$exerday * exerHoursPerDay
+heartHealthCleaned.df$exerHoursPerWeek = exerHoursPerWeek
+
+#fit model
+exer.fit = glm(exerHoursPerWeek ~ age+smoke, data=heartHealthCleaned.df, family="gaussian")
+#model summary
+summary(exer.fit)
+#confidence intervals
+confint(exer.fit)
+```
+
+## Heart Attacks
+
+```{r Heart Attacks}
+
+
 ```
