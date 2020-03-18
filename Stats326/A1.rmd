@@ -30,7 +30,12 @@ xlab="Year",ylab="Monthly average exchange rate")
 plot(stl(aud.ts, s.window="periodic"))
 ```
 The data was found from: https://www.ofx.com/en-us/forex-news/historical-exchange-rates/monthly-average-rates/
-In the plot you can see major cycle accompanied by a few minor cycles. There is no seasonal component or clear trend.   
+
+
+The series shows strong cyclical behaviour with reasonably large random variation. There is no clear trend or seasonal behaviour. 
+The range of the monthly average exchange rate is between 0.70 AUD to 0.98 AUD. 
+
+
 ## Question 2 - Find a Stationary Time Series.
 Found from: https://coinmarketcap.com/currencies/xrp/
 ```{r Change in XRP value}
@@ -46,7 +51,7 @@ plot(stl(changeInXrp12.ts, s.window="periodic"))
 ```
 
 Data was found from: https://coinmarketcap.com/currencies/xrp/
-The time series above shows no seasonality, trend or cycles. It is mean-centered at 0 and has reasonably constant variance. Thus it is a stationary time series. The large spikes in the plot indicate that there were large price fluctuations between June 2019 and August 2019.
+The series above shows no seasonality, trend or cycles. It is mean-centered at 0 and has reasonably constant variance. Thus it is a stationary time series. The large spikes in the plot indicate that there were large price fluctuations between June 2019 and August 2019.
 
 ## Question 2 - Find a Stationary Time Series.
 Found from: https://www.gold.org/goldhub/data/gold-prices
@@ -82,8 +87,10 @@ plot(stl(temp.ts, s.window="periodic"))
 
 ```
 Data was found from: https://www.kaggle.com/marvintherain/average-monthly-temp/data
-The data above shows a very strong seasonal component and has no trend or cycles present. 
 
+The series appears to have a strong seasonal component, although their is a large seasonal trough in 2008 and 2011. 
+The annual seasonal pattern, with January having the lowest temperature and July having the highest. There does not appear to be any trend or cyclical behaviour. 
+The range of the Temperature (in Celcius) is between 1 degree and 30 degrees. 
 
 ## Question 4 - Find a Time Series that has a reasonably linear trend and has a seasonal component. 
 Found from: https://new.censusatschool.org.nz/resource/time-series-data-sets-2013/
@@ -97,7 +104,9 @@ xlab="Year", ylab="Wine consumption (Litres)")
 plot(stl(alc.ts, s.window="periodic"))
 ```
 Data found from: Found from: https://new.censusatschool.org.nz/resource/time-series-data-sets-2013/
-The plot above shows that the time series has a strong seasonal component and an increasing trend. Furthermore, the time series does not show any cyclical behaviour. 
+
+The series above shows that the time series has a strong seasonal component and an reasonably linear increasing trend. The seasonal pattern implies that quarter 1 has the lowest quarterly value while quarter 4 has the highest quarterly value. Furthermore, there is a much lower seasonal trough in 2003. 
+The range of the data appears to be between 1 and 4. 
 
 ## Question 5  
 ```{r Cape Grim CO2 Concentration}
@@ -118,4 +127,7 @@ plot(capeGrimQuarterly.ts, main="Average Quarterly CO2 Concentration at Cape Gri
 plot(stl(capeGrimQuarterly.ts, s.window="periodic"))
 ```
 
-The plot shows a clear increasing trend in CO2 concentration at Cape Grim. Further, the plot displays seasonal behaviour with a slight 'bump' in CO2 concentration approximately once a year. There is no cyclical behaviour. 
+The series shows a reasonably linear increasing trend in CO2 concentration at Cape Grim. Further, the series contains seasonal behaviour. 
+
+The seasonal pattern shows a quarter 1 being the lowest quarterly value and quarter 3 with the highest quarerly value in CO2 concentration annually. 
+The range of the CO2 concentration varies from 350 ppm and 450 ppm. 
