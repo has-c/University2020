@@ -33,7 +33,7 @@ The series shows cyclical behaviour with reasonably large random variation. Ther
 Found from: https://www.gold.org/goldhub/data/gold-prices
 ```{r Gold prices}
 gold.ts = ts(gold.df$Deviation[242:373], frequency=12, start=c(1990, 1))
-plot(gold.ts, main="Deviations in monthly price of Gold (Jan 1990 to Dec 2000)", ylab="Change in Gold Price (USD)", xlab="Year")
+plot(gold.ts, main="Deviations in monthly price of Gold (Jan 1990 to Dec 2000)", ylab="Change in Gold Price (USD/oz)", xlab="Year")
 ```
 
 Data was found from: https://www.gold.org/goldhub/data/gold-prices
