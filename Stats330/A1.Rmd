@@ -16,16 +16,31 @@ library(ggplot2)
 
 ```{r Data Cleaning}
 heartHealth.df = read.csv("hearthealth.csv")
-heartHealthCleaned.df = read.csv("hearthealth_cleaned.csv")
-heartHealthCleanedCondensed.df = heartHealthCleaned.df[c("height", "weight", "sbp", "dbp")]
-heartHealthCondensed.df = heartHealth.df[c("height", "weight", "sbp", "dbp")]
-pairs20x(heartHealthCondensed.df)
-pairs20x(heartHealthCleanedCondensed.df)
+#initial pairs plot
+pairs20x(heartHealth.df[c("height", "weight", "sbp", "dbp")], main="Initial Pairs Plot") 
+
+#adjustment 1
+heartHealth.df[heartHealth.df["height"] == 15.1, 4] = 1.51 
+pairs20x(heartHealth.df[c("height", "weight", "sbp", "dbp")], main="After adjustment 1") 
+
+#adjustment 2
+heartHealth.df = heartHealth.df[-c(106), ] 
+pairs20x(heartHealth.df[c("height", "weight", "sbp", "dbp")], main="After adjustment 2") 
+
+#adjustment 3
+sdp = heartHealth.df[44, "sbp"] 
+dbp = heartHealth.df[44, "dbp"] 
+heartHealth.df[44, "dbp"] = sdp
+heartHealth.df[44, "sbp"] = dbp
+pairs20x(heartHealth.df[c("height", "weight", "sbp", "dbp")], main="After adjustment 3") 
 ```
+Adjustment 1
 From the pairs plot you can see that height has a single outlier (height = 15.1 metres).This height is not sensible and I propose the decimal point was inputted in the wrong place. This is because if we examine similar instances (females between 40-45 years old with similar other features) we can see their heights are between 1.53m and 1.65m. Therefore, I believe the outlier is a mistake and the height should be modified to 1.51m. 
 
+Adjustment 2
 From the pairs plot you can see that weight has a single outlier (weight = 13.4kg). The subject is a European male of height 1.75m, therefore a weight of 13.4kg is infeasible. I believe this value is an error and as such have decided to remove the instance. 
 
+Adjustment 3
 There's another outlier in the dbp. I believe the dbp and sbp values were swapped for this person upon data entry. Therefore, I have swapped the sbp and dbp values for this person. 
 
 ## Eggs Exploration
@@ -43,9 +58,6 @@ We estimate that the expected number of eggs conusmed per week by a European per
 We estimate that the expected number of eggs consumed per week by a Maori person is 3.3 to 5 times higher than an European person.
 We estimate that the expected number of eggs consumed per week by a Polynesian person is 1.1 to 2.5 times higher than an European person. 
 ```{r Eggs Exploration}
-
-#remove Na rows in eggs
-  
 
 #box plot
 plot(heartHealthCleaned.df$ethnicity, heartHealthCleaned.df$eggs)
