@@ -27,7 +27,7 @@ pairs20x(heartHealth.cleaned.df, main="Initial Pairs Plot")
 heartHealth.cleaned.df[heartHealth.cleaned.df["height"] == 15.1, "height"] = 1.51
 pairs20x(heartHealth.cleaned.df, main="after adjustment 1")
 
-#adjustment 2
+#adjustment 2 - add NA
 heartHealth.cleaned.df = heartHealth.cleaned.df[-c(106), ]
 pairs20x(heartHealth.cleaned.df, main="after adjustment 2")
 
@@ -150,12 +150,6 @@ legend("topright", legend=c("Non-Smokers", "Smokers"),
 
 ```{r Heart Attacks}
 
-logit2prob <- function(logit){
-  odds <- exp(logit)
-  prob <- odds / (1 + odds)
-  return(prob)
-}
-
 heartattack.df = heartHealth.df[c("heartattack", "chol", "age")]
 
 #fit model
@@ -181,8 +175,8 @@ lowCholPredictionsProb = lowCholPredictionsOdds / (1 + lowCholPredictionsOdds)
 
 plot(heartattack ~ age, data = heartattack.df, col = ifelse(heartattack.df$chol == "High" , "blue", "red"),xlim=c(0,100), ylim=c(0,1), 
      main="Age vs Probability of having a heart-attack subset by \n Cholestrol level", xlab="Age", ylab="Probability of having a heart attack")
-lines(lowPred.df$age, lowCholPredictionsProb, col="red")
-lines(highPred.df$age, highCholPredictionsProb, col="blue")
+lines(pred.df$age, lowCholPredictionsProb, col="red")
+lines(pred.df$age, highCholPredictionsProb, col="blue")
 legend("topleft", legend=c("Low Cholestrol", "High Cholestrol"),
        col=c("red", "blue"), lty=1)
 ```
