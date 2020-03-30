@@ -1,0 +1,72 @@
+---
+title: "326 Assignment 2"
+author: "Hasnain Cheena"
+date: "30/03/2020"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(s20x)
+```
+
+```{r Data Input}
+df = read.table('Cape Grim.CO2.quarterly.txt', header=TRUE) 
+time <- seq(2000.25,2019.75,0.25)
+df["Time"] = time
+#2000 Q1 to 2018.3 - training data
+#2018.4 to 2019.4
+trainDf = df[1:75,]
+testDf = df[76:79,]
+
+CO2.train.ts = ts(trainDf$CO2, frequency = 4, start=c(2000,1))
+CO2.test.ts = ts(testDf$CO2, frequency = 4, start=c(2018,4))
+
+Time = 1:75
+```
+
+
+## Question 1
+```{r Q1}
+HW.fit = HoltWinters(CO2.train.ts)
+HW.fit
+
+HW.pred = predict(HW.fit,n.ahead=4)
+HW.pred
+
+HW.RMSEP = sqrt(1/4*sum((CO2.test.ts-HW.pred)^2))
+
+plot(HW.fit, HW.pred, main="Cape Grim CO2 - Holt Winters", xlab="Time", ylab="Observed/Fitted CO2 (ppm)")
+```
+## Question 2
+```{r Q2}
+
+#Moving Average Model
+decomp.ma.CO2 = decompose(CO2.train.ts)
+ma.CO2.ts = CO2.train.ts - decomp.ma.CO2$seasonal
+plot(ma.CO2.ts, main="Moving average seasonally adjusted CO2 Cape Grim", xlab="Time", ylab="CO2 (ppm)")
+
+#build seasonality adjusted model and check for autocorrelation 
+CO2.fit.1 = lm(ma.CO2.ts~Time)
+plot.ts(residuals(CO2.fit.1),main="Residual Series")
+plot.ts(trainDf$CO2)
+
+# #add lagged response variable
+# CO2.fit.2 = lm(ma.CO2.ts[-1]~trainDf$Time[-1] + ma.CO2.ts[-75])
+# plot.ts(residuals(CO2.fit.2),main="Residual Series")
+# acf(residuals(CO2.fit.2))
+# 
+# summary(CO2.fit.2)
+
+#Seasonal Trend Lowess
+
+
+```
+## Question 3
+
+## Question 4
+```{r Q4}
+
+
+```
