@@ -23,7 +23,9 @@ testDf = df[76:79,]
 CO2.train.ts = ts(trainDf$CO2, frequency = 4, start=c(2000,1))
 CO2.test.ts = ts(testDf$CO2, frequency = 4, start=c(2018,4))
 
-Time = 1:75
+Time = 1:79
+trainTime = 1:75
+testTime = 76:79
 ```
 
 
@@ -47,17 +49,17 @@ decomp.ma.CO2 = decompose(CO2.train.ts)
 ma.CO2.ts = CO2.train.ts - decomp.ma.CO2$seasonal
 plot(ma.CO2.ts, main="Moving average seasonally adjusted CO2 Cape Grim", xlab="Time", ylab="CO2 (ppm)")
 
-#build seasonality adjusted model and check for autocorrelation 
-CO2.fit.1 = lm(ma.CO2.ts~Time)
-plot.ts(residuals(CO2.fit.1),main="Residual Series")
-plot.ts(trainDf$CO2)
-
-# #add lagged response variable
-# CO2.fit.2 = lm(ma.CO2.ts[-1]~trainDf$Time[-1] + ma.CO2.ts[-75])
-# plot.ts(residuals(CO2.fit.2),main="Residual Series")
-# acf(residuals(CO2.fit.2))
-# 
-# summary(CO2.fit.2)
+#build seasonality adjusted model 
+#method from page 61
+#change in trend at t=50
+Time.train.break = c(rep(0,49), trainTime[50:75]-trainTime[50])
+co2.break.fit = lm(ma.CO2.ts ~ trainTime+Time.train.break)
+plot.ts(residuals(co2.break.fit))
+acf(residuals(co2.break.fit))
+#add lagged response variable 
+co2.break.fit2 = lm(ma.CO2.ts[-1] ~ trainTime[-1]+Time.train.break[-1] + ma.CO2.ts[-75])
+plot.ts(residuals(co2.break.fit2))
+acf(residuals(co2.break.fit2))
 
 #Seasonal Trend Lowess
 
