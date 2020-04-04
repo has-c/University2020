@@ -23,7 +23,7 @@ heartHealth.cleaned.df = heartHealth.df[c("height", "weight", "sbp", "dbp")]
 #initial pairs plot
 pairs20x(heartHealth.cleaned.df, main="Initial Pairs Plot") 
 ```
-*Problem 1- height of 15.1m*
+*Problem 1- height of 15.1m* \n
 Looking at the height histogram in the pairs plot shows a single outlier (height = 15.1 metres).This height is not sensible and I propose the decimal point was inputted in the wrong place. However, because I do not know how the data entry occurred I have decided to change the outlier value to NA. The pairs plot below shows the effect of replacing the observation with NA. 
 
 ```{r Data Cleaning Problem 1}
@@ -32,7 +32,7 @@ heartHealth.cleaned.df[heartHealth.cleaned.df["height"] == 15.1, "height"] = NA
 pairs20x(heartHealth.cleaned.df, main="Problem 1 Adjustment")
 ```
 
-*Problem 2 – weight of 13.4kg *
+*Problem 2 – weight of 13.4kg* \n
 From the pairs plot you can see that weight has a single outlier (weight = 13.4kg). The subject is a European male of height 1.75m, therefore a weight of 13.4kg is infeasible. I believe this value is an error and have replaced it with NA. The pairs plot below shows the effect of replacing the observation with NA. 
 
 ```{r Data Cleaning Problem 2}
@@ -41,10 +41,10 @@ heartHealth.cleaned.df[106,"weight"] = NA
 pairs20x(heartHealth.cleaned.df, main="Problem 2 Adjustment")
 ```
 
-*Problem 3 – dbp of 163 mm Hg*
+*Problem 3 – dbp of 163 mm Hg* \n
 Looking at the histogram of dbp theres a clear outlier of 163 mm Hg. I believe the dbp value of the participant was incorrectly entered during the data collection. However, because I cannot confirm how the data was collected nor am I a healthcare expert (no knowledge about reasonable dbp values and the value could relate to medical condition the participant had) I have elected to retain the value. 
 
-## Eggs 
+## Eggs  
 ```{r Eggs Exploration - Exploratory Analysis}
 
 #remove any NA's
@@ -52,11 +52,11 @@ eggs.df = heartHealth.df[,c("ethnicity", "eggs")]
 eggs.df = eggs.df[complete.cases(eggs.df[, "eggs"]),]
 
 #box plot
-plot(eggs.df$ethnicity, eggs.df$eggs, main="Ethnicity versus typical number of eggs consumed per week",
+plot(eggs.df$ethnicity, eggs.df$eggs, main="Ethnicity versus number of eggs consumed per week",
      xlab="Ethnicity", ylab="Number of eggs consumeed per week")
 
 #pairs plot
-pairs20x(eggs.df[c("ethnicity", "eggs")])
+pairs20x(eggs.df, main="Pairs plot")
 ```
 *Exploratory Analysis*
 Firstly did some initial data exploration creating a box plot showing ethnicity versus number of eggs consumed per week. The plot showed a clear outlier where a Maori participant typically consumed 60 eggs a week. I have decided to keep this outlier as even though it is quite large it is definitely within the realm of possibility. 
@@ -94,7 +94,7 @@ We have no evidence (p-value $\approx$ 0.9) for a difference in the expected num
 #subset dataframe
 drinking.df = heartHealth.df[, c("drinkmaxday", "age", "sex")]
 
-pairs20x(drinking.df, main="Pairs plot of age, sex and maximum number of \n alcoholic drinks consumed per day")
+pairs20x(drinking.df, main="Pairs plot")
 ```
 
 *Explanatory and Response Variables*
@@ -105,15 +105,18 @@ The response variable (drinkmaxday) is a count and thus cannot be negative. Furt
 There is a outlier in the response variable of 50 drinks consumed in a day (within the last 3 months). However, I have decided to keep this outlier in my analysis as it could be feasible because we do not have any additional information on key factors such as size or alcohol type of the drinks consumed. 
 
 ```{r Drinking - Model fit}
+#fit model
+drinks.fit1 = glm(drinkmaxday ~ age*sex, data=drinking.df, family="poisson")
+#model summary
+summary(drinks.fit1)
 
 #fit model
-drinks.fit = glm(drinkmaxday ~ age+sex, data=drinking.df, family="poisson")
-
+drinks.fit2 = glm(drinkmaxday ~ age+sex, data=drinking.df, family="poisson")
 #model summary
-summary(drinks.fit)
+summary(drinks.fit2)
 
 #confidence intervals 
-100*(exp(confint(drinks.fit))-1)
+100*(exp(confint(drinks.fit2))-1)
 ```
 
 *Model Interpretation*
@@ -126,10 +129,10 @@ We estimate that, for the same age, the expected number of of the maximum number
 ```{r Drinking - Plot}
 #create dataframe for predictiom
 ages <- data.frame(age=seq(0,100), sex="M")
-malePredictedValues <- predict(drinks.fit, newdata = ages)
+malePredictedValues <- predict(drinks.fit2, newdata = ages)
 malePredictedValues <- exp(malePredictedValues)
 ages <- data.frame(age=seq(0,100), sex="F")
-femalePredictedValues <- predict(drinks.fit, newdata = ages)
+femalePredictedValues <- predict(drinks.fit2, newdata = ages)
 femalePredictedValues <- exp(femalePredictedValues)
 
 #plot response variable
@@ -149,11 +152,11 @@ he plot also shows us a clear outlier who is male, around 33 years old and has d
 ```{r Drinking - Estimate values}
 #Point estimate males of ages 30 and 50
 pred1.df = data.frame(age=c(30,50), sex=c("M", "M"))
-prediction1.pred = predict(drinks.fit, newdata = pred1.df, type = "response")
+prediction1.pred = predict(drinks.fit2, newdata = pred1.df, type = "response")
 
 #point estimates male and female of age 40
 pred2.df = data.frame(age=c(40,40), sex=c("M", "F"))
-prediction2.pred = predict(drinks.fit, newdata = pred2.df, type = "response")
+prediction2.pred = predict(drinks.fit2, newdata = pred2.df, type = "response")
 
 prediction1.pred
 prediction2.pred
@@ -181,12 +184,18 @@ In this situation the explanatory variables are age of the participant and smoki
 This variable is a combination of exermin, exerhour and exerday variables. The method of calculation is shown in the code chunk above. 
 
 ```{r Exercise - Model Fit}
+
 #fit model
-exer.fit = glm(exerHoursPerWeek ~ age+smoke, data=exercise.df, family="gaussian")
+exer.fit1 = glm(exerHoursPerWeek ~ age*smoke, data=exercise.df, family="gaussian")
 #model summary
-summary(exer.fit)
+summary(exer.fit1)
+
+#fit model
+exer.fit2 = glm(exerHoursPerWeek ~ age+smoke, data=exercise.df, family="gaussian")
+#model summary
+summary(exer.fit2)
 #confidence intervals 
-confint(exer.fit)
+confint(exer.fit2)
 ```
 
 *Model Overview*
@@ -203,9 +212,9 @@ We estimate that the expected number of hours exercised per week for people who 
 ```{r Exercise - Plot}
 #create predictions
 pred.df <- data.frame(age=seq(0,100), smoke="Yes")
-smokersPredictions <- predict(exer.fit, newdata = pred.df)
+smokersPredictions <- predict(exer.fit2, newdata = pred.df)
 pred.df <- data.frame(age=seq(0,100), smoke="No")
-nonsmokersPredictions <- predict(exer.fit, newdata = pred.df)
+nonsmokersPredictions <- predict(exer.fit2, newdata = pred.df)
 
 #plot response
 plot(exerHoursPerWeek ~ age, data = exercise.df, col = ifelse(exercise.df$smoke == "Yes" , "blue", "red"),xlim=c(0, 100), 
@@ -230,11 +239,17 @@ The plot also shows that the model can predict negative hours exercised per week
 heartattack.df = heartHealth.df[c("heartattack", "chol", "age")]
 
 #fit model
-heartattack.fit = glm(heartattack ~ age+chol, data=heartattack.df, family="binomial")
-summary(heartattack.fit)
+heartattack.fit1 = glm(heartattack ~ age*chol, data=heartattack.df, family="binomial")
+#model summary
+summary(heartattack.fit1)
+
+#fit model
+heartattack.fit2 = glm(heartattack ~ age+chol, data=heartattack.df, family="binomial")
+#model summary
+summary(heartattack.fit2)
 
 #confidence interval
-100*(exp(confint(heartattack.fit))-1)
+100*(exp(confint(heartattack.fit2))-1)
 ```
 
 *Explanatory and Response Variables*
@@ -254,13 +269,13 @@ We estimate that the odds of people who have low cholestrol having a heart-attac
 ```{r Heart Attacks - Plot}
 #high cholestrol predictions
 pred.df <- data.frame(age=seq(0,100), chol="High")
-highCholPredictions <- predict(heartattack.fit, newdata = pred.df, type="response")
+highCholPredictions <- predict(heartattack.fit2, newdata = pred.df, type="response")
 #low cholestrol predictions 
 pred.df <- data.frame(age=seq(0,100), chol="Low")
-lowCholPredictions <- predict(heartattack.fit, newdata = pred.df, type="response")
+lowCholPredictions <- predict(heartattack.fit2, newdata = pred.df, type="response")
 
 plot(heartattack ~ age, data = heartattack.df, col = ifelse(heartattack.df$chol == "High" , "blue", "red"),xlim=c(0,100), ylim=c(0,1), 
-     main="Age vs Probability of having a heart-attack subset by \n Cholestrol level", xlab="Age", ylab="Probability of having a heart attack")
+     main="Age vs Probability of having a heart-attack subset by \n cholestrol level", xlab="Age", ylab="Probability of having a heart attack")
 lines(pred.df$age, lowCholPredictions, col="red")
 lines(pred.df$age, highCholPredictions, col="blue")
 legend("topleft", legend=c("Low Cholestrol", "High Cholestrol"),
