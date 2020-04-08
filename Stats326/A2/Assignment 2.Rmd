@@ -11,13 +11,13 @@ knitr::opts_chunk$set(echo = TRUE)
 library(s20x)
 ```
 
-```{r Data Input}
+```{r Data Input, echo=FALSE}
 CO2.df = read.table('Cape Grim.CO2.quarterly.txt', header=TRUE) 
 
 #create time series object
 CO2.fit.ts = ts(CO2.df[1:75, ], frequency = 4, start=c(2000,1))
 CO2.pred.ts = ts(CO2.df[76:79, ], frequency = 4, start=c(2018,4))
-CO2.full.ts = ts(CO2.df, frequency=4, start=c(2000,1))
+CO2.full.ts = ts(CO2.df$CO2, frequency=4, start=c(2000,1))
 
 #setup Time
 Time = 1:79
@@ -28,7 +28,7 @@ reduced.Time = 1:75
 
 
 ## Question 1
-```{r Q1}
+```{r Q1 - HW Fit}
 HW.fit = HoltWinters(CO2.fit.ts)
 HW.fit
 
@@ -36,104 +36,144 @@ HW.pred = predict(HW.fit,n.ahead=4)
 HW.pred
 
 HW.RMSEP = sqrt(1/4*sum((CO2.pred.ts-HW.pred)^2))
+HW.RMSEP
 
 plot(HW.fit, HW.pred, main="Cape Grim CO2 - Holt Winters", xlab="Year", ylab="Observed/Fitted CO2 (ppm)")
 ```
-## Question 2
-```{r Q2 - Moving Average}
-#calculate and extract seasonal estimates
-decomp.ma.CO2 = decompose(CO2.fit.ts)
-#de-seasonalize 
-ma.CO2.ts = CO2.fit.ts - decomp.ma.CO2$seasonal
-plot(ma.CO2.ts, main="Moving average seasonally adjusted CO2 Cape Grim", xlab="Year", ylab="CO2 (ppm)")
+The plot of the Holt-Winters model shows the model is good fit. This is becaue the model (red line) is very close to the actual observations (black line) with very litte white space between the lines.  
 
-#build normal model
-CO2.fit = lm(ma.CO2.ts ~ reduced.Time)
-plot.ts(residuals(CO2.fit)) #residuals show peaking and clustering thus indicating a break in trend around t=50
+The RMSEP indicates that, on average, the prediction error is 0.22 ppm.
 
-#change in trend at t=50
-Time.break = c(rep(0,49), reduced.Time[50:75]-reduced.Time[50])
-CO2.break.fit = lm(ma.CO2.ts ~ reduced.Time + Time.break)
-plot.ts(residuals(CO2.break.fit)) #residuals show still show clustering
-acf(residuals(CO2.break.fit)) #check for autocorrelation - significant autocorrelation so add lag response variable
+## Question  2 
 
-#add lagged response variable
-CO2.break.fit2 = lm(ma.CO2.ts[-1] ~ reduced.Time[-1]+Time.break[-1] + ma.CO2.ts[-75])
-plot.ts(residuals(CO2.break.fit2)) #residuals are 0 mean with constant variance 
-acf(residuals(CO2.break.fit2)) #still significant lag at lag(1) - best we can do so far
-normcheck(CO2.break.fit2, shapiro.wilk = TRUE) #check normality - seems normal but need more information about shapiro-wilk p-value
-summary(CO2.break.fit2)
-
-#use model to forecast
-ma.seasonal.estimates = decomp.ma.CO2$figure
-#forecast 2018 Q4
-t76.sa.pred = CO2.break.fit2$coefficients[1] + CO2.break.fit2$coefficients[2] * 76 + CO2.break.fit2$coefficients[3] * 76 + CO2.break.fit2$coefficients[4]  * ma.CO2.ts[75]
-t76.pred = t76.sa.pred + ma.seasonal.estimates[4]
-#forecast 2019 Q1
-t77.sa.pred = CO2.break.fit2$coefficients[1] + CO2.break.fit2$coefficients[2] * 77 + CO2.break.fit2$coefficients[3] * 77 + CO2.break.fit2$coefficients[4]  * t76.sa.pred
-t77.pred = t77.sa.pred + ma.seasonal.estimates[1]
-#forecast 2019 Q2
-t78.sa.pred = CO2.break.fit2$coefficients[1] + CO2.break.fit2$coefficients[2] * 78 + CO2.break.fit2$coefficients[3] * 78 + CO2.break.fit2$coefficients[4]  * t77.sa.pred
-t78.pred = t78.sa.pred + ma.seasonal.estimates[2]
-#forecast 2019 Q3
-t79.sa.pred = CO2.break.fit2$coefficients[1] + CO2.break.fit2$coefficients[2] * 79 + CO2.break.fit2$coefficients[3] * 79 + CO2.break.fit2$coefficients[4]  * t78.sa.pred
-t79.pred = t79.sa.pred + ma.seasonal.estimates[3]
-
-#calculte RMSEP
-ma.pred.df = data.frame(CO2=c(t76.pred,t77.pred,t78.pred,t79.pred))
-ma.pred = ts(ma.pred.df, start=c(2018,4), frequency = 4)
-
-#RMSEP
-MA.RMSEP = sqrt(1/4*sum((CO2.pred.ts-ma.pred)^2))
-```
-```{r Q2 - STL}
+```{r Q2 - Plot}
 #calculate and extract seasonal estimates
 decomp.stl.CO2 = stl(CO2.fit.ts, s.window="periodic")
 #de-seasonalize 
-#extract seasonal
 stl.CO2.ts = CO2.fit.ts - decomp.stl.CO2$time.series[,1]
-plot(stl.CO2.ts, main="STL seasonally adjusted CO2 Cape Grim", xlab="Year", ylab="CO2 (ppm)")
+quick.fit = lm(CO2.df$CO2~Time)
 
-#same model as MA
+plot(stl.CO2.ts, main="STL seasonally adjusted CO2 Cape Grim", xlab="Year", ylab="CO2 (ppm)")
+abline(quick.fit, lty=2)
+abline(v=50, lty=3)
+
+```
+The plot of the seasonal-trend-lowess seasonally adjusted series shows a reasonably increasing linear trend. 
+
+
+```{r Q2 - Seasonal Estimates}
+#seasonal estimates
+decomp.stl.CO2$time.series[1:4,1]
+```
+The seasonal estimates for Quarter 1 & Quarter 2 are similar negative values (below the trend). In comparision Quarter 3 & Quarter 4 are positive and above the trend. 
+Quarter 3 is the highest (0.48) while Quarter 1 is the lowest (-0.39). 
+
+```{r Q2 - Model Fit 1, echo=FALSE}
+
+Time.break = c(rep(0,49), Time[50:75]-Time[50])
+
 CO2.break.fit3 = lm(stl.CO2.ts[-1] ~ reduced.Time[-1]+Time.break[-1] + stl.CO2.ts[-75])
-plot.ts(residuals(CO2.break.fit3)) #residuals are 0 mean with constant variance 
-acf(residuals(CO2.break.fit3)) #still significant lag at lag(1) - best we can do so far
-normcheck(CO2.break.fit3, shapiro.wilk = TRUE) #check normality - seems normal but need more information about shapiro-wilk p-value
+plot.ts(residuals(CO2.break.fit3), main="Residual Series") #residuals are 0 mean with constant variance 
+acf(residuals(CO2.break.fit3), main="ACF Plot of Residual Series") #still significant lag at lag(1) - best we can do so far
+normcheck(CO2.break.fit3, shapiro.wilk = TRUE) #check normality - seems normal but need more information about 
+
+stl.seasonal.estimates = decomp.stl.CO2$time.series
+```
+
+```{r Q2 - Model Fit}
+#model summary
 summary(CO2.break.fit3)
 
-#forecasting
-stl.seasonal.estimates = decomp.stl.CO2$time.series
 #forecast 2018 Q4
-t76.sa.pred = CO2.break.fit3$coefficients[1] + CO2.break.fit3$coefficients[2] * 76 + CO2.break.fit3$coefficients[3] * 76 + CO2.break.fit3$coefficients[4]  * stl.CO2.ts[75]
+t76.sa.pred = CO2.break.fit3$coefficients[1] + CO2.break.fit3$coefficients[2] * 76 + CO2.break.fit3$coefficients[3] * 26 + CO2.break.fit3$coefficients[4]  * stl.CO2.ts[75]
 t76.pred = t76.sa.pred + stl.seasonal.estimates[4,1]
+
 #forecast 2019 Q1
-t77.sa.pred = CO2.break.fit3$coefficients[1] + CO2.break.fit3$coefficients[2] * 77 + CO2.break.fit3$coefficients[3] * 77 + CO2.break.fit3$coefficients[4]  * t76.sa.pred
+t77.sa.pred = CO2.break.fit3$coefficients[1] + CO2.break.fit3$coefficients[2] * 77 + CO2.break.fit3$coefficients[3] * 27 + CO2.break.fit3$coefficients[4]  * t76.sa.pred
 t77.pred = t77.sa.pred + stl.seasonal.estimates[1,1]
+
 #forecast 2019 Q2
-t78.sa.pred = CO2.break.fit3$coefficients[1] + CO2.break.fit3$coefficients[2] * 78 + CO2.break.fit3$coefficients[3] * 78 + CO2.break.fit3$coefficients[4]  * t77.sa.pred
+t78.sa.pred = CO2.break.fit3$coefficients[1] + CO2.break.fit3$coefficients[2] * 78 + CO2.break.fit3$coefficients[3] * 28 + CO2.break.fit3$coefficients[4]  * t77.sa.pred
 t78.pred = t78.sa.pred + stl.seasonal.estimates[2,1]
+
 #forecast 2019 Q3
-t79.sa.pred = CO2.break.fit3$coefficients[1] + CO2.break.fit3$coefficients[2] * 79 + CO2.break.fit3$coefficients[3] * 79 + CO2.break.fit3$coefficients[4]  * t78.sa.pred
+t79.sa.pred = CO2.break.fit3$coefficients[1] + CO2.break.fit3$coefficients[2] * 79 + CO2.break.fit3$coefficients[3] * 29 + CO2.break.fit3$coefficients[4]  * t78.sa.pred
 t79.pred = t79.sa.pred + stl.seasonal.estimates[3,1]
 
+results.df = data.frame("Time"=c("2018 Q4", "2019 Q1", "2019 Q2", "2019 Q3"),
+                        "Seasonally Adjusted"=c(t76.sa.pred,t77.sa.pred,t78.sa.pred,t79.sa.pred), 
+                        "Predictions"=c(t76.pred,t77.pred,t78.pred,t79.pred))
+
+results.df
+
 #calculte RMSEP
-stl.pred.df = data.frame(CO2=c(t76.pred,t77.pred,t78.pred,t79.pred))
-stl.pred = ts(stl.pred.df, start=c(2018,4), frequency = 4)
+stl.pred.ts = ts(results.df$Predictions, start=c(2018,4), frequency = 4)
 
 #RMSEP
-STL.RMSEP = sqrt(1/4*sum((CO2.pred.ts-stl.pred)^2))
-
+STL.RMSEP = sqrt(1/4*sum((CO2.pred.ts-stl.pred.ts)^2))
+STL.RMSEP
 ```
 
 ## Question 3 - Technical Notes
+The seasonal estimates show that the CO2 concentration is below the overall trend for Quarter 1 & Quarter 2 with Quarter 1 being the lowest (-0.39) and the CO2 concenetration is above the overall trend for Quarter 3 & Quarter 4, with Quarter 3 being the highest (0.48).
+
+The plot of the seasonally adjusted series shows a change in the slope/break in the trend around 2012 Quarter 2 (t=50), with the trend after t=50 being slightly higher than previously. 
+
+
+The final model fitted to the seasonal trend lowess seasonally adjusted series included a break-in trend term and was also corrected for auto-correlation. 
+
+For the final model the residual series appears to be random scatter about 0. The plot of the autocorrelation function shows a significant autocorrelation at positive lag(1) and lag(11) and significant negative autocorrelation at lag(16). 
+The residuals appear to be normally distributed (Shaprio-Wilk P-value = 0.83) with a 
+Since we have autocorrelation in the Residual Series, the estimate of the error standard deviation and variance of the estimates and will be underestimated. Further, $R^2$ will be overestimated and the t-statistics and F-statistic will not be valid. The model $CO2.break.fit3$ does not satisfy the assumptions for a linear regression model. 
+
+We have strong evidence against the hypothesis that the coefficient associated with the time variable is 0 (P-value \approx 0.0001). Further, we have strong against the hypothesis that the coefficient associated with the break-in trend time variable is 0 (P-value \approx 0.0005). Additionally, we have very strong evidence against the hypothesis of no autocorrelation (P-value \approx 0).
+
+The F-statistic provides extremely strong evidence against the hypothesis that none of the variables are related to the seasonally adjusted CO2 concentration (P-value \approx 0). The multiple $R^2$ is 0.9997 indicating that 99% of the variation in the seasonally adjusted CO2 concentration is explained by our model. Prediction wil be unreliable as the assumptions are not satisfied. 
 
 ## Question 4
-```{r Q4}
-#best predicting model - holt winters model
-#fit holt winters
-HW.full.fit = HoltWinters(CO2.full.ts)
-
-#predict
-HW.full.pred = predict(HW.full.fit, n.ahead=4)
-HW.full.pred
+```{r Q4, echo=FALSE}
+Time = 1:79
+Time.break = c(rep(0,49), Time[50:79]-Time[50])
+CO2.df = read.table('Cape Grim.CO2.quarterly.txt', header=TRUE) 
+CO2.full.ts = ts(CO2.df$CO2, frequency=4, start=c(2000,1))
+decomp.stl.CO2 = stl(CO2.full.ts, s.window="periodic")
+#de-seasonalize 
+stl.CO2.ts = CO2.full.ts - decomp.stl.CO2$time.series[,1]
+stl.seasonal.estimates = decomp.stl.CO2$time.series
 ```
+
+
+```{r Q4 - Model Fit}
+#best predicting model - STL model
+
+#rerun the model using all avaliable data
+CO2.break.fit4 = lm(stl.CO2.ts[-1] ~ Time[-1]+Time.break[-1] + stl.CO2.ts[-79])
+
+#model summary
+summary(CO2.break.fit4)
+```
+
+```{r Q4 - Forecasts}
+#forecast 2019 Q4
+t80.sa.pred = CO2.break.fit4$coefficients[1] + CO2.break.fit4$coefficients[2] * 80 + CO2.break.fit4$coefficients[3] * 30 + CO2.break.fit4$coefficients[4]  * stl.CO2.ts[79]
+t80.pred = t80.sa.pred + stl.seasonal.estimates[4,1]
+
+#forecast 2020 Q1
+t81.sa.pred = CO2.break.fit4$coefficients[1] + CO2.break.fit4$coefficients[2] * 81 + CO2.break.fit4$coefficients[3] * 31 + CO2.break.fit4$coefficients[4]  * t80.sa.pred
+t81.pred = t81.sa.pred + stl.seasonal.estimates[1,1]
+
+#forecast 2020 Q2
+t82.sa.pred = CO2.break.fit4$coefficients[1] + CO2.break.fit4$coefficients[2] * 82 + CO2.break.fit4$coefficients[3] * 32 + CO2.break.fit4$coefficients[4]  * t81.sa.pred
+t82.pred = t82.sa.pred + stl.seasonal.estimates[2,1]
+
+#forecast 2020 Q3
+t83.sa.pred = CO2.break.fit4$coefficients[1] + CO2.break.fit4$coefficients[2] * 83 + CO2.break.fit4$coefficients[3] * 33 + CO2.break.fit4$coefficients[4]  * t82.sa.pred
+t83.pred = t83.sa.pred + stl.seasonal.estimates[3,1]
+
+#convert to ts object
+stl.pred.df = data.frame(CO2=c(t80.pred,t81.pred,t82.pred,t83.pred))
+stl.pred.ts = ts(stl.pred.df, start=c(2019,4), frequency = 4)
+stl.pred.ts
+```
+
+The seasonal-trend-lowess model estimates for the full timeframe model ($CO2.break.fit4$) are similar to those from the reduced timeframe model ($CO2.break.fit3$). 

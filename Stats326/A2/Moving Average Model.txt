@@ -1,0 +1,46 @@
+```{r Q2 - Moving Average}
+#calculate and extract seasonal estimates
+decomp.ma.CO2 = decompose(CO2.fit.ts)
+#de-seasonalize 
+ma.CO2.ts = CO2.fit.ts - decomp.ma.CO2$seasonal
+plot(ma.CO2.ts, main="Moving average seasonally adjusted CO2 Cape Grim", xlab="Year", ylab="CO2 (ppm)")
+
+#build normal model
+CO2.fit = lm(ma.CO2.ts ~ reduced.Time)
+plot.ts(residuals(CO2.fit)) #residuals show peaking and clustering thus indicating a break in trend around t=50
+
+#change in trend at t=50
+Time.break = c(rep(0,49), reduced.Time[50:75]-reduced.Time[50])
+CO2.break.fit = lm(ma.CO2.ts ~ reduced.Time + Time.break)
+plot.ts(residuals(CO2.break.fit)) #residuals show still show clustering
+acf(residuals(CO2.break.fit)) #check for autocorrelation - significant autocorrelation so add lag response variable
+
+#add lagged response variable
+CO2.break.fit2 = lm(ma.CO2.ts[-1] ~ reduced.Time[-1]+Time.break[-1] + ma.CO2.ts[-75])
+plot.ts(residuals(CO2.break.fit2)) #residuals are 0 mean with constant variance 
+acf(residuals(CO2.break.fit2)) #still significant lag at lag(1) - best we can do so far
+normcheck(CO2.break.fit2, shapiro.wilk = TRUE) #check normality - seems normal but need more information about shapiro-wilk p-value
+summary(CO2.break.fit2)
+
+#use model to forecast
+ma.seasonal.estimates = decomp.ma.CO2$figure
+#forecast 2018 Q4
+t76.sa.pred = CO2.break.fit2$coefficients[1] + CO2.break.fit2$coefficients[2] * 76 + CO2.break.fit2$coefficients[3] * 26 + CO2.break.fit2$coefficients[4]  * ma.CO2.ts[75]
+t76.pred = t76.sa.pred + ma.seasonal.estimates[4]
+#forecast 2019 Q1
+t77.sa.pred = CO2.break.fit2$coefficients[1] + CO2.break.fit2$coefficients[2] * 77 + CO2.break.fit2$coefficients[3] * 27 + CO2.break.fit2$coefficients[4]  * t76.sa.pred
+t77.pred = t77.sa.pred + ma.seasonal.estimates[1]
+#forecast 2019 Q2
+t78.sa.pred = CO2.break.fit2$coefficients[1] + CO2.break.fit2$coefficients[2] * 78 + CO2.break.fit2$coefficients[3] * 28 + CO2.break.fit2$coefficients[4]  * t77.sa.pred
+t78.pred = t78.sa.pred + ma.seasonal.estimates[2]
+#forecast 2019 Q3
+t79.sa.pred = CO2.break.fit2$coefficients[1] + CO2.break.fit2$coefficients[2] * 79 + CO2.break.fit2$coefficients[3] * 29 + CO2.break.fit2$coefficients[4]  * t78.sa.pred
+t79.pred = t79.sa.pred + ma.seasonal.estimates[3]
+
+#calculte RMSEP
+ma.pred.df = data.frame(CO2=c(t76.pred,t77.pred,t78.pred,t79.pred))
+ma.pred = ts(ma.pred.df, start=c(2018,4), frequency = 4)
+
+#RMSEP
+MA.RMSEP = sqrt(1/4*sum((CO2.pred.ts-ma.pred)^2))
+MA.RMSEP
