@@ -1,0 +1,63 @@
+---
+title: "Stats 330 A2"
+author: "Hasnain Cheena"
+date: "18/04/2020"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(s20x)
+```
+
+```{r Data Import and Setup, echo=FALSE}
+nyBridges.df = read.csv("NYbridges.csv")
+```
+
+
+## Question 1
+
+```{r Question 1 - Communication}
+
+#convert degrees fahrenheit to celsius
+HighC = (nyBridges.df$High.Temp - 32) * 5/9
+LowC = (nyBridges.df$Low.Temp - 32) * 5/9
+
+#convert rain in inches to mm
+Rainmm = as.numeric(as.character(nyBridges.df$Precipitation)) * 25.4
+
+#relevel day variable
+day.relevel = relevel(nyBridges.df$Day, "Monday")
+
+#recode Trace 
+Rainmm[is.na(Rainmm)] = 0
+```
+Day Factor Relevel: Monday was selected to be the baseline level as in New Zealand we consider Monday to be the first day of the week. 
+
+Trace denotes an amount of percipitation that is greater than 0 but too small to be meassured reliably. It's purpose is to indicate that percipitation did fall but not enough to be measured reliably. Thus have replaced all trace amounts with 0 as the amount of percipitation was too small to be measured reliably
+
+## Question 2
+
+```{r Question 2 - Create new dataframe, echo=FALSE}
+nyBridges.Q2.df = data.frame(Brooklyn=nyBridges.df$Brooklyn, 
+                            Rainmm = Rainmm, 
+                            HighC = HighC, 
+                            LowC = LowC, 
+                            Day = day.relevel)
+```
+
+
+```{r Question 2 - Brooklyn Bridge}
+pairs20x(nyBridges.Q2.df)
+
+trendscatter(nyBridges.Q2.df$Rainmm, nyBridges.Q2.df$Brooklyn)
+trendscatter(log1p(nyBridges.Q2.df$Rainmm), nyBridges.Q2.df$Brooklyn)
+```
+(a) The statistician did not include both high temperature ($HighC$) and low temperature ($LowC$). This is because as you can see from the pairs plot that the high temperature variable and low temperature variable are highly correlated. Thus, both HighC and LowC explain the same pattern in the response variable and therefore the statistician only included one of them.
+
+(b) log1p computes the computes the natural logarithm of the given value plus 1. 
+
+The relationship between the response variable and Rainmm is exponential 
+
+(c)
