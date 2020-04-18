@@ -30,59 +30,196 @@ Quarter = factor(rep(1:4,20)[-80])
 reduced.Quarter = Quarter[1:75]
 
 #time break setup
-Time.break = c(rep(0,49), Time[50:75]-Time[50])
+reduced.Time.break.fit = c(rep(0,49), Time[50:75]-Time[50])
 ```
 
 ## Question 1
 
-```{r Question - Model Fit and Assumptions}
-CO2.sf.fit = lm(CO2.fit.ts[-1] ~ reduced.Time[-1] + Time.break[-1 ]+ reduced.Quarter[-1] + CO2.fit.ts[-75])
+```{r Question - Model, echo=FALSE}
+sf.fit = lm(CO2.fit.ts[-1] ~ reduced.Time[-1] + reduced.Time.break.fit[-1 ]+ reduced.Quarter[-1] + CO2.fit.ts[-75])
 
-#model summary
-summary(CO2.sf.fit)
-
-#normality check
-normcheck(CO2.sf.fit,shapiro.wilk = TRUE)
-
-#residual series plot
-plot.ts(residuals(CO2.sf.fit), main="Residual Series")
-
-#acf plot
-acf(residuals(CO2.sf.fit), main="ACF Plot of Residual Series")
+#residual series
+plot.ts(residuals(sf.fit), main="Residual Series") #residuals are 0 mean with constant variance 
+acf(residuals(sf.fit), main="ACF Plot of Residual Series") #still significant lag at lag(1) - best we can do so far
+normcheck(sf.fit, shapiro.wilk = TRUE) #check normality - seems normal but need more information about 
 ```
-```{r Question - Forecasting}
+
+```{r Question - Model output}
+summary(sf.fit)
+```
+```{r Question 1 - Forecasting}
 
 #forecast 2018 Q4
-t76.sf.pred = CO2.sf.fit$coefficients[1] + (CO2.sf.fit$coefficients[2] * 76) + (CO2.sf.fit$coefficients[3] * 26) + 
-  (CO2.sf.fit$coefficients[6]*1) + (CO2.sf.fit$coefficients[7]*CO2.fit.ts[75])
+t76.sf.pred = sf.fit$coefficients[1] + (sf.fit$coefficients[2] * 76) + (sf.fit$coefficients[3] * 26) + 
+  (sf.fit$coefficients[6]*1) + (sf.fit$coefficients[7]*CO2.fit.ts[75])
 
 #forecast 2019 Q1
-t77.sf.pred = CO2.sf.fit$coefficients[1] + (CO2.sf.fit$coefficients[2] * 77) + (CO2.sf.fit$coefficients[3] * 27) + 
-  (CO2.sf.fit$coefficients[7]*t76.sf.pred)
+t77.sf.pred = sf.fit$coefficients[1] + (sf.fit$coefficients[2] * 77) + (sf.fit$coefficients[3] * 27) + 
+  (sf.fit$coefficients[7]*t76.sf.pred)
 
 #forecast 2019 Q2
-t78.sf.pred = CO2.sf.fit$coefficients[1] + (CO2.sf.fit$coefficients[2] * 78) + (CO2.sf.fit$coefficients[3] * 28) + 
-  (CO2.sf.fit$coefficients[4]*1) + (CO2.sf.fit$coefficients[7]*t77.sf.pred)
+t78.sf.pred = sf.fit$coefficients[1] + (sf.fit$coefficients[2] * 78) + (sf.fit$coefficients[3] * 28) + 
+  (sf.fit$coefficients[4]*1) + (sf.fit$coefficients[7]*t77.sf.pred)
 
 #forecast 2019 Q3
-t79.sf.pred = CO2.sf.fit$coefficients[1] + (CO2.sf.fit$coefficients[2] * 79) + (CO2.sf.fit$coefficients[3] * 29) + 
-  (CO2.sf.fit$coefficients[5]*1) + (CO2.sf.fit$coefficients[7]*t78.sf.pred)
+t79.sf.pred = sf.fit$coefficients[1] + (sf.fit$coefficients[2] * 79) + (sf.fit$coefficients[3] * 29) + 
+  (sf.fit$coefficients[5]*1) + (sf.fit$coefficients[7]*t78.sf.pred)
 
 #results
-results.sf.df = data.frame(Predictions=c(t76.sf.pred,t77.sf.pred,t78.sf.pred,t79.sf.pred))
+results.sf.df = data.frame(Time=c("2018.4", "2019.1", "2019.2", "2019.3"),
+                           Predictions=c(t76.sf.pred,t77.sf.pred,t78.sf.pred,t79.sf.pred))
+results.sf.df
 
 #RMSEP
-sf.pred.ts = ts(results.sf.df$Predictions, start=c(2018,4), frequency = 4)
-sf.RMSEP = sqrt(1/4*sum((CO2.pred.ts-sf.pred.ts)^2))
+sf.RMSEP = sqrt(1/4*sum((results.sf.df$Predictions-CO2.pred.ts)^2))
 sf.RMSEP
 ```
+The Seasonal Factor model included a Time variable, break-in trend variable, seasonal factor and lagged response variable. 
+The Residual Series showed reasonably constant scatter about 0. There is a slight upward trend in the early part of the Residual Series. 
+The plot of the autocorrelation function shows signficant lag at 1, 11 and 16. 
+The residuals appeared to follow a normal distribution (Shapiro-Wilk P-value = 0.852, min=-0.49 and max=0.54). 
+
+The RMSEP indicates that, on average, the prediction error is 0.24 ppm. 
 
 ## Question 2
 
+```{r Question 2 - Full Harmonic Model Fit, echo=FALSE}
+c1 = cos(2*pi*reduced.Time*(1/4))
+s1 = sin(2*pi*reduced.Time*(1/4))
+c2 = cos(2*pi*reduced.Time*(2/4))
 
-```{r Question 2 - Harmonic Models}
-#cosine harmonic model
+#model fit
+FH.fit = lm(CO2.fit.ts[-1] ~ reduced.Time[-1] + reduced.Time.break.fit[-1 ]+ c1[-1] + s1[-1] + c2[-1]  + CO2.fit.ts[-75])
+```
+
+```{r Question 2 - Model summary}
+summary(FH.fit)
+```
+
+```{r Question 2 - Forecasting}
+
+#forecast 2018 Q4
+t76.FH.pred = FH.fit$coefficients[1] + (FH.fit$coefficients[2] * 76) + (FH.fit$coefficients[3] * 26) + 
+(FH.fit$coefficients[4] *cos(2*pi*76*(1/4))) + 
+(FH.fit$coefficients[5] *sin(2*pi*76*(1/4))) +
+(FH.fit$coefficients[6] *cos(2*pi*76*(2/4))) +
+(FH.fit$coefficients[7]*CO2.fit.ts[75])
+
+#forecast 2019 Q1
+t77.FH.pred = FH.fit$coefficients[1] + (FH.fit$coefficients[2] * 77) + (FH.fit$coefficients[3] * 27) + 
+(FH.fit$coefficients[4] *cos(2*pi*77*(1/4))) + 
+(FH.fit$coefficients[5] *sin(2*pi*77*(1/4))) +
+(FH.fit$coefficients[6] *cos(2*pi*77*(2/4))) +
+(FH.fit$coefficients[7]*t76.FH.pred)
+
+#forecast 2019 Q2
+t78.FH.pred = FH.fit$coefficients[1] + (FH.fit$coefficients[2] * 78) + (FH.fit$coefficients[3] * 28) + 
+(FH.fit$coefficients[4] *cos(2*pi*78*(1/4))) + 
+(FH.fit$coefficients[5] *sin(2*pi*78*(1/4))) +
+(FH.fit$coefficients[6] *cos(2*pi*78*(2/4))) +
+(FH.fit$coefficients[7]*t77.FH.pred)
+
+#forecast 2019 Q3
+t79.FH.pred = FH.fit$coefficients[1] + (FH.fit$coefficients[2] * 79) + (FH.fit$coefficients[3] * 29) + 
+(FH.fit$coefficients[4] *cos(2*pi*79*(1/4))) + 
+(FH.fit$coefficients[5] *sin(2*pi*79*(1/4))) +
+(FH.fit$coefficients[6] *cos(2*pi*79*(2/4))) +
+(FH.fit$coefficients[7]*t78.FH.pred)
+
+#results
+results.FH.df = data.frame(Time=c("2018.4", "2019.1", "2019.2", "2019.3"),
+                           Predictions=c(t76.FH.pred,t77.FH.pred,t78.FH.pred,t79.FH.pred))
+
+#RMSEP
+FH.RMSEP = sqrt(1/4*sum((results.FH.df$Predictions-CO2.pred.ts)^2))
+FH.RMSEP
+```
+The Full Harmonic model produced the same results as the Seasonal Factor, which is expected. The Full Harmonic model had the smallest RMSEP of all the Harmonic models (0.238 ppm). 
+
+The Full Harmonic model included a Time variable, break-in trend variable, 3 harmonics (c1 with a P-value \approx 0.79 being non-significant) and a lagged response variable. 
+The Residual Series showed reasonably constant scatter about 0. There is a slight upward trend in the early part of the Residual Series. 
+The plot of the autocorrelation function shows signficant lag at 1, 11 and 16. 
+The residuals appeared to follow a normal distribution (Shapiro-Wilk P-value = 0.852, min=-0.49 and max=0.54). 
+
+A reduced harmonic model created by removing non-signficant pairs of harmonics is the same as the Full Harmonic model (as there are no non-significant pairs). Another reduced harmonic model created by removing non-significant harmonics resulted in removing c1 and produced an RMSEP of 0.243 ppm. Therefore, it as rejected.
+Furthermore, a cosine model was not appropriate as the observations did not follow a smooth harmonic curve for each year. 
+
+## Question 3
+The Seasonal Factor model included a Time variable, break-in trend variable, seasonal factor and lagged response variable to 
+account for the autocorrelation. 
+
+The Residual Series showed reasonably constant scatter about 0. There is a slight upward trend in the beginning of the Residual Series. However, as this is in the early part of the series it is not of concern.
+The plot of the autocorrelation function shows significant autocorrelation at lag1, lag11and lag16. However, this is not a concern as lag 11 and lag 16 are unusual lags to be significant in quarterly data. Furthermore, even though the plot shows significant positive autocorrelation at lag 1, our model has a lagged response variable to account for autocorrelation at lag 1 and itis only slightly significant; hence not a worry.
+The residuals appeared to follow a normal distribution (Shapiro-Wilk P-value = 0.852, min=-0.49 and max=0.54).
+Therefore, model assumptions are satisified. 
+
+We have strong evidence against the hypothesis that the coefficient associated time variable is 0 (p-value \approx 0.0003). Further, we have strong evidence against the hypothesis that the coefficient associated with the break-in trend time variable is 0 (p-value \approx 0.0008).  Additionally, we have very strong evidence against the hypothesis of no autocorrelation (p-value \approx 0).
+
+The F-statistic provides extremely strong evidence against the hypothesis that none of the variables are related to the CO2 concentration (p-value \approx 0). The Multiple R^2 is almost 1 (0.9997) indicating that nearly all the variation in the CO2 concentration is explained by the model.
+
+The Residual Standard Error is 0.19 ppm so the prediction intervals should be reasonably narrow. The model predictionscan be reliedupon as the assumptions are satisfied. The RMSEP for the predictions from 2018 Q4 to 2019 Q3 was 0.238 ppm which was smaller than the Reduced Harmonic model (0.244 ppm) and the same as the Full Harmonic model. 
+
+The predictions for 2018 Q4 to 2019 Q3 are:
+2018 Q4: 406.03 ppm
+2019 Q1: 406.14 ppm
+2019 Q2: 406.84 ppm
+2019 Q3: 408.23 ppm
+
+## Question 4
+```{r Question 4 - Best Model Setup, echo=FALSE}
+reduced.Time.break.fit = c(rep(0,49), Time[50:79]-Time[50])
+Time = 1:79
+Quarter = factor(rep(1:4,20)[-80])
+```
+
+```{r Question 4 - Best Predicting Model}
+
+#model fit
+sf.full.fit = lm(CO2.full.ts[-1] ~ Time[-1] + reduced.Time.break.fit[-1]+ Quarter[-1] + CO2.full.ts[-79])
+summary(sf.full.fit)
+
+#FORECASTING
+
+#forecast 2019 Q4
+t80.sf.pred = sf.full.fit$coefficients[1] + (sf.full.fit$coefficients[2] * 80) + (sf.full.fit$coefficients[3] * 30) + 
+  (sf.full.fit$coefficients[6]*1) + (sf.full.fit$coefficients[7]*CO2.full.ts[79])
+
+#forecast 2020 Q1
+t81.sf.pred = sf.full.fit$coefficients[1] + (sf.full.fit$coefficients[2] * 81) + (sf.full.fit$coefficients[3] * 31) + 
+  (sf.full.fit$coefficients[7]*t80.sf.pred)
+
+#forecast 2020 Q2
+t82.sf.pred = sf.full.fit$coefficients[1] + (sf.full.fit$coefficients[2] * 82) + (sf.full.fit$coefficients[3] * 32) + 
+  (sf.full.fit$coefficients[4]*1) + (sf.full.fit$coefficients[7]*t81.sf.pred)
+
+#forecast 2020 Q3
+t83.sf.pred = sf.full.fit$coefficients[1] + (sf.full.fit$coefficients[2] * 83) + (sf.full.fit$coefficients[3] * 33) + 
+  (sf.full.fit$coefficients[5]*1) + (sf.full.fit$coefficients[7]*t82.sf.pred)
+
+#results
+results.sf.df = data.frame(Time=c("2019.4", "2020.1", "2020.2", "2020.3"),
+                           Predictions=c(t80.sf.pred,t81.sf.pred,t82.sf.pred,t83.sf.pred))
+results.sf.df
+```
+
+```{r Question 4 - Prediction intervals, echo=FALSE}
+#width of pred intervals for SF
+pred1.int = 0.1888*1.96*2
+pred1.int
+pred2.int = (0.1888 * sqrt(1+(sf.full.fit$coefficients[7])^2))*1.96*2
+pred2.int
+pred3.int = (0.1888 * sqrt(1+(sf.full.fit$coefficients[7])^2 + (sf.full.fit$coefficients[7])^4))*1.96*2
+pred3.int
 
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+The summary shows the seasonal factort model parameter estimates for the full timeframe model ($sf.full.fit$) are similar to those of the reduced timeframe model ($sf.fit$). 
+As the model assumptions were satifised our predictions should be reasonably reliable. 
+
+The prediction intervals are between 0.74 and 0.98 ppm. 
+
+## Question 5
+The best predicting model is the seasonal-trend-lowess seasonally adjusted model as it had the lowest RMSEP (0.2 ppm). As the model assumptions for the seasonally adjusted model were satisified, we should be able to rely on any predictions. 
+
+The prediction intervals for the Seasonally Adjusted and Seasonal Factors models are the same (both are 0.74 to 0.98 ppm). 
