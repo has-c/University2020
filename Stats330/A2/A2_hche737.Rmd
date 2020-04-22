@@ -9,6 +9,10 @@ output: word_document
 knitr::opts_chunk$set(echo = TRUE)
 
 library(s20x)
+library(mgcv)
+library(MASS)
+library(statmod)
+library(MuMIn)
 ```
 
 ```{r Data Import and Setup, echo=FALSE}
@@ -34,8 +38,13 @@ day.relevel = relevel(nyBridges.df$Day, "Monday")
 Rainmm[is.na(Rainmm)] = 0
 ```
 Day Factor Relevel: Monday was selected to be the baseline level as in New Zealand we consider Monday to be the first day of the week. 
+See if there is a difference between first day of working week vs rest of week. 
+See if theres a difference between weekday and weekend. 
 
-Trace denotes an amount of percipitation that is greater than 0 but too small to be meassured reliably. It's purpose is to indicate that percipitation did fall but not enough to be measured reliably. Thus have replaced all trace amounts with 0 as the amount of percipitation was too small to be measured reliably
+Trace denotes an amount of percipitation that is greater than 0 but too small to be meassured reliably. It's purpose is to indicate that percipitation did fall but not enough to be measured reliably. Thus have replaced all trace amounts with 0 as the amount of percipitation was too small to be measured reliably.
+
+Equivalent to 0 and make it 0
+Convert it to NA like in A1
 
 ## Question 2
 
@@ -54,10 +63,136 @@ pairs20x(nyBridges.Q2.df)
 trendscatter(nyBridges.Q2.df$Rainmm, nyBridges.Q2.df$Brooklyn)
 trendscatter(log1p(nyBridges.Q2.df$Rainmm), nyBridges.Q2.df$Brooklyn)
 ```
-(a) The statistician did not include both high temperature ($HighC$) and low temperature ($LowC$). This is because as you can see from the pairs plot that the high temperature variable and low temperature variable are highly correlated. Thus, both HighC and LowC explain the same pattern in the response variable and therefore the statistician only included one of them.
+(a) The statistician did not include both high temperature ($HighC$) and low temperature ($LowC$). This is because as you can see from the pairs plot that the high temperature variable and low temperature variable are highly correlated. Thus, both HighC and LowC explain the same pattern in the response variable and therefore the statistician only included one of them. HighC in specific was choosen HighC was choosen as HighC has a stronger correlation to the response than LowC. 
 
 (b) log1p computes the computes the natural logarithm of the given value plus 1. 
+The relationship between the response variable and Rainmm is exponential, Rainmm cannot be negative therefore a log transformation is needed. log1p is used in this case because Rainmm has 0 values so log1p is good. 
 
-The relationship between the response variable and Rainmm is exponential 
+why did she want to log the explanatory variable - exponential relationship (log-linear) between response and explanatory.
+log1p vs log 
 
-(c)
+
+(c) the relationship showed curvature and so including a quadratic effect was necessary. 
+You can see a non-linear response (curvature) and so a quadratic term was added to account for it. 
+
+## Question 3
+```{r Question 3, echo=FALSE}
+
+NYBridges.df = data.frame(Brooklyn=nyBridges.df$Brooklyn, 
+                            Rainmm = Rainmm, 
+                            HighC = HighC, 
+                            LowC = LowC, 
+                            Day = day.relevel)
+
+
+```
+
+
+```{r Question 3 - Model A Exploration}
+
+model.lin.a<-lm(Brooklyn~log1p(Rainmm)+Day+HighC+I(HighC^2),data=NYBridges.df)
+
+#raw residual
+plot(model.lin.a, which=1)
+#pearson residual 
+plot(predict(model.lin.a),residuals(model.lin.a, type="pearson"))
+abline(h=0, lty='dashed')
+normcheck(model.lin.a, shapiro.wilk = TRUE)
+
+#its count data it shouldnt fit a normal distribution
+#residuals are right skewed
+#residual plot seems ok
+#non constant variance but mean centred at 0
+#pearson residuals residuals -2 and 2 so large overdispersion in the model
+
+
+summary(model.lin.a)
+
+anova(model.lin.a, test="Chisq")
+
+#assess goodness of fit
+deviance(model.lin.a)
+
+#RSS is very large. RSS is scale based 
+#Multiple R2 is 0.6911 compared to other models so not a good fit
+
+```
+
+```{r Question 3 - Model B Exploration}
+
+model.pois.b<-glm(Brooklyn~log1p(Rainmm)+Day+HighC+I(HighC^2),family=poisson,data=NYBridges.df)
+
+#pearson residual 
+plot(predict(model.pois.b),residuals(model.pois.b, type="pearson"))
+#deviance 
+plot(predict(model.pois.b),residuals(model.pois.b, type="deviance"))
+
+#summary
+summary(model.pois.b)
+
+anova(model.pois.b, test="Chisq")
+
+#assess goodness of fit
+1-pchisq(model.pois.b$deviance, model.pois.b$df.residual)
+
+
+#deviance shows bad fit (p-value=0)
+#residuals show not mean centred at 0 and non-constant variance 
+#overdispersion (non-constant variance)
+```
+
+```{r Question 3 - Model C Exploration}
+
+model.qpois.c<-glm(Brooklyn~log1p(Rainmm)+Day+HighC+I(HighC^2),family=quasipoisson,data=NYBridges.df)
+
+#pearson residual 
+plot(predict(model.qpois.c),residuals(model.qpois.c, type="pearson"))
+#deviance 
+plot(predict(model.qpois.c),residuals(model.qpois.c, type="deviance"))
+
+#summary
+summary(model.qpois.c)
+
+
+anova(model.qpois.c, test="F")
+
+#dispersion parameter scales each point the same 
+#you want to scale the end smaller than the beginning
+
+#still see non-constant variance - so quasi model isn't working
+
+```
+```{r Question 3 - Model D Exploration}
+
+model.nb.d<-glm.nb(Brooklyn~log1p(Rainmm)+Day+HighC+I(HighC^2),data=NYBridges.df)
+
+#pearson residual 
+plot(predict(model.nb.d),residuals(model.nb.d, type="pearson"))
+#deviance 
+plot(predict(model.nb.d),residuals(model.nb.d, type="deviance"))
+
+#summary
+summary(model.nb.d)
+
+#assess goodness of fit
+1-pchisq(model.nb.d$deviance, model.nb.d$df.residual)
+
+anova(model.nb.d, test="Chisq")
+
+#dispersion parameter scales each point the same 
+#you want to scale the end smaller than the beginning
+
+#pattern: higher expected value generally lower the variance
+
+plot(predict(model.nb.d),qresiduals(model.nb.d))
+
+```
+
+```{r Question 4}
+AIC(model.pois.b,model.nb.d)
+AICc(model.pois.b,model.nb.d)
+BIC(model.pois.b,model.nb.d)
+
+#plot fitted model against raw data to see how it fits - sense check
+# 
+```
