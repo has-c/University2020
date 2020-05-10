@@ -30,23 +30,25 @@ Quarter = factor(rep(1:4,20)[-80])
 reduced.Quarter = Quarter[1:75]
 
 #time break setup
-reduced.Time.break.fit = c(rep(0,49), Time[50:75]-Time[50])
+reduced.Time.break = c(rep(0,49), Time[50:75]-Time[50])
 ```
 
 ## Question 1
 
-```{r Question - Model, echo=FALSE}
-sf.fit = lm(CO2.fit.ts[-1] ~ reduced.Time[-1] + reduced.Time.break.fit[-1 ]+ reduced.Quarter[-1] + CO2.fit.ts[-75])
+```{r Question - Model}
+sf.fit = lm(CO2.fit.ts[-1] ~ reduced.Time[-1] + reduced.Time.break[-1 ]+ reduced.Quarter[-1] + CO2.fit.ts[-75])
 
+#model summary
+summary(sf.fit)
+```
+
+```{r Question - Checks, echo=FALSE}
 #residual series
 plot.ts(residuals(sf.fit), main="Residual Series") #residuals are 0 mean with constant variance 
 acf(residuals(sf.fit), main="ACF Plot of Residual Series") #still significant lag at lag(1) - best we can do so far
 normcheck(sf.fit, shapiro.wilk = TRUE) #check normality - seems normal but need more information about 
 ```
 
-```{r Question - Model output}
-summary(sf.fit)
-```
 ```{r Question 1 - Forecasting}
 
 #forecast 2018 Q4
@@ -87,12 +89,13 @@ The RMSEP indicates that, on average, the prediction error is 0.24 ppm.
 c1 = cos(2*pi*reduced.Time*(1/4))
 s1 = sin(2*pi*reduced.Time*(1/4))
 c2 = cos(2*pi*reduced.Time*(2/4))
-
-#model fit
-FH.fit = lm(CO2.fit.ts[-1] ~ reduced.Time[-1] + reduced.Time.break.fit[-1 ]+ c1[-1] + s1[-1] + c2[-1]  + CO2.fit.ts[-75])
 ```
 
 ```{r Question 2 - Model summary}
+
+#model fit
+FH.fit = lm(CO2.fit.ts[-1] ~ reduced.Time[-1] + reduced.Time.break[-1 ]+ c1[-1] + s1[-1] + c2[-1]  + CO2.fit.ts[-75])
+#model summary 
 summary(FH.fit)
 ```
 
@@ -129,7 +132,7 @@ t79.FH.pred = FH.fit$coefficients[1] + (FH.fit$coefficients[2] * 79) + (FH.fit$c
 #results
 results.FH.df = data.frame(Time=c("2018.4", "2019.1", "2019.2", "2019.3"),
                            Predictions=c(t76.FH.pred,t77.FH.pred,t78.FH.pred,t79.FH.pred))
-
+results.FH.df
 #RMSEP
 FH.RMSEP = sqrt(1/4*sum((results.FH.df$Predictions-CO2.pred.ts)^2))
 FH.RMSEP
@@ -157,7 +160,7 @@ We have strong evidence against the hypothesis that the coefficient associated t
 
 The F-statistic provides extremely strong evidence against the hypothesis that none of the variables are related to the CO2 concentration (p-value \approx 0). The Multiple R^2 is almost 1 (0.9997) indicating that nearly all the variation in the CO2 concentration is explained by the model.
 
-The Residual Standard Error is 0.19 ppm so the prediction intervals should be reasonably narrow. The model predictionscan be reliedupon as the assumptions are satisfied. The RMSEP for the predictions from 2018 Q4 to 2019 Q3 was 0.238 ppm which was smaller than the Reduced Harmonic model (0.244 ppm) and the same as the Full Harmonic model. 
+The Residual Standard Error is 0.19 ppm so the prediction intervals should be reasonably narrow. The model predictions can be relied upon as the assumptions are satisfied. The RMSEP for the predictions from 2018 Q4 to 2019 Q3 was 0.238 ppm which was smaller than the Reduced Harmonic model (0.244 ppm) and the same as the Full Harmonic model. 
 
 The predictions for 2018 Q4 to 2019 Q3 are:
 2018 Q4: 406.03 ppm
@@ -167,15 +170,16 @@ The predictions for 2018 Q4 to 2019 Q3 are:
 
 ## Question 4
 ```{r Question 4 - Best Model Setup, echo=FALSE}
-reduced.Time.break.fit = c(rep(0,49), Time[50:79]-Time[50])
+  
 Time = 1:79
 Quarter = factor(rep(1:4,20)[-80])
+Time.break = c(rep(0,49), Time[50:79]-Time[50])
 ```
 
 ```{r Question 4 - Best Predicting Model}
 
 #model fit
-sf.full.fit = lm(CO2.full.ts[-1] ~ Time[-1] + reduced.Time.break.fit[-1]+ Quarter[-1] + CO2.full.ts[-79])
+sf.full.fit = lm(CO2.full.ts[-1] ~ Time[-1] + Time.break[-1]+ Quarter[-1] + CO2.full.ts[-79])
 summary(sf.full.fit)
 
 #FORECASTING
@@ -214,7 +218,7 @@ pred3.int
 ```
 
 
-The summary shows the seasonal factort model parameter estimates for the full timeframe model ($sf.full.fit$) are similar to those of the reduced timeframe model ($sf.fit$). 
+The summary shows the seasonal factor  model parameter estimates for the full timeframe model ($sf.full.fit$) are similar to those of the reduced timeframe model ($sf.fit$). 
 As the model assumptions were satifised our predictions should be reasonably reliable. 
 
 The prediction intervals are between 0.74 and 0.98 ppm. 
