@@ -61,11 +61,20 @@ plot.ts(A4.df$TS2, main="TS2")
 acf(A4.df$TS2)
 pacf(A4.df$TS2)
 ```
-The plot of the series shows no discrenable pattern. The acf shows cut-off at lag 2 and the pacf shows decay (or persistence). This suggests MA(2) is the most suitable model. 
+The plot of the series shows no discrenable pattern. The acf shows cut-off at lag 2 and the pacf shows decay (or persistence). 
 
-$$ y_t = \varepsilon _{t} + \alpha_1\varepsilon_{t-1}$$
+This suggests MA(2) is the most suitable model. 
 
+$$ y_t = \varepsilon _{t} + \alpha_1\varepsilon_{t-1} + \alpha_1\varepsilon_{t-2}$$
+```{r TS2 Fit}
+TS2.fit = arima(A4.df$TS2, order=c(0,0,2))
+TS2.fit
 
+plot(residuals(TS2.fit), main="Residual Series")
+acf(residuals(TS2.fit))
+```
+Compare with MA(3)
+ARMA(1,2)
 
 ## Question 3
 
