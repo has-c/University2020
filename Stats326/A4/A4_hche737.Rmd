@@ -1,6 +1,6 @@
 ---
-title: 'Stats 326: Assignment 3'
-author: "Hasnain Cheena"
+title: 'Stats 326: Assignment 4'
+author: "Hasnain Cheena 190411106 hche737"
 date: "16/04/2020"
 output: word_document
 ---
@@ -13,30 +13,34 @@ library(s20x)
 
 ```{r Data Setup, echo=FALSE}
 A4.df = read.table('Ass 4 Data.txt', header=TRUE) 
-
 ```
 
 ## Question 1
 
 ```{r TS1 Explore}
 plot.ts(A4.df$TS1, main="TS1")
-acf(A4.df$TS1)
-pacf(A4.df$TS1)
+acf(A4.df$TS1, main="ACF of TS1")
+pacf(A4.df$TS1, main="PACF of TS1")
 ```
+The plot of the series shows clustering indcating positive autocorrelation. The acf shows decay while the pacf shows cut-off at lag 2. This suggests AR(2) is the most suitable model. A general equation of the model is shown below:
 
 $$ y_t = \rho_{1} y_{t-1} \times \rho_2 y_{t-2} + \varepsilon_t $$
-
-The plot of the series shows clustering indcating positive autocorrelation. The acf shows decay while the pacf shows cut-off at lag 2. This suggests AR(2) is the most suitable model.
 
 ```{r TS1 Fit}
 TS1.fit = arima(A4.df$TS1, order=c(2,0,0))
 TS1.fit
+```
+Estimated equation of model:
 
+$$ y_t = 0.5958 y_{t-1} \times 0.2928 y_{t-2} + \varepsilon_t $$
+ 
+```{r TS1 Fit Check}
 plot(residuals(TS1.fit), main="Residual Series")
-acf(residuals(TS1.fit))
+acf(residuals(TS1.fit), main="ACF")
 ```
 
-$$ y_t = 0.5958 y_{t-1} \times 0.2928 y_{t-2} + \varepsilon_t $$ 
+The Residual Series appear to be random scatter about 0. The plot of the autocorrelation function of the Residual Series shows no significant lags. Therefore, AR(2) is appropriate. 
+
 
 ```{r TS1 Fit Other Models, echo=FALSE}
 TS1.AR3.fit = arima(A4.df$TS1, order=c(3,0,0))
@@ -45,56 +49,74 @@ TS1.AR3.fit
 TS1.ARMA1.fit = arima(A4.df$TS1, order=c(2,0,1))
 TS1.ARMA1.fit
 ```
-The Residual Series appear to be random scatter about 0. The plot of the autocorrelation function of the Residual Series shows no significant lags. 
 
 Other models tried:
 
 AR(3)        AIC = 2857.86    
-ARMA(2,10)   AIC = 2889.29    
+ARMA(2,1)    AIC = 2889.29    
 
-AR(2) is the best model. This is because all terms in the AR(2) and AR(3) were significant. However, the AIC of the AR(2) is lower than the AR(3) and the AR(2) is a simpler model. 
+AR(2) is the best model. This is because all terms in the AR(2) were significant (at a 10% level) unlike the ARMA(2,1) model. Furthermore, the AIC of the AR(2) is lower than the AR(3). 
 
 ## Question 2
 
-```{r TS1 Explore}
+```{r TS2 Explore}
 plot.ts(A4.df$TS2, main="TS2")
-acf(A4.df$TS2)
-pacf(A4.df$TS2)
+acf(A4.df$TS2, main="ACF of TS2")
+pacf(A4.df$TS2, main="PACF of TS2")
 ```
-The plot of the series shows no discrenable pattern. The acf shows cut-off at lag 2 and the pacf shows decay (or persistence). 
-
-This suggests MA(2) is the most suitable model. 
+The plot of the series shows no discrenable pattern. The acf shows cut-off at lag 2 and the pacf shows decay (or persistence). This suggests MA(2) is the most suitable model.A general equation of the model is shown below: 
 
 $$ y_t = \varepsilon _{t} + \alpha_1\varepsilon_{t-1} + \alpha_1\varepsilon_{t-2}$$
 ```{r TS2 Fit}
 TS2.fit = arima(A4.df$TS2, order=c(0,0,2))
 TS2.fit
-
-plot(residuals(TS2.fit), main="Residual Series")
-acf(residuals(TS2.fit))
 ```
-Compare with MA(3)
-ARMA(1,2)
+Estimated equation of model:
+
+$$ y_t = \varepsilon _{t} + 0.4377\varepsilon_{t-1} -0.311 \varepsilon_{t-2}$$
+```{r TS2 Fit Check}
+plot(residuals(TS2.fit), main="Residual Series")
+acf(residuals(TS2.fit), main="ACF")
+```
+
+```{r 2 Fit Other Models, echo=FALSE}
+TS2.MA3 = arima(A4.df$TS2, order=c(0,0,3))
+TS2.MA3
+
+TS2.AR1MA2.fit = arima(A4.df$TS2, order=c(1,0,2))
+TS2.AR1MA2.fit
+```
+Other models tried:
+
+MA(3)        AIC = 3236.86  
+ARMA(1,2)    AIC = 3236.98    
+
+MA(2) is the best model. This is because even though all terms in all 3 models were significant (at a 10% level), the AIC of MA(2) is lower than the other models tried. Furthermore, MA(2) is a simpler model.  
 
 ## Question 3
 
-```{r TS1 Explore}
+```{r TS3 Explore}
 plot.ts(A4.df$TS3, main="TS3")
-acf(A4.df$TS3)
-pacf(A4.df$TS3)
+acf(A4.df$TS3, main="ACF of TS3")
+pacf(A4.df$TS3, main="PACF of TS3")
 ```
+
+The plot of the series shows no discrenible pattern. The acf and pacf show no significant lags. This suggests the series is White Noise. A general form of the model is shown below:
+
 $$ y_t = \varepsilon _{t}$$
 
-The plot of the series shows no discrenible pattern. The acf and pacf show no significant lags. This suggests the series is White Noise. 
 
 ```{r TS3 Fit}
 TS3.fit = arima(A4.df$TS3, order=c(0,0,0))
 TS3.fit
-
-plot(residuals(TS3.fit), main="Residual Series")
-acf(residuals(TS3.fit))
 ```
+Estimated model:
 $$ y_t = \varepsilon _{t}$$
+```{r TS3 Fit Check}
+plot(residuals(TS3.fit), main="Residual Series")
+acf(residuals(TS3.fit), main="ACF")
+```
+The Residual Series appears to be random scatter about 0. The plot of the autocorrelation function of the Residual Series shows no significant lags. 
 
 ```{r TS3 Fit Other Models, echo=FALSE}
 TS3.AR1.fit = arima(A4.df$TS3, order=c(1,0,0))
@@ -105,33 +127,37 @@ TS3.MA1.fit
 
 ```
 
-The Residual Series appears to be random scatter about 0. The plot of the autocorrelation function of the Residual Series shows no significant lags. 
-
 Other models tried: 
 AR(1)    AIC: 2839.17
 MA(1)    AIC: 2839.14 
+
+The white noise model is the best model as it met all assumptions and has the lowest AIC score relative to the other models tried. 
 
 
 ## Question 4
 
 ```{r TS4 Explore}
 plot.ts(A4.df$TS4, main="TS4")
-acf(A4.df$TS4)
-pacf(A4.df$TS4)
+acf(A4.df$TS4, main="ACF of TS4")
+pacf(A4.df$TS4, main="PACF of TS4")
 ```
-$$ y_t = \rho_1 y_{t-1} + \alpha_1 \varepsilon _{t-1} + \varepsilon _{t}$$
 
-The plot of the series shows clustering indicating positive autocorrelation. Both the acf and pacf show decay. This suggests an ARMA(p,q) is an appropriate model. However from the plots we have no indication of what order of the ARMA model and thus I began ARMA(1,1).
+The plot of the series shows clustering indicating positive autocorrelation. Both the acf and pacf show decay. This suggests an ARMA(p,q) is an appropriate model. However from the plots we have no indication of what order of the ARMA model and thus I began ARMA(1,1). General form of ARMA(1,1) shown below: 
+
+$$ y_t = \rho_1 y_{t-1} + \alpha_1 \varepsilon _{t-1} + \varepsilon _{t}$$
 
 ```{r TS4 Fit}
 TS4.fit = arima(A4.df$TS4, order=c(1,0,1))
 TS4.fit
-
-plot(residuals(TS4.fit), main="Residual Series")
-acf(residuals(TS4.fit))
 ```
+Estimate equation of the model:
 
 $$ y_t = 0.8974 y_{t-1} +  0.9121 \varepsilon _{t-1} + \varepsilon _{t}$$
+```{r TS4 Fit Check}
+plot(residuals(TS4.fit), main="Residual Series")
+acf(residuals(TS4.fit), main="ACF")
+```
+The Residual Series appears to be random scatter about 0. The plot of the autocorrelation function of the Residual Series shows 2 weakly signficant lags at lags 20 and 21. As they are weakly significant, they are not a concern. 
 
 ```{r TS4 Fit Other Models, echo=FALSE}
 TS4.AR2MA1.fit = arima(A4.df$TS4, order=c(2,0,1))
@@ -140,8 +166,6 @@ TS4.AR2MA1.fit
 TS4.AR1MA2.fit = arima(A4.df$TS4, order=c(1,0,2))
 TS4.AR1MA2.fit
 ```
-
-The Residual Series appears to be random scatter about 0. The plot of the autocorrelation function of the Residual Series shows 2 weakly signficant lags at lags 20 and 21. As they are weakly significant, they are not a concern. 
 
 Other models tried: 
 ARMA(2,1)    AIC: 2833.86 
@@ -154,39 +178,42 @@ ARMA(1,1) is the best model. Even though all terms are significant in ARMA(2,1) 
 
 ```{r TS5 Explore}
 plot.ts(A4.df$TS5, main="TS5")
-acf(A4.df$TS5)
-pacf(A4.df$TS5)
+acf(A4.df$TS5, main="ACF of TS5")
+pacf(A4.df$TS5, main="PACF of TS5")
 ```
-$$ y_t = \rho_1 y_{t-1} + \alpha_1 \varepsilon _{t-1} + \varepsilon _{t}$$
 
-The plot of the series shows clustering indicating positive autocorrelation. Both the acf and pacf show decay/persistance. This suggests an ARMA(p,q) is an appropriate model. However from the plots we have no indication of what order of the ARMA model and thus I began ARMA(1,1).
+The plot of the series shows clustering indicating positive autocorrelation. Both the acf shows exponential decay and the pacf show persistance (or decay). This suggests an ARMA(p,q) is an appropriate model. However from the plots we have no indication of what order of the ARMA model and thus I began ARMA(1,1).General form of ARMA(1,1) shown below: 
+
+$$ y_t = \rho_1 y_{t-1} + \alpha_1 \varepsilon _{t-1} + \varepsilon _{t}$$
 
 ```{r TS5 Fit}
 TS5.fit = arima(A4.df$TS5, order=c(1,0,1))
 TS5.fit
-
+```
+Estimated equation: 
+$$ y_t = 0.9674 y_{t-1} +  0.1876 \varepsilon _{t-1} + \varepsilon _{t}$$
+```{r TS5 Fit Check}
 plot(residuals(TS5.fit), main="Residual Series")
-acf(residuals(TS5.fit))
+acf(residuals(TS5.fit), main="ACF")
 ```
 
-$$ y_t = 0.9674 y_{t-1} +  0.1876 \varepsilon _{t-1} + \varepsilon _{t}$$
 The Residual Series appears to be random scatter about 0. The plot of the autocorrelation function of the Residual Series shows 4 significant lags at lags 2, 3, 9 and 15. 
 
 Better Model: 
 ```{r TS5 Fit Better Model}
-TS5.AR5MA1.fit = arima(A4.df$TS5, order=c(5,0,1))
-TS5.AR5MA1.fit
+TS5.AR2MA2.fit = arima(A4.df$TS5, order=c(2,0,2))
+TS5.AR2MA2.fit
 ```
+Estimated equation: 
 
-$$ y_t = 1.6551 y_{t-1}  -0.6328 y_{t-2} - 0.2822 y_{t-3} + 0.4033 y_{t-4} - 0.1634 y_{t-5} - 0.4363 \varepsilon _{t-1} + \varepsilon _{t}$$
+$$ y_t = 0.5840 y_{t-1} +0.3552 y_{t-2} + 0.6361 \varepsilon _{t-1} + 0.3235 \varepsilon_{t-2}  + \varepsilon _{t}$$
 
 ```{r TS4 Fit Better Model Plots}
-plot(residuals(TS5.AR5MA1.fit), main="Residual Series")
-acf(residuals(TS5.AR5MA1.fit))
-
+plot(residuals(TS5.AR2MA2.fit), main="Residual Series")
+acf(residuals(TS5.AR2MA2.fit), main="ACF")
 ```
 The Residual Series appears to be random scatter about 0. The plot of the autocorrelation function of the residual series shows no signficant lags. 
 
-Therefore, ARMA(5,1) was decided as the best model for this series. 
+Therefore, ARMA(2,2) was decided as the best model for this series. 
 
 
