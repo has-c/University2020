@@ -12,48 +12,52 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Question 1: Heart Attacks
 
 ```{r Read Data and Lib Imports, include=FALSE}
-library(VGAM)
-library(MuMIn)
-
 hearthealth.df= read.csv('hearthealth.csv')[c('age','chol', 'heartattack')]
-hearthealth.df$chol <- factor(hearthealth.df$chol) #use fchol instead of chol
-
+#fit GAM
+library(VGAM)
 ```
-
 
 
 ```{r Q1 - Fit}
+hearthealth.df$chol <- factor(hearthealth.df$chol) #convert chol to a factor 
+
 #fit GAM
 heart.gam.fit = vgam(heartattack ~ s(age) + chol, family=binomialff, data=hearthealth.df)
 
+#model summary
 summary(heart.gam.fit)
 ```
 
-The summary output shows us that we have no evidence against  using linear terms for the variables age and cholesterol in the model $ha.lin$. Thus the claim that $ha.lin$ is appropriate is correct.
+The summary output shows us that we have no evidence against using a linear term for $age$ in $ha.lin$. Hence using linear terms for both age and cholestrol in $ha.lin$ is appropriate. 
+```{r Q1 - Detach, include=FALSE}
+#detach all VGAM packages 
+detach(package:VGAM)
+detach(package:stats4)
+detach(package:splines)
+```
 
-```{r Q1 - Plot}
+```{r Q1 - Plot, fig.width=10, fig.height=6}
 plot(heart.gam.fit, se=TRUE, lcol="blue", scol="red", llwd=2, slwd=2)
 ```
-Comment: 
-- Uncertainty 
-- Generally linear 
-
+From the plot you can see the standard error bands are very wide on the left-hand side. Moreover, the plot shows that $age$ is reasonably linear. Furthermore, from the rugplot you can see the distribution of age is right skewed. 
 
 Mathematical equation of the GLM:
 
-$$ $$ 
+$$ logit(p_i) = \beta_0 + \beta_1chol_i + \beta_2age_i$$ 
 
-$$ $$ 
+$$ Y_i \sim Binomial(1,p_i) $$ 
+where 
+$age_i$ is the age in years of a participant, $chol_i$ = 1 when a patient has low cholestrol and 0 when a patient has high cholestrol and $p_i$ is the probability the ith participant had a heart attack. 
+Furthermore, $Y_i$ is a Bernoulli random variable that takes the value 1 with probability $p_i$ and 0 with probability $1-pi$. 
 
-
-
-Mathematical formula of the gAM model:
+Mathematical formula of the GAM model:
 
 $$ logit(p_i) = \beta_0 + f_1(age_i) + \beta_2chol_i $$
+$$ Y_i \sim Binomial(1,p_i) $$ 
 
-$$ Y_i \sim Binomial(n,p) $$
-where $age_i$ is the age in years of a patient and $chol_i$ = 1 when a patient has low cholestrol and 0 when a patient has high cholestrol. Furthermore, the response variable has binomial distribution with parameters n and p. 
-
+where 
+$age_i$ is the age in years of a participant, $chol_i$ = 1 when a patient has low cholestrol and 0 when a patient has high cholestrol and $p_i$ is the probability the ith participant had a heart attack. 
+Furthermore, $Y_i$ is a Bernoulli random variable that takes the value 1 with probability $p_i$ and 0 with probability $1-pi$. 
 
 ## Question 2: Women's BMI
 
@@ -68,88 +72,86 @@ bmi.df = bmi.df[order(bmi.df$age),]
 bmi.df$bmi = bmi.df$weight / ((bmi.df$height)^2)
 
 
-#proportion of obese people
+#proportion of obese women
+prop.obese = sum(bmi.df$bmi >= 30) * 100 /nrow(bmi.df) 
+#proportion of overweight women
+prop.overweight = sum(bmi.df$bmi >= 25 & bmi.df$bmi < 30)*100/nrow(bmi.df)
+
 proportions = data.frame("groups"= c("Obese", "Overweight"),
-                         "proportions" = c(sum(bmi.df$bmi >= 30) * 100 /nrow(bmi.df), sum(bmi.df$bmi >= 25 & bmi.df$bmi < 30))*100/nrow(bmi.df))
+                         "proportions" = c(prop.obese, prop.overweight))
   
 proportions
  
 ```
-WHO Guidelines:
-https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight
+WHO Guidelines Source:https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight
+The source above states that:
+- Obesity is defined as where BMI being greater than or equal to 30
+- Overweight is defined as where BMI is greater than or equal to 25
 
-Website states that:
-- Obese is where the BMI is greater than or equal to 30
-- Overweight is where the BMI is greater than or equal to 25
-
-The calculations show that 0.49% of the sample is WHO classified as obese and 29.04% of the sample is classified as overweight. 
-
-Obese = 13%
-Overweight = 26%
-
+From the calculation above you can see 12.8% of the European women in our sample can be clssified as obese and 29% can be classified as overweight but not obese. 
 
 ```{r Q2 - Plot, fig.width=10, fig.height=6}
 #dataset is very large so randomly select 
-# set.seed(321)
+set.seed(321)
 index = sample(nrow(bmi.df), size=1000)
 small.bmi.df = na.omit(bmi.df[index,])
 
 #scatterplot
-plot(bmi~age, small.bmi.df, main="BMI vs Age", xlab="age (years)")
+plot(bmi~age, small.bmi.df, main="BMI vs Age", xlab="age (years)", ylab=expression ("BMI"~kg/m^2))
 
 
 ```
-Comment:
-A random sample of 1000 datapoints were taken so that a high quality scatterplot could be produced to comment on. 
+A random sample of 1000 datapoints was taken so that a high quality scatterplot is produced where important features can be seen.  
 
-From the scatterplot it is visible that at the younger ages there is less variance in bmi than at the older ages. Bmi variance increases as age increases. Further it is clear there are more many more observations of people between the ages of 20-50 than people between 50-90. 
-
-Trend: slightly increasing upto 60 and a slight decrease after. 
+From the scatterplot it is visible that at the younger age range there is less variance in BMI than at the older age range. Further it is clear there are more many more observations of European women between the ages of 20-50 than people between 50-90. Furthermore, from the scatterplot it can be seen that generally as age increases BMI also increases until the around 60 years old. After this point BMI starts to decrease again.
 
 
 ```{r Q2 - Smooth Spline,fig.width=10, fig.height=6}
 #smooth spline - EDF set by GCV
-bmi.spline = with(small.bmi.df,smooth.spline(age,bmi))
+bmi.spline = with(bmi.df,smooth.spline(age,bmi))
 bmi.spline
 
 #add to plot
-plot(bmi~age, small.bmi.df, col="grey")
+plot(bmi~age, bmi.df, col="grey", main="BMI vs Age", xlab="age (years)", ylab=expression ("BMI ("~kg/m^2 ~ ")"))
 lines(bmi.spline, col="blue", lwd=2)
+legend("topleft",legend=c("Spline"),col=c("blue"),lty=rep(1))
 ```
 
 
-The equivalent degrees of freedom fit using GCV is approximately 4.8 which is reasonable. From the plot the spline seems to be a good fit (not too overfit or underfit). The trend seems to be as European woman get older their bmi tends to increases until it peaks around 62 years old. After this age it starts to decrease again. 
+The equivalent degrees of freedom fit using GCV is approximately 5 which is reasonable. From the plot the spline seems to be a good fit (not too overfit or underfit). The trend seems to be as European woman get older their BMI tends to increases until it peaks around 62 years old. After this age it starts to decrease again. 
 
-This trend could be because at the younger ages till around 60 people in the education system or in the workforce. This lifestyle can be sedentary (less exercise) therfore bmi increases gradually. However at around 60 years old people retire and have health issues. 
+This trend could be because at the younger ages till around 60 people are in the workforce. This lifestyle can be sedentary (less exercise) therfore weight and hence BMI increases gradually. However at around 60 years old people retire and as they are older tend to have health issues causing weight and BMI to decrease. 
 
-Height doesn't increase alot past 19-20 but weight continues to change. 
-
-```{r Q2 - Smooth Spline Fitted value,  fig.width=10, fig.height=6}
+```{r Q2 - Smooth Spline Fitted value}
 predict(bmi.spline, 50)
 ```
-We estimate for a European woman that is 50 years old, her bmi will be 25.64. 
+We estimate for a European woman that is 50 years old, her bmi will be approximately 25.8. 
 
-```{r Q2 - Quadratic }
+```{r Q2 - Quadratic ,fig.width=10, fig.height=6}
 #quadratic 
-bmi.quad.fit = lm(bmi~ poly(age,2), data=small.bmi.df)
+bmi.quad.fit = lm(bmi~ poly(age,2), data=bmi.df)
 
 age = data.frame("age"=16:87)
-predictions = predict(bmi.quad.fit, age)
+predictions = predict(bmi.quad.fit, age, type="response")
 
 #fit 
 #add to plot
-plot(bmi~age, small.bmi.df, col="grey")
+plot(bmi~age, bmi.df, col="grey", xlab="Age (years)", ylab=expression ("BMI ("~kg/m^2 ~ ")"), main="BMI vs Age")
 lines(bmi.spline, col="blue", lwd=2)
 lines(age$age, predictions, col="red", lty=2, lwd=2)
+legend("topleft",legend=c("Spline","Quadratic"),col=c("blue","red"),lty=rep(1,2))
 
 ```
-The quadratic seems to be underfitting the pattern unlike the smooth spline. 
+The quadratic and smooth spline fit are very close. However, the quadratic seems to be slightly underfitting the data unlike the smooth spline.
 
 ## Question 3: COVID-19
 
-```{r Q3 - Data Cleaning}
+```{r Q3 - Data Cleaning, fig.width=10, fig.height=6}
 #read in data
 covid.df = read.csv('covid19nz.csv')
+
+#convert doy to date type
+covid.df$doy = as.Date(covid.df$doy)
 
 #replace -1 with 0
 covid.df[covid.df$newcases == -1,]$newcases = 0
@@ -158,56 +160,55 @@ covid.df[covid.df$newcases == -1,]$newcases = 0
 covid.df$Day = seq(1,nrow(covid.df))
 
 #scatterplot
-plot(newcases~Day, data=covid.df)
-
-#use asDate to change string date to date and then plot as newcases vs date
+plot(newcases~doy, data=covid.df, main="Number of new cases vs Date", ylab="Number of new cases", xlab="Date")
 ```
-The scatterplot shows that at lower case numbers there is less variance and at higher cases numbers there seems to be more variance. Further the spread of the data seems reasonably symmetric.
+The scatterplot shows that at lower new case numbers there is less variance and at higher new cases numbers there seems to be more variance. Further the distribution of $newcases$ is reasonably symmetric. Further it shows that the number of cases peaked twice. Once around the end of March and again at the beginning of April. 
 
+```{r Q3 - mgcv include, include=FALSE}
 
-```{r Q3 - load mgcv and detach vgam}
-#detach mgcv
-detach(package:VGAM)
-
-#attach mgcv
 library(mgcv)
+
 ```
 
-
-```{r Q3 - fit}
-#fit
+```{r Q3 - fit, fig.width=10, fig.height=6}
 covid.gam.fit = gam(newcases~s(Day), data=covid.df, family=poisson)
 
 #plot 
-plot(covid.gam.fit, pages=1)
+plot(covid.gam.fit, main="Smoothed Plot")
 
 #plot scatter and the line
-plot(newcases~Day, covid.df, col="grey")
+plot(newcases~Day, covid.df, col="grey", main="Number of new cases vs Day", ylab="Number of new cases")
 lines(fitted(covid.gam.fit), col="blue")
+legend("topleft",legend=c("GAM"),col=c("blue"),lty=rep(1))
 
 ```
 
-From the plot of the fitted values versus the observations indicates that the GAM has fit well (not overfit or underfit the data). However it also shows that at lower case numbers (less variance in case numbers) the GAM was able to fit the data well (the tails), but as cases increased the variance in the new case numbers also increased and therefore the GAM was not able to fit the data well in this region.
+```{r Q3 - mgcv detach, include=FALSE}
 
-- Fit well but fits tails better than peak because of high variance
+detach(package:mgcv)
+detach(package:nlme)
+```
+The smoothed plot shows that the a linear term for day is not appropriate and therefore a non-linear term such as a quadratic may be more appropriate. 
+The plot of the fitted values versus the observations indicates that the GAM has fit the data reasonably well (not too overfit or underfit). 
 
-```{r Q3 - quadratic, plot and AIC}
+```{r Q3 - quadratic, plot and AIC, fig.width=10, fig.height=6}
 #quadratic 
 covid.quad.fit = glm(newcases~ poly(Day,2), data=covid.df, family=poisson)
 
 #add to plot
-plot(newcases~Day, covid.df, col="grey")
+plot(newcases~Day, covid.df, col="grey", main="Number of new cases vs Day", ylab="Number of new cases")
 lines(fitted(covid.gam.fit), col="blue")
-lines(fitted(covid.quad.fit), col="orange")
+lines(fitted(covid.quad.fit), col="red")
+legend("topleft",legend=c("GAM","Quadratic"),col=c("blue","red"),lty=rep(1,2))
 
 
 #use AIC to compare the models
 AIC(covid.gam.fit,covid.quad.fit)
 
 ```
-From the plot you can see the quadratic doesnt fit the data as well. Overestimates and underestimates and estimates a later peak. 
+From the plot you can see the quadratic slightly underfits the data compared to the GAM. It overestimates at lower new cases number and underestimates at the higher new case numbers. Further it predicts the peak is later on than the GAM. 
 
-Furthermore, the AIC score of the GAM is much lower than the quadratic. This means we have strong evidence to suggest that the GAM fits the data better than the quadratic model (parametric model).
+Furthermore, the AIC score of the GAM is much lower than the quadratic. This means we have strong evidence to suggest that the GAM (non-parametric model) fits the data better than the quadratic model (parametric model).
 
 ```{r Q3 - new cases peak}
 #GAM peak
@@ -215,15 +216,23 @@ covid.df$doy[which.max(covid.gam.fit$fitted.values)]
 
 #Quadratic peak
 covid.df$doy[which.max(covid.quad.fit$fitted.values)]
-
 ```
-Comment:
 The GAM estimates that the number of new cases peaked on the 31st of March 2020, compared to the quadratic which estimates the number of new cases peaked on the 3rd of April 2020. The true answer is the cases peaked on the 2nd and 5th of April 2020 at 89 new cases. 
 
-There is a observable difference between both models. Quadratic model underestimated the peak by ..... amount of cases and also estimated the peak later than the GAM. The quadratic overestimates and underestimates more than the GAM. In comparision the GAM seems to be fitting the data much beter (as proven by AIC). 
+```{r Q3 - additional zeros, fig.width=12, fig.height=4}
+#remove the additional zeros before the first case
+covid.red.df = covid.df[5:nrow(covid.df),]
+covid.red.df$Day = 1:nrow(covid.red.df)
+#refit quadratic with zero's removed
+covid.red.quad.fit = glm(newcases~ poly(Day,2), data=covid.red.df, family=poisson)
 
-Q3e: 
+#plot both quadratics
+par(mfrow = c(1, 2))
+plot(newcases~Day, covid.red.df, col="grey", main="Zeros removed: Number of new cases vs Day", ylab="Number of new cases")
+lines(fitted(covid.red.quad.fit), col="blue")
+plot(newcases~Day, covid.df, col="grey", main="Zeros added: Number of new cases vs Day", ylab="Number of new cases")
+lines(fitted(covid.quad.fit), col="red")
+```
 
-A number of 0's was added prior to the first case. This was for symmetry to allow us to fit a quadratic (a symmetric plot) without performing any transformations. 
+A number of 0's was added prior to the first case. As can be seen from the plots above the addition of 0's means the tails of the quadratic model are more similar in length. As the quadratic is a symmetric model this allowed us to use it without performing any other ladder-of-powers transformations. 
 
-Show some evidence - remove all 0's and refit to show it doesn't work without the additional 0's 
