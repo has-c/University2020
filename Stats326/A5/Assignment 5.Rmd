@@ -41,7 +41,7 @@ sarima.fit = arima(red.CO2.ts,order=c(0,1,1),
 seasonal=list(order=c(0,1,1),period=4))
 sarima.fit
 ```
-```{r Q1 - Plot, echo=FALSE}
+```{r Q1 - Plot, fig.width=10, fig.height=6}
 plot.ts(residuals(sarima.fit),main="Residual Series")
 acf(residuals(sarima.fit))
 normcheck(residuals(sarima.fit), shapiro.wilk = T)
@@ -50,16 +50,17 @@ The Residual Series show reasonably random scatter about 0, although there are t
 Normality is okay with CLT though?
 
 ```{r Q1 - Predictions}
+#predictions
 sarima.pred = predict(sarima.fit,n.ahead=4)
 sarima.pred
-
+#actual
 pred.CO2.ts
-
+#RMSEP
 RMSEP.sarima = sqrt(1/4*sum((pred.CO2.ts-sarima.pred$pred)^2))
 RMSEP.sarima
 ```
 
-The $SARIMA(0,1,1)x(0,1,1)_4$ model had an RMSEP of 0.33 ppm. The best predicting model from previous assginments was the seasonal-trend-lowess seasonally adjusted model as it had the lowest RMSEP (0.2 ppm). Therefore, the SARIMA model is not better predicting the the STL model has SARIMA has a higher RMSEP. 
+The $SARIMA(0,1,1)\times(0,1,1)_4$ model had an RMSEP of 0.33 ppm. The best predicting model from previous assginments was the seasonal-trend-lowess seasonally adjusted model as it had the lowest RMSEP (0.2 ppm). Therefore, the SARIMA model is not better predicting the the STL model has SARIMA has a higher RMSEP. 
 
 ## Question 2
 
@@ -75,53 +76,39 @@ $$(1-B-B^4+B^5)y_t  = (1+\alpha_1B + A_1B^4 + \alpha_1A_1B^5)\varepsilon_t$$
 $$y_t - y_{t-1} - y_{t-4} + y_{t-5} = \varepsilon_t + \alpha_1\varepsilon_{t-1} + A_1\varepsilon_{t-4} +  \alpha_1A_1\varepsilon_{t-5}$$
 $$ y_t = y_{t-1} + y_{t-4} - y_{t-5} + \varepsilon_t + \alpha_1\varepsilon_{t-1} + A_1\varepsilon_{t-4} +  \alpha_1A_1\varepsilon_{t-5}$$ 
 $$ y_t = y_{t-1} + y_{t-4} - y_{t-5} + \varepsilon_t + 0.5614\varepsilon_{t-1} - 0.8524\varepsilon_{t-4} - 0.4785\varepsilon_{t-5}$$
-```{r Q1 - Predictions}
-sarima.pred.full = predict(sarima.fit.full,n.ahead=4)
-sarima.pred.full
+#### Predictions
 
-full.CO2.ts
-
-residuals(sarima.fit.full)
-```
-
-
-#### 2019 Q4
-$$ y_{t+1} = y_{t} + y_{t-3} - y_{t-4} + \varepsilon_{t+1} + 0.5614\varepsilon_{t} - 0.8524\varepsilon_{t-3} - 0.4785\varepsilon_{t-4}$$
+Prediction 2019 Q4: $$ y_{t+1} = y_{t} + y_{t-3} - y_{t-4} + \varepsilon_{t+1} + 0.5614\varepsilon_{t} - 0.8524\varepsilon_{t-3} - 0.4785\varepsilon_{t-4}$$
 
 ```{r Q1 - Predictions 2019Q4}
 #2019 Q4
 pred.2019Q4 = 408.25 + 405.83 - 405.56 + (0.5614 * 0.031927800) - (0.8524 * 0.009630730) - (0.4785 * -0.101088224)
-pred.2019Q4
 ```
 
-#### 2020 Q1
-$$ y_{t+2} = y_{t+1} + y_{t-2} - y_{t-3} + \varepsilon_{t+2} + 0.5614\varepsilon_{t+1} - 0.8524\varepsilon_{t-2} - 0.4785\varepsilon_{t-3}$$
+Prediction 2020 Q1:$$ y_{t+2} = y_{t+1} + y_{t-2} - y_{t-3} + \varepsilon_{t+2} + 0.5614\varepsilon_{t+1} - 0.8524\varepsilon_{t-2} - 0.4785\varepsilon_{t-3}$$
 ```{r Q1 - Predictions 2020Q1}
 #2020Q1
-pred.2020Q1 = pred.2019Q4 + 405.83 - 405.83 - (0.8524 * -0.106133913) - (0.4785 * 0.009630730)
+pred.2020Q1 = pred.2019Q4 + 405.73 - 405.83 - (0.8524 * -0.106133913) - (0.4785 * 0.009630730)
 pred.2020Q1
 ```
-#### 2020 Q2
-$$ y_{t+3} = y_{t+2} + y_{t-1} - y_{t-2} + \varepsilon_{t+3} + 0.5614\varepsilon_{t+2} - 0.8524\varepsilon_{t-1} - 0.4785\varepsilon_{t-2}$$
+
+Prediction 2020 Q2: $$ y_{t+3} = y_{t+2} + y_{t-1} - y_{t-2} + \varepsilon_{t+3} + 0.5614\varepsilon_{t+2} - 0.8524\varepsilon_{t-1} - 0.4785\varepsilon_{t-2}$$
 ```{r Q1 - Predictions 2020Q2}
 #2020Q3
 pred.2020Q2 = pred.2020Q1 + 406.71 - 405.73 - (0.8524 * 0.402908803) - (0.4785 * -0.106133913)
-pred.2020Q2
 ```
 
-#### 2020 Q3
-$$ y_{t+4} = y_{t+3} + y_{t} - y_{t-1} + \varepsilon_{t+4} + 0.5614\varepsilon_{t+3} - 0.8524\varepsilon_{t} - 0.4785\varepsilon_{t-1}$$
+Prediction 2020 Q3: $$ y_{t+4} = y_{t+3} + y_{t} - y_{t-1} + \varepsilon_{t+4} + 0.5614\varepsilon_{t+3} - 0.8524\varepsilon_{t} - 0.4785\varepsilon_{t-1}$$
 ```{r Q1 - Predictions 2020Q3}
 #2020Q4
 pred.2020Q3 = pred.2020Q2 + 408.25 - 406.71 - (0.8524 * 0.031927800) - (0.4785 * 0.402908803)
-pred.2020Q3
 ```
 
 ```{r Q1 - Predictions By Hand}
 #results
 results.df = data.frame(Time=c("2019.4", "2020.1", "2020.2", "2020.3"),
-                           ByHAnd=c(pred.2019Q4,pred.2020Q1,pred.2020Q2,pred.2020Q3),
-                           R = sarima.pred.full$pred)
+                           Predictions=c(round(pred.2019Q4,2),round(pred.2020Q1,2),round(pred.2020Q2,2),round(pred.2020Q3,2)))
+                          
 results.df
 ```
 
