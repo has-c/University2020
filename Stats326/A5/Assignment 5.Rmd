@@ -103,7 +103,7 @@ Prediction 2020 Q3: $$ y_{t+4} = y_{t+3} + y_{t} - y_{t-1} + \varepsilon_{t+4} +
 #2020Q4
 pred.2020Q3 = pred.2020Q2 + 408.25 - 406.71 - (0.8524 * 0.031927800) - (0.4785 * 0.402908803)
 ```
-
+Prediction Results:
 ```{r Q1 - Predictions By Hand}
 #results
 results.df = data.frame(Time=c("2019.4", "2020.1", "2020.2", "2020.3"),
