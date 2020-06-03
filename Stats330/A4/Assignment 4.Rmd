@@ -143,13 +143,16 @@ dredge(fm1,rank="BIC", subset=with(ddpi))
 ## Question 3
 ```{r Q3a}
 # Generate the 'original' data
-set.set.seed(123)
-# Substitute the last 3 digits of your student ID number!!
+#ID: 190411106
+set.seed(106)
+
 n <- 100
 X <- scale(3 * (1:n)/n, scale = FALSE)
 myfun <- function(x)
-  2 - x + 3*x*xY <- myfun(X) + rnorm(n)
+  2 - x + 3*x*x
+Y <- myfun(X) + rnorm(n)
 
-plot(X, Y, col = "blue")fit <- smooth.spline(X, Y, df = 3 , all = TRUE)
+plot(X, Y, col = "blue")
+fit <- smooth.spline(X, Y, df = 3 , all = TRUE)
 lines(fit, lty = 1, col = "darkgreen", lwd = 2)
 ```
