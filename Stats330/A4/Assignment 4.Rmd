@@ -1,0 +1,155 @@
+---
+title: "Stats 330 Assignment 4"
+author: "Hasnain Cheena"
+date: "04/06/2020"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 1
+
+### 1a)
+```{r Q1a - P1}
+feuro.df = read.csv('feuro.csv', header = TRUE)
+
+#create BMI
+feuro.df <- transform(feuro.df, BMI = weight / height^2)
+
+# Sort by age
+sort.order <- with(feuro.df, order(age))
+feuro.df <- feuro.df[sort.order, ]
+
+#fit linear model with quadratic in age
+quadbmi.fit = lm(BMI ~ poly(age, 2, raw=TRUE), feuro.df)
+```
+To obtain the age at which BMI is maximised: 
+
+$$ ax^2 + bx + c$$ 
+
+$$ \frac{d}{dx} (ax^2 + bx + c) = 0$$
+
+$$ 2ax + b = 0$$
+
+$$ x = \frac{-b}{2a}$$
+
+```{r Q1a - P2}
+#obtain age where bmi is maximised
+theta.hat = (-1*quadbmi.fit$coefficients[2])/(2*quadbmi.fit$coefficients[3])
+theta.hat
+``` 
+
+Therefore the estimated age at which BMI is maximised for European women is 61.9 years old.
+
+### Q1b
+```{r Q1b - Parametric Bootstrapping}
+#reproducible
+set.seed(321)
+
+n.sims = 10000
+#create vectors to store estimates
+est.theta = numeric(n.sims)
+#number of observations
+n = nrow(feuro.df)
+#calculate expected values
+feuro.df$expected.values = quadbmi.fit$coefficients[1] + quadbmi.fit$coefficients[2]*feuro.df$age + quadbmi.fit$coefficients[3]*(feuro.df$age)^2
+
+sigma.hat = summary(quadbmi.fit)$sigma
+
+#simulate
+for (i in 1:n.sims){
+  #simulate responses
+  bmi.simulated = rnorm(n, feuro.df$expected.values, sigma.hat)
+  
+  #refit
+  sim.fit = lm(bmi.simulated ~ poly(feuro.df$age, 2, raw=TRUE))
+  
+  #calculate theta and save
+  est.theta[i] = (-1*sim.fit$coefficients[2])/(2*sim.fit$coefficients[3])
+}
+
+#quantiles to obtain 95% interval
+quantile(est.theta, prob=c(0.025, 0.975))
+```
+
+```{r Q1b - Confint of theta using fit a}
+#theoretical confidence interval
+
+```
+
+### Q1b
+```{r Q1c - Non-parametric Bootstrapping}
+#reproducible
+set.seed(321)
+
+n.sims = 10000
+#create vectors to store estimates
+est.theta = numeric(n.sims)
+#number of observations
+n = nrow(feuro.df)
+
+#simulate
+for (i in 1:n.sims){
+  #resample dataframe
+  samp = sample(1:n, replace=TRUE)
+  boot.df = feuro.df[samp,]
+  
+  #fit the model
+  sim.fit = lm(BMI ~ poly(age, 2, raw=TRUE), boot.df)
+  
+  #calculate theta and save
+  est.theta[i] = (-1*sim.fit$coefficients[2])/(2*sim.fit$coefficients[3])
+}
+
+#quantiles to obtain 95% interval
+quantile(est.theta, prob=c(0.025, 0.975))
+```
+
+Compare 95% parametric to non-parametric 
+
+### Q1d
+```{r Q1d - Delta method}
+library(msm)
+
+#using original model fit from abv
+quadbmi.fit = lm(BMI ~ poly(age, 2, raw=TRUE), feuro.df)
+
+#dm 
+dm.sd = deltamethod(~x1/(2*x2), coef(quadbmi.fit), vcov(quadbmi.fit))
+(dm.CI = -coef(quadbmi.fit)[2]/(2*coef(quadbmi.fit)[3]) + 1.96 * c(-1,1) * dm.sd)
+```
+
+Compare answers to non-parametric and parametric bootstrapping
+
+### Q1e
+
+
+
+## Question 2
+```{r Q2a}
+library(datasets)
+library(MuMIn)
+
+fm1 <- lm(sr ~ pop15 + pop75 + dpi + ddpi, data = LifeCycleSavings)
+
+#use dredge to get a model selected from a table of models
+#only keep models that include models with ddpi and use BIC to rank models
+options(na.action="na.fail", width=120)
+dredge(fm1,rank="BIC", subset=with(ddpi))
+```
+
+## Question 3
+```{r Q3a}
+# Generate the 'original' data
+set.set.seed(123)
+# Substitute the last 3 digits of your student ID number!!
+n <- 100
+X <- scale(3 * (1:n)/n, scale = FALSE)
+myfun <- function(x)
+  2 - x + 3*x*xY <- myfun(X) + rnorm(n)
+
+plot(X, Y, col = "blue")fit <- smooth.spline(X, Y, df = 3 , all = TRUE)
+lines(fit, lty = 1, col = "darkgreen", lwd = 2)
+```
