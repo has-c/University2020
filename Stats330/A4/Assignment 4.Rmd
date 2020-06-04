@@ -141,6 +141,8 @@ dredge(fm1,rank="BIC", subset=with(ddpi))
 ```
 
 ## Question 3
+
+### Q3a
 ```{r Q3a}
 # Generate the 'original' data
 #ID: 190411106
@@ -154,5 +156,94 @@ Y <- myfun(X) + rnorm(n)
 
 plot(X, Y, col = "blue")
 fit <- smooth.spline(X, Y, df = 3 , all = TRUE)
-lines(fit, lty = 1, col = "darkgreen", lwd = 2)
+
 ```
+Comment
+
+
+### Q3b
+```{r Q3b}
+#smooth spline with df=2
+spline.df2 <- smooth.spline(X, Y, df = 2 , all = TRUE)
+
+#smooth spline with df=20
+spline.df20 <- smooth.spline(X, Y, df = 20 , all = TRUE)
+
+plot(X, Y, col = "blue")
+lines(fit, lty = 1, col = "darkgreen", lwd = 2)
+lines(spline.df2, lty = 1, col = "red", lwd = 2)
+lines(spline.df20, lty = 1, col = "yellow", lwd = 2)
+
+```
+
+Comment on clear underfitting overfitting etc
+
+### Q3c
+```{r Q3c }
+
+df = 2:n
+results.df = data.frame(df=df, MSE= matrix(0, nrow=n-1))
+
+
+for (i in df){
+  #fit spline
+  smooth.fit = smooth.spline(X, Y, df = i , all = TRUE)
+  #calculate MSE and add to df
+  results.df$MSE[i-1] = (sum((Y - smooth.fit$y)^2))/n
+}
+
+#plot using line
+plot(df, MSE, type="n") 
+lines(df, MSE,  lty = 1, col = "red", lwd = 2)
+```
+Comment about overfitting and underfitting and major drop initiality and inflection point (Where adding more complexity is not helping)
+Generalisation and onverfitting
+
+### Q3d
+```{r Q3d}
+#model complexity vs prediction error
+#generate new test data
+n <- 100
+X.test <- scale(3 * (1:n)/n, scale = FALSE)
+myfun <- function(x)
+  2 - x + 3*x*x
+Y.test <- myfun(X.test) + rnorm(n)
+
+df = 2:n
+results.train.df = data.frame(df=df, MSE= matrix(0, nrow=n-1))
+results.test.df = data.frame(df=df, MSE= matrix(0, nrow=n-1))
+
+#fit splines with training data and fit on test data
+for (i in df){
+  #fit spline
+  smooth.fit = smooth.spline(X, Y, df = i , all = TRUE)
+  #calculate MSE and add to training df
+  results.train.df$MSE[i-1] = (sum((Y - smooth.fit$y)^2))/n
+  
+  #predict test 
+  Y.pred = predict(smooth.fit, data=X.test, type="response")
+  #calculate MSE
+  results.test.df$MSE[i-1] = (sum((Y.test - Y.pred$y)^2))/n
+}
+
+#plot using line
+plot(df, MSE, type="n") 
+lines(MSE~df,  lty = 1, col = "red", lwd = 2, results.train.df)
+lines(MSE~df,  lty = 1, col = "blue", lwd = 2, results.test.df)
+```
+
+
+### Q3e
+```{r Q3e}
+smooth.autogcv.fit = smooth.spline(X, Y, all = TRUE)
+smooth.autogcv.fit
+
+#plot a scatter plot with the smoother
+plot(X, Y, col = "blue")
+lines(smooth.autogcv.fit, lty = 1, col = "pink", lwd = 2)
+```
+Comment
+
+
+### Q3f
+
