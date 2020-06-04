@@ -43,10 +43,18 @@ theta.hat
 
 Therefore the estimated age at which BMI is maximised for European women is 61.9 years old.
 
+
+```{r Q1a - P3, fig.width=10, fig.height=6}
+azure  <- "#007FFF"
+
+plot(BMI ~ jitter(age), data = feuro.df, col = azure, cex = 0.5,las = 1, main = "European-type Females",  ylab = "BMI (kg/m^2)")
+lines(with(feuro.df, age), fitted(quadbmi.fit), col = "red", lwd=2)
+``` 
+
 ### Q1b
 ```{r Q1b - Parametric Bootstrapping}
 #reproducible
-set.seed(321)
+set.seed(1688)
 
 n.sims = 10000
 #create vectors to store estimates
@@ -71,18 +79,15 @@ for (i in 1:n.sims){
 }
 
 #quantiles to obtain 95% interval
-quantile(est.theta, prob=c(0.025, 0.975))
+a = theta.hat - quantile(est.theta, prob=0.025)
+b = quantile(est.theta, prob=0.975) - theta.hat
+c(theta.hat-b, theta.hat+a)
 ```
 
-```{r Q1b - Confint of theta using fit a}
-#theoretical confidence interval
-
-```
-
-### Q1b
+### Q1c
 ```{r Q1c - Non-parametric Bootstrapping}
 #reproducible
-set.seed(321)
+set.seed(1688)
 
 n.sims = 10000
 #create vectors to store estimates
@@ -104,7 +109,9 @@ for (i in 1:n.sims){
 }
 
 #quantiles to obtain 95% interval
-quantile(est.theta, prob=c(0.025, 0.975))
+a = theta.hat - quantile(est.theta, prob=0.025)
+b = quantile(est.theta, prob=0.975) - theta.hat
+c(theta.hat-b, theta.hat+a)
 ```
 
 Compare 95% parametric to non-parametric 
@@ -146,7 +153,7 @@ dredge(fm1,rank="BIC", subset=with(ddpi))
 ```{r Q3a}
 # Generate the 'original' data
 #ID: 190411106
-set.seed(106)
+set.seed(267)
 
 n <- 100
 X <- scale(3 * (1:n)/n, scale = FALSE)
@@ -156,7 +163,7 @@ Y <- myfun(X) + rnorm(n)
 
 plot(X, Y, col = "blue")
 fit <- smooth.spline(X, Y, df = 3 , all = TRUE)
-
+lines(fit, lty = 1, col = "darkgreen", lwd = 2)
 ```
 Comment
 
