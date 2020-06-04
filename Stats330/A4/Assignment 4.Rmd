@@ -124,7 +124,7 @@ library(msm)
 quadbmi.fit = lm(BMI ~ poly(age, 2, raw=TRUE), feuro.df)
 
 #dm 
-dm.sd = deltamethod(~x1/(2*x2), coef(quadbmi.fit), vcov(quadbmi.fit))
+dm.sd = deltamethod(~ -x1/(2*x2), coef(quadbmi.fit), vcov(quadbmi.fit))
 (dm.CI = -coef(quadbmi.fit)[2]/(2*coef(quadbmi.fit)[3]) + 1.96 * c(-1,1) * dm.sd)
 ```
 
