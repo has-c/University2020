@@ -25,15 +25,17 @@ feuro.df <- feuro.df[sort.order, ]
 #fit linear model with quadratic in age
 quadbmi.fit = lm(BMI ~ poly(age, 2, raw=TRUE), feuro.df)
 ```
-To obtain the age at which BMI is maximised: 
+The model equation is shown below:
 
-$$ ax^2 + bx + c$$ 
+$$ BMI_i = \beta_2age_i^2 + \beta_1age_i + \beta_0 $$ 
+Where $BMI_i$ is the ith European woman's body mass index and $age_i$ is the ith European woman's age in years. To find the age at which a European woman's BMI is maximised the derivative of the equation is found and equated to 0 as shown below: 
 
-$$ \frac{d}{dx} (ax^2 + bx + c) = 0$$
 
-$$ 2ax + b = 0$$
+$$ \frac{d}{dx} (\beta_2age_i^2 + \beta_1age_i + \beta_0) = 0$$
 
-$$ x = \frac{-b}{2a}$$
+$$ 2\beta_2age_i + \beta_1 = 0$$
+
+$$ age_i = \frac{-\beta_1}{ 2\beta_2}$$
 
 ```{r Q1a - P2}
 #obtain age where bmi is maximised
@@ -206,7 +208,7 @@ From the scatterplot above overlaid with the smooth splines it is clear that the
 ```{r Q3c, fig.width=10, fig.height=6}
 
 dfvec = 2:n
-results.df = data.frame(df=df, MSE= matrix(0, nrow=n-1))
+results.df = data.frame(df=dfvec, MSE= matrix(0, nrow=n-1))
 
 
 for (i in dfvec){
@@ -235,8 +237,8 @@ myfun <- function(x)
 Y.test <- myfun(X.test) + rnorm(n)
 
 dfvec = 2:n
-results.train.df = data.frame(df=df, MSE= matrix(0, nrow=n-1))
-results.test.df = data.frame(df=df, MSE= matrix(0, nrow=n-1))
+results.train.df = data.frame(df=dfvec, MSE= matrix(0, nrow=n-1))
+results.test.df = data.frame(df=dfvec, MSE= matrix(0, nrow=n-1))
 
 #fit splines with training data and fit on test data
 for (i in dfvec){
