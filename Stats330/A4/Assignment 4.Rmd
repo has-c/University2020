@@ -38,6 +38,7 @@ $$ x = \frac{-b}{2a}$$
 ```{r Q1a - P2}
 #obtain age where bmi is maximised
 theta.hat = (-1*quadbmi.fit$coefficients[2])/(2*quadbmi.fit$coefficients[3])
+names(theta.hat) = "Age at which bmi is maximised"
 theta.hat
 ``` 
 
@@ -46,15 +47,17 @@ Therefore the estimated age at which BMI is maximised for European women is 61.9
 
 ```{r Q1a - P3, fig.width=10, fig.height=6}
 azure  <- "#007FFF"
-
-plot(BMI ~ jitter(age), data = feuro.df, col = azure, cex = 0.5,las = 1, main = "European-type Females",  ylab = "BMI (kg/m^2)")
-lines(with(feuro.df, age), fitted(quadbmi.fit), col = "red", lwd=2)
+plot(BMI ~ jitter(age), data = feuro.df, col = azure, cex = 0.5,las = 1, main = "BMI vs age for European women",  ylab = "BMI (kg/m^2)")
+lines(with(feuro.df, age), fitted(quadbmi.fit), col = "red", lwd=1)
+abline(v=c(theta.hat), lty="dashed", col="gray50")
+legend("topleft",legend=c("Quadratic"),col=c("red"),lty=rep(1))
 ``` 
+To produce a high quality scatter plot jitter was used. The vertical dashed line in the scatterplot shows the age at which BMI is maximised ($\hat{\theta}$). 
 
-### Q1b
+### 1b)
 ```{r Q1b - Parametric Bootstrapping}
 #reproducible
-set.seed(1688)
+set.seed(106)
 
 n.sims = 10000
 #create vectors to store estimates
@@ -81,13 +84,16 @@ for (i in 1:n.sims){
 #quantiles to obtain 95% interval
 a = theta.hat - quantile(est.theta, prob=0.025)
 b = quantile(est.theta, prob=0.975) - theta.hat
-c(theta.hat-b, theta.hat+a)
+ci = c(theta.hat-b, theta.hat+a)
+names(ci) = c("2.5%", "97.5%")
+ci
 ```
+Therefore, using parametric boostrapping we estimate that the expected age at which bmi is maximised is between 57.5 years old and 64.9 years old. 
 
-### Q1c
+### 1c)
 ```{r Q1c - Non-parametric Bootstrapping}
 #reproducible
-set.seed(1688)
+set.seed(106)
 
 n.sims = 10000
 #create vectors to store estimates
@@ -111,28 +117,38 @@ for (i in 1:n.sims){
 #quantiles to obtain 95% interval
 a = theta.hat - quantile(est.theta, prob=0.025)
 b = quantile(est.theta, prob=0.975) - theta.hat
-c(theta.hat-b, theta.hat+a)
+ci = c(theta.hat-b, theta.hat+a)
+names(ci) = c("2.5%", "97.5%")
+ci
 ```
+Therefore, using non-parametric boostrapping we estimate that the expected age at which bmi is maximised is between 57.4 years old and 64.9 years old. 
 
-Compare 95% parametric to non-parametric 
+Therefore, the confidence intervals created by parametric and non-parametric bootstrapping are very similar. 
 
-### Q1d
+### 1d)
 ```{r Q1d - Delta method}
 library(msm)
 
-#using original model fit from abv
+#using original model fit from above
 quadbmi.fit = lm(BMI ~ poly(age, 2, raw=TRUE), feuro.df)
 
-#dm 
+#delta method
 dm.sd = deltamethod(~x1/(2*x2), coef(quadbmi.fit), vcov(quadbmi.fit))
-(dm.CI = -coef(quadbmi.fit)[2]/(2*coef(quadbmi.fit)[3]) + 1.96 * c(-1,1) * dm.sd)
+dm.CI = -coef(quadbmi.fit)[2]/(2*coef(quadbmi.fit)[3]) + 1.96 * c(-1,1) * dm.sd
+names(dm.CI) = c("2.5%", "97.5%")
+dm.CI
 ```
+Therefore, using the delta-method we estimate that the expected age at which bmi is maximised is between 52.2 years old and 71.6 years old. 
 
-Compare answers to non-parametric and parametric bootstrapping
+Therefore, it can be seen that the confidence interval created by the delta-method is relatively wider than the intervals created by parametric/non-parametric bootstrapping. 
 
 ### Q1e
+The results obtained above will not be able to generalise well to the population here and now. This is because: 
+1. The original study has conducted in the mid-1990's which is around 25 years ago. Factors that affect BMI such as the food we eat has evolved over time and therefore the population in the original study is different from the population today. 
 
+2.The original study contained both male and female participants. However, our results were based on female participants only.Thus, the results will not generalise over both genders. 
 
+3.The original study contained 4 major ethnic groups: “Europeans”, “Maori”, “Polynesian” and “Others”. Our results were only based on the "European" group and as such will not generalise well over all ethnicities. 
 
 ## Question 2
 ```{r Q2a}
@@ -146,14 +162,15 @@ fm1 <- lm(sr ~ pop15 + pop75 + dpi + ddpi, data = LifeCycleSavings)
 options(na.action="na.fail", width=120)
 dredge(fm1,rank="BIC", subset=with(ddpi))
 ```
+The table above shows a selection of models ranked by BIC and that contain the variable $ddpi$. 
 
 ## Question 3
 
-### Q3a
-```{r Q3a}
+### 3a)
+```{r Q3a,, fig.width=10, fig.height=6}
 # Generate the 'original' data
 #ID: 190411106
-set.seed(267)
+set.seed(106)
 
 n <- 100
 X <- scale(3 * (1:n)/n, scale = FALSE)
@@ -161,53 +178,54 @@ myfun <- function(x)
   2 - x + 3*x*x
 Y <- myfun(X) + rnorm(n)
 
-plot(X, Y, col = "blue")
+plot(X, Y, col = "blue", main="Simulated Data fit with smooth splines")
 fit <- smooth.spline(X, Y, df = 3 , all = TRUE)
-lines(fit, lty = 1, col = "darkgreen", lwd = 2)
+lines(fit, lty = 1, col = "black", lwd = 1)
+legend("topright",legend=c("Smooth Spline df=3"),col=c("darkgreen"),lty=rep(1))
 ```
-Comment
+The scatterplot above overlaid with the spline of equivalent number of degrees of freedom of 3 shows that the spline is underfitting the data.
 
-
-### Q3b
-```{r Q3b}
+### 3b)
+```{r Q3b, fig.width=10, fig.height=6}
 #smooth spline with df=2
 spline.df2 <- smooth.spline(X, Y, df = 2 , all = TRUE)
 
 #smooth spline with df=20
 spline.df20 <- smooth.spline(X, Y, df = 20 , all = TRUE)
 
-plot(X, Y, col = "blue")
-lines(fit, lty = 1, col = "darkgreen", lwd = 2)
-lines(spline.df2, lty = 1, col = "red", lwd = 2)
-lines(spline.df20, lty = 1, col = "yellow", lwd = 2)
-
+plot(X, Y, col = "blue", main="Simulated Data fit with smooth splines")
+lines(fit, lty = 1, col = "black", lwd = 1)
+lines(spline.df2, lty = 1, col = "red", lwd = 1)
+lines(spline.df20, lty = 1, col = "orange", lwd = 1)
+legend("topright",legend=c("Smooth Spline df=3", "Smooth Spline df=2", "Smooth Spline df=20"),col=c("darkgreen", "red", "orange"),lty=rep(1,3))
 ```
 
-Comment on clear underfitting overfitting etc
+From the scatterplot above overlaid with the smooth splines it is clear that the spline with equivalent degrees of freedom of 2 is underfitting while the spline with equivalent number of degrees of freedom of 20 is overfitting. 
 
-### Q3c
-```{r Q3c }
+### 3c)
+```{r Q3c, fig.width=10, fig.height=6}
 
-df = 2:n
+dfvec = 2:n
 results.df = data.frame(df=df, MSE= matrix(0, nrow=n-1))
 
 
-for (i in df){
+for (i in dfvec){
   #fit spline
   smooth.fit = smooth.spline(X, Y, df = i , all = TRUE)
   #calculate MSE and add to df
   results.df$MSE[i-1] = (sum((Y - smooth.fit$y)^2))/n
+
 }
 
 #plot using line
-plot(MSE~df, results.df, type="n") 
-lines(MSE~df, results.df, lty = 1, col = "red", lwd = 2)
+plot(MSE~df, results.df, type="n", main="Mean Residual Sum of Squares vs Equivalent degrees of freedom", xlab="Equivalent degrees of freedom", ylab="Mean Residual Sum of Squares") 
+lines(MSE~df, results.df, lty = 1, col = "red", lwd = 1)
+legend("topright",legend=c("Training Error"),col=c("red"),lty=rep(1))
 ```
-Comment about overfitting and underfitting and major drop initiality and inflection point (Where adding more complexity is not helping)
-Generalisation and onverfitting
+From the plot above it can be seen that as the equivalent degrees of freedom increases the mean residuals sum of squares computed on the training set decreases. This is because as the equivalent degrees of freedom increases the model becomes more complex begins to overfit the data. 
 
-### Q3d
-```{r Q3d}
+### 3d)
+```{r Q3d, fig.width=10, fig.height=6}
 #model complexity vs prediction error
 #generate new test data
 n <- 100
@@ -216,12 +234,12 @@ myfun <- function(x)
   2 - x + 3*x*x
 Y.test <- myfun(X.test) + rnorm(n)
 
-df = 2:n
+dfvec = 2:n
 results.train.df = data.frame(df=df, MSE= matrix(0, nrow=n-1))
 results.test.df = data.frame(df=df, MSE= matrix(0, nrow=n-1))
 
 #fit splines with training data and fit on test data
-for (i in df){
+for (i in dfvec){
   #fit spline
   smooth.fit = smooth.spline(X, Y, df = i , all = TRUE)
   #calculate MSE and add to training df
@@ -234,23 +252,29 @@ for (i in df){
 }
 
 #plot using line
-plot(MSE~df, results.train.df, type="n") 
-lines(MSE~df,  lty = 1, col = "red", lwd = 2, results.train.df)
-lines(MSE~df,  lty = 1, col = "blue", lwd = 2, results.test.df)
+plot(MSE~df, results.train.df, type="n", main="Mean Residual Sum of Squares vs Equivalent degrees of freedom", xlab="Equivalent degrees of freedom", ylab="Mean Residual Sum of Squares")
+lines(MSE~df,  lty = 1, col = "red", lwd = 1, results.train.df)
+lines(MSE~df,  lty = 1, col = "blue", lwd = 1, results.test.df)
+legend("topright",legend=c("Training Error", "Test Error"),col=c("red", "blue"),lty=rep(1,2))
 ```
+From the plot above it can be seen that as the equivalent degrees of freedom increases the mean residuals sum of squares computed on the training dataset decreases. In comparision, mean residuals sum of squares computed on the test dataset initially decrease upto an optimal equivalent degrees of freedom value and then begin to increase. This is because as the equivalent degrees of freedom increases the model becomes more complex and begins to overfit to the training set and therefore clearly doesn't generalise well on the test set. From the plot it is clear the optimal equivalent degrees of freedom is between 4 and 5. 
 
-
-### Q3e
-```{r Q3e}
+### 3e)
+```{r Q3e, fig.width=10, fig.height=6}
 smooth.autogcv.fit = smooth.spline(X, Y, all = TRUE)
 smooth.autogcv.fit
 
 #plot a scatter plot with the smoother
-plot(X, Y, col = "blue")
-lines(smooth.autogcv.fit, lty = 1, col = "pink", lwd = 2)
+plot(X, Y, col = "blue", main="Simulated Data fit with smooth splines")
+lines(smooth.autogcv.fit, lty = 1, col = "orange", lwd = 1)
 ```
-Comment
+The optimal equivalent degrees of freedom set by GCV is approximately 5.1. This spline is a good fit and relatively better than the splines above as it seems to captures the underlying pattern in the data.
 
+### 3f)
+This section highlights the differences between good fitting, underfitting and overfitting models.
 
-### Q3f
+Quetions 3b and 3e show the visual differences between a good fitting, underfitting and overfitting model. These questions show that overfitting models fit to the random variation in the data (low bias and high variance) while underfitting models are not able to capture the underlying pattern in the data (high bias and low variance). 
+
+Furthermore, Questions 3c and 3d show how overfitting tends to occur when the complexity (equivalent degrees of freedom) of a model increases leading to a failure to generalise well. Moreover, these questions also show that characteristicly underfitting models have both high training and test error while overfitting models have low training error but high test error. 
+
 
