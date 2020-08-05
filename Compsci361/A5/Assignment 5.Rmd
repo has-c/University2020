@@ -1,0 +1,128 @@
+---
+title: "Stats 326 - Assignment 5"
+author: "Hasnain Cheena"
+date: "27/05/2020"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(s20x)
+```
+
+```{r Data Setup, include=FALSE}
+CO2.df = read.table('Cape Grim.CO2.quarterly.txt', header=TRUE) 
+
+#create time series object
+red.CO2.ts = ts(CO2.df[1:75, ], frequency = 4, start=c(2000,1))
+pred.CO2.ts = ts(CO2.df[76:79, ], frequency = 4, start=c(2018,4))
+full.CO2.ts = ts(CO2.df$CO2, frequency=4, start=c(2000,1))
+
+#setup Time
+Time = 1:79
+reduced.Time = 1:75
+#observations 1 to 75 used to fit the model
+#observations 76 to 79 used to test models
+
+#quarterly factor
+Quarter = factor(rep(1:4,20)[-80])
+reduced.Quarter = Quarter[1:75]
+
+#time break setup
+reduced.Time.break = c(rep(0,49), Time[50:75]-Time[50])
+```
+
+## Question 1
+
+```{r Q1 - Fit}
+#best fitting SARIMA
+sarima.fit = arima(red.CO2.ts,order=c(0,1,1),
+seasonal=list(order=c(0,1,1),period=4))
+sarima.fit
+```
+```{r Q1 - Plot, fig.width=10, fig.height=6}
+plot.ts(residuals(sarima.fit),main="Residual Series")
+acf(residuals(sarima.fit))
+normcheck(residuals(sarima.fit), shapiro.wilk = T)
+```
+The Residual Series show reasonably random scatter about 0, although there are two large negative residuals (2001 Quarter 1 and 2009 Quarter 2). The autocorrelation function plot of the Residual Series shows a significant lag at lag 11. This is an unsual lag to be significant in quarterly data. Furthermore, the residuals seems reasonably normally distributed. Therefore, all model assumptions are satifised. 
+Normality is okay with CLT though?
+
+```{r Q1 - Predictions}
+#predictions
+sarima.pred = predict(sarima.fit,n.ahead=4)
+sarima.pred
+#actual
+pred.CO2.ts
+#RMSEP
+RMSEP.sarima = sqrt(1/4*sum((pred.CO2.ts-sarima.pred$pred)^2))
+RMSEP.sarima
+```
+
+The $SARIMA(0,1,1)\times(0,1,1)_4$ model had an RMSEP of 0.33 ppm. The best predicting model from previous assginments was the seasonal-trend-lowess seasonally adjusted model as it had the lowest RMSEP (0.2 ppm). Therefore, the SARIMA model is not better predicting the the STL model has SARIMA has a higher RMSEP. 
+
+## Question 2
+
+```{r Q1 - Fit All}
+#best fitting SARIMA
+sarima.fit.full = arima(full.CO2.ts,order=c(0,1,1),
+seasonal=list(order=c(0,1,1),period=4))
+sarima.fit.full
+```
+Model in backshift notation:
+$$ (1-B)(1-B^4)y_t = (1+\alpha_1B)(1+A_1B^4)\varepsilon_t$$ 
+$$(1-B-B^4+B^5)y_t  = (1+\alpha_1B + A_1B^4 + \alpha_1A_1B^5)\varepsilon_t$$ 
+$$y_t - y_{t-1} - y_{t-4} + y_{t-5} = \varepsilon_t + \alpha_1\varepsilon_{t-1} + A_1\varepsilon_{t-4} +  \alpha_1A_1\varepsilon_{t-5}$$
+$$ y_t = y_{t-1} + y_{t-4} - y_{t-5} + \varepsilon_t + \alpha_1\varepsilon_{t-1} + A_1\varepsilon_{t-4} +  \alpha_1A_1\varepsilon_{t-5}$$ 
+$$ y_t = y_{t-1} + y_{t-4} - y_{t-5} + \varepsilon_t + 0.5614\varepsilon_{t-1} - 0.8524\varepsilon_{t-4} - 0.4785\varepsilon_{t-5}$$
+#### Predictions
+
+Prediction 2019 Q4: $$ y_{t+1} = y_{t} + y_{t-3} - y_{t-4} + \varepsilon_{t+1} + 0.5614\varepsilon_{t} - 0.8524\varepsilon_{t-3} - 0.4785\varepsilon_{t-4}$$
+
+```{r Q1 - Predictions 2019Q4}
+#2019 Q4
+pred.2019Q4 = 408.25 + 405.83 - 405.56 + (0.5614 * 0.031927800) - (0.8524 * 0.009630730) - (0.4785 * -0.101088224)
+```
+
+Prediction 2020 Q1:$$ y_{t+2} = y_{t+1} + y_{t-2} - y_{t-3} + \varepsilon_{t+2} + 0.5614\varepsilon_{t+1} - 0.8524\varepsilon_{t-2} - 0.4785\varepsilon_{t-3}$$
+```{r Q1 - Predictions 2020Q1}
+#2020Q1
+pred.2020Q1 = pred.2019Q4 + 405.73 - 405.83 - (0.8524 * -0.106133913) - (0.4785 * 0.009630730)
+pred.2020Q1
+```
+
+Prediction 2020 Q2: $$ y_{t+3} = y_{t+2} + y_{t-1} - y_{t-2} + \varepsilon_{t+3} + 0.5614\varepsilon_{t+2} - 0.8524\varepsilon_{t-1} - 0.4785\varepsilon_{t-2}$$
+```{r Q1 - Predictions 2020Q2}
+#2020Q3
+pred.2020Q2 = pred.2020Q1 + 406.71 - 405.73 - (0.8524 * 0.402908803) - (0.4785 * -0.106133913)
+```
+
+Prediction 2020 Q3: $$ y_{t+4} = y_{t+3} + y_{t} - y_{t-1} + \varepsilon_{t+4} + 0.5614\varepsilon_{t+3} - 0.8524\varepsilon_{t} - 0.4785\varepsilon_{t-1}$$
+```{r Q1 - Predictions 2020Q3}
+#2020Q4
+pred.2020Q3 = pred.2020Q2 + 408.25 - 406.71 - (0.8524 * 0.031927800) - (0.4785 * 0.402908803)
+```
+Prediction Results:
+```{r Q1 - Predictions By Hand}
+#results
+results.df = data.frame(Time=c("2019.4", "2020.1", "2020.2", "2020.3"),
+                           Predictions=c(round(pred.2019Q4,2),round(pred.2020Q1,2),round(pred.2020Q2,2),round(pred.2020Q3,2)))
+                          
+results.df
+```
+
+## Question 3 - Executive Summary
+
+The task was to predict the atmospheric concentration of carbon dixiode at Cape Grim, Tasmania, Australia (in parts per million) between 2019 Quarter 4 and 2020 Quarter 3. 
+
+We need to be wary of our predictions and their reliability as we have a time series with only 79 observations. However the model that is used is a good model therefore the predictions should be reasonably reliable.
+
+Several different models were built using observations between 2000 Quarter 1 and 2018 Quarter 3 and used to predict 2018 Quarter 4 to 2019 Quarter 3. Each model's predictions were then compared to the actual values to find the model that produced the most accurate predictions. 
+The best predicting model found from this method was then re-run on all the avaliable data and predictions for 2019 Quarter 4 to 2020 Quarter 3 were produced as per the task. 
+
+We predict the carbon dixiode concentration in the atmosphere above Cape Grim in Tasmania, Australia will be:
+2019 Quarter 4: 408.60 ppm
+2020 Quarter 1: 408.61 ppm
+2020 Quarter 2: 409.34 ppm
+2020 Quarter 3: 410.76 ppm 

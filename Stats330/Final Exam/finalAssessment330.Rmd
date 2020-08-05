@@ -1,0 +1,307 @@
+---
+author: 'Hasnain Cheena 190411106'
+title: "STATS 330 Final Assessment; University of Auckland, Semester 1"
+date: 'Due Date: 1:00pm NZ Time, Thursday 25th June 2020'
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Question 1
+
+### 1a)
+
+$$ log(\mu_i) = \beta_0 + \beta_1CullBefore_i + \beta_2GrazingModerate_i + \beta_3CullBefore_iGrazingModerate_i $$
+$$ Y_i \sim Poisson(\mu_i) $$
+Where:
+$CullBefore_i = 1$ if the cull of feral animals has not occurred yet on the ith site and $0$ if the cull of feral animals has occurred. Furthermore, $GrazingModerate_i=1$ if the ith site has a grazing status of moderate and $0$ if the ith site has a grazing status of heavy. Moreover, $Y_i$ is the number of birds heard/observed during the bird survey at the ith site. 
+
+### 1b)
+```{r 1b}
+heavy.cull.effect = (exp(-0.6776)-1)*100
+heavy.cull.effect
+
+medium.cull.effect = (exp(-0.6776+0.4463+0.8213)-1) * 100
+medium.cull.effect
+```
+The effect of $Cull$ on the number of birds observed depends on the grazing status of the site. 
+We estimate that for sites with a grazing status of heavy, the expected number of birds observed at a site prior to culling is 49.2% lower than after culling. 
+We estimate that for sites with grazing status of medium, the expected number of birds observed at a site prior to culling is 80.4% higher than after culling. 
+
+
+### 1c)
+```{r 1c}
+1-pchisq(437.23, 58)
+```
+
+Assuming the conditions of the chi-squared approximation are met, yes there is evidence of lack of fit. This is because the mean of a chi-squared distribution is approximately equal to its degrees of freedom. As the observed deviance is much greater than the degrees of freedom of the chi-squared distribution, it will be out in the tails leading to a small p-value suggesting a lack of fit. 
+
+### 1d)
+Model $conservation,fit2$ assumes the response variables ($Number$) has a negative binomial distribution. This is in an effort to deal with overdispersion. It deals with overdispersion by changing the assumption between mean and variance. The negative binomial assumes the mean and variance have a quadratic relationship instead of equal like the Poisson distributuon. 
+
+### 1ei)
+Estimates of $conservation.fit2$ will be different to $conservation.fit1$. 
+
+### 1eii)
+Standard errors of $conservation.fit2$ will be higher than $conservation.fit1$. This is because the negative binomial regression model can account for more variance than a Poisson regression model, thus the standard errors will increase. 
+
+### 1f)
+$$ AIC = -2l + 2k $$
+```{r 1f-AIC}
+aic = -2*-180.06 + 2*5
+aic
+```
+$$ BIC = -2l + klog(n) $$
+```{r 1f-BIC}
+bic = -2*-180.06 + log(62)*5
+bic
+```
+
+### 1g)
+Using AIC as the model selection criterion I would choose $conservation.fit2$. This is because it has a much lower AIC score than $conservation.fit1$, therefore evidence supporting it. 
+
+### 1h) 
+If the second bird survey was carried out at the same sites at a 30-minute period rather than 20-minute period, overall more birds would have been observed. Therfore, we know the effect survey time has on the expected number of birds observed and it does not need to be estimated. Therefore, the period of a survey measures its exposure to the number of birds observed. This known effect can be incorporated in our model by fitting the log of the $survey.period$ as an offset. 
+
+## Question 2
+
+### 2a)
+```{r 2a}
+donald.weight.kg = 243/2.2046
+pnorm(donald.weight.kg, 78,13.2, lower.tail = FALSE)
+```
+Donald Trump is in the 0.73th percentile. 
+### 2b)
+```{r 2b}
+dnorm(80,78,13.2) / dnorm(80,70.3,16.8)
+```
+
+### 2c)
+```{r 2c}
+set.seed(1)
+n = 100000
+mean((rnorm(n, 78, 13.2) - rnorm(n, 70.8, 16.8)) >= 20)
+```
+
+### 2d)
+Upper bound of lower quartile is 25%. 
+```{r 2d}
+qnorm(0.25, 70.3, 16.8)
+```
+
+## Question 3
+
+### 3ai)
+$hist(means)$ shows you the distribution of sample means. 
+
+### 3aii)
+As $N$ is increased more random points are sampled of the Poisson distribution. This leads to the distribution of sample means becoming more normally distributed. This is an example of Central Limit Theorem in action. 
+
+### 3aiii)
+As $Nsim$ is increased the mean of means will get closer to lambda. 
+
+### 3aiv)
+As $lambda$ is increased the distribution of means will become more normally distributed. 
+
+### 3b)
+
+$mean(myvec)$ calculates the overall mean squared prediction error (MSPE) of the simulation study. It is not truly successful as the mean squared prediction error has been calculated on the data used in the model building process. Therefore, the MSPE estimate is optimistic (smaller than it should be).
+
+## Question 4
+
+### 4a)
+```{r 4a, error=TRUE}
+kids.df = transform(kids.df, numberOfPeopleAtHome= (as.numeric(bothparents)+1) + siblings + 1)
+fit.4a = glm(tv ~ numberOfPeopleAtHome, poisson, kids.df) 
+```
+
+I fitted a poisson regression model as the response variable is a discrete count. 
+Furthermore, I combined the variables bothparents and siblings into a single numeric variable that contains information about the number of people living at home. I assumed that if bothaparents = 0 then there is a single parent at home and if both parents = 1 then there are two parents living at home. Adding that assumption to the total number of other siblings and then finally accounting for the child that gives you the total number of people living at home. 
+
+### 4b)
+```{r 4b, error=TRUE}
+kids.df = transform(kids.df, obesity=weight/(height^2) > 30)
+fit.4b = glm(obesity ~ age + sex + tv + dbp + siblings + bothparents + bovs, binomial, kids.df)
+```
+I fitted a logistic regression model to explore this research question. All the possible explanatory variables were used to determine if any of the variables can explain obesity in the child. 
+
+### 4c)
+```{r 4c, error=TRUE}
+fit.4c = glm(bothparents ~ siblings * bovs, binomial, kids.df)
+```
+I fitted a logistic regression model as the response variable is binary. Furthermore, an interaction term is key here as to assess the condition whether the effect of family size depends on whether children have an oversea's influence. 
+
+### 4d)
+```{r 4d, error=TRUE}
+kids.df = transform(kids.df, obesity=weight/(height^2) > 30)
+fit.4b.gam = gam(obesity ~ s(age) + sex + tv + s(dbp) + siblings + bothparents + bovs, binomial, kids.df)
+```
+In the GAM model above I have chosen not to smooth tv or siblings. This is because tv and siblings may have less than 10 distinct values. 
+I would fit a GAM first. This is because fitting a GAM before a GLM would allow me to do linearity and significance tests to assess the explanatory variables. Furthermore, any variables that were found to fail linearity, GAM plots can be used to make judgements on appropriate non-linear terms to add into the model. 
+
+### 4e)
+$fit1$ has aspects of it that are inappropriate:
+1. Smoothing age with degrees of freedom of 15 is much much too high. 
+2. $bovs$ does not need to be smoothed as it is discrete.  
+3. height is a continous variable and more specifically not a count variable therefore a poisson distribution may not be the best to represent the response distribution. 
+
+## Question 5
+```{r 5}
+p = 0:10
+A = -log(exp(3/2 * (p^2)))
+B = (p-1)^2
+lambda = 2
+
+scores = A + lambda*B
+scores
+p[which.min(scores)]
+```
+Therefore using the penalty function approach above using 4 parameters is optimal.
+
+## Question 6
+
+### 6a)
+Yes it is important to perform the train test split in a random manner. Firstly, the test dataset is key to judging model performance. Inorder to do this fairly and correctly the training and test sets must be approximately representative samples of the population. This fair representation is a result of random train test partitions. 
+
+### 6b)
+Seed the random number generator to make it reproducible. For example $set.seed(1)$. 
+
+### 6c)
+Generally having a training set that small relative to the test set is not proper technique. This is because the training set may not have enough data to model the underlying pattern and thus will be underfit. 
+
+## Question 7
+
+### 7a)
+Jitter was used to seperate overlapping points on the scatterplot so they would show clearly inorder to produce a high quality scatterplot. 
+
+### 7b)
+The dataframe was sorted by $Start$ so that the fitted model could easily and correctly be overlaid on the scatterplot using $lines(fitted(kfit1))$. 
+
+### 7c)
+```{r 7c}
+data(kyphosis, package = "rpart")
+
+ooo <- with(kyphosis, order(Start))
+kyphosis <- kyphosis[ooo, ]
+kfit1 = glm(Kyphosis ~ Start, binomial, data = kyphosis)
+summary(kfit1)
+
+cfs <- coef(kfit1)
+eta = cfs[1] + cfs[2] * with(kyphosis, Start)
+n.obs = nrow(kyphosis)
+
+Nsim <- 1e4
+devs <- numeric(Nsim)
+
+for (i in Nsim){
+  ysim = rbinom(n.obs, size = 1, prob = 1 / (1 + exp(-eta)))
+  mod_i = glm(cbind(ysim, 1-ysim) ~ Start, binomial, data = kyphosis) 
+  devs[i] = deviance(mod_i)
+}
+
+round(mean(devs > deviance(kfit1)), 3)
+```
+The chi-squared distribution approximation are not met as the data is ungrouped binary data which is extremely sparse. This means each observation is a singular trial. Therfore, a simulation was performed to assess overdispersion with respect to the binomial. 
+
+Using the results above there is evidence that suggesting that lack of fit and that there is overdispersion with respect to the binomial.
+
+### 7d)
+$size$ denotes the total number of trials that occurs. $size = 1$ was set as response variable being simulated is ungrouped binary each - a child either has kyphosis or doesn't. 
+
+each observation is one trial
+
+### 7e) 
+This is parametric bootstrapping. 
+
+### 7f)
+$$ log(\frac{p}{1-p}) = \beta_0 + \beta_1\theta $$
+$$ \theta = \frac{log(\frac{0.25}{1-0.25}) - \beta_0}{\beta_1} $$
+$$ \theta = \frac{-1.098 - \beta_0}{\beta_1} $$
+The above shows where the -1.098 comes from. It is the log-odds of having a 25% probability of presence of kyphosis.
+
+### 7g)
+
+```{r 7g}
+data(kyphosis, package = "rpart")
+
+ooo <- with(kyphosis, order(Start))
+kyphosis <- kyphosis[ooo, ]
+kfit1 = glm(Kyphosis ~ Start, binomial, data = kyphosis)
+
+#expected values and 
+cfs <- coef(kfit1)
+eta = cfs[1] + cfs[2] * with(kyphosis, Start)
+n.obs = nrow(kyphosis)
+
+Nsim = 1e3
+est.theta = matrix(0, Nsim)
+
+start.value = data.frame("Start"=c(10))
+
+theta.hat = predict(kfit1, start.value, type="response")
+
+#simulate
+for (i in 1:Nsim){
+  #simulate responses
+  ysim = rbinom(n.obs, size = 1, prob = 1 / (1 + exp(-eta)))
+  #refit
+  kfit.sim = glm(cbind(ysim, 1-ysim) ~ Start, binomial, data = kyphosis)
+  #estimate probability when start is 10
+  est.theta[i] = predict(kfit.sim, start.value, type="response")
+}
+
+#quantiles to obtain 95% interval
+a = theta.hat - quantile(est.theta, prob=0.025)
+b = quantile(est.theta, prob=0.975) - theta.hat
+ci = c(theta.hat-b, theta.hat+a)
+names(ci) = c("2.5%", "97.5%")
+ci
+```
+Therefore, we estimate that when Start is 10, the probability of having Kyphosis is between 0.12 and 0.32.  
+
+### 7h)
+Assuming mgcv is already attached:
+
+$$ fit.kyphosis.gam = gam(kyphosis \sim s(Start), binomial, kyphosis) $$
+
+## Question 8
+
+### 8a)
+
+```{r 8a}
+prevelance = 744/1586
+prevelance
+```
+
+### 8b)
+```{r 8b}
+sensitivity = 670/744
+sensitivity
+```
+
+### 8c)
+```{r 8c}
+specificity = 640/842
+specificity
+```
+
+### 8d)
+```{r 8d}
+negative.nodisease = 640 / (74+640)
+negative.nodisease
+```
+
+### 8e)
+From a patient’s point of view, it is better to have false positive than false negative. This is because a false positive means the patient doesn’t have the disease instead thinks they do. However, in the much worse case of a false negative the patient has the disease and thinks they don’t which causes them to not get the required treatement for the disease.
+
+
+
+
+
+
+

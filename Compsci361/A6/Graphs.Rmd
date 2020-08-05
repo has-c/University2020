@@ -1,0 +1,49 @@
+---
+title: "A6 Compsci Graphs"
+author: "Hasnain Cheena"
+date: "11/06/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 1
+
+```{r Hoeffding Tree Default,fig.width=10, fig.height=6}
+
+jpeg("rplot.jpg")
+
+par(mfrow = c(2, 1))
+
+df <- read.csv('HoeffdingTreeDefault100.txt')
+df.hat <- read.csv('HATDefault.txt')
+
+plot(df$learning.evaluation.instances, df$classifications.correct..percent., type="n", xlab="instances", ylab="accuracy", main="Accuracy: Hoeffding Tree versus Adaptive Hoeffding Tree")
+lines(df$learning.evaluation.instances, df$classifications.correct..percent., col="red", lwd=1)
+lines(df.hat$learning.evaluation.instances, df.hat$classifications.correct..percent., col="blue", lwd=1, lty=2)
+legend("bottomleft",legend=c("Hoeffding Tree", "Adaptive Hoeffding Tree"),col=c("red", "blue"),lty=rep(1,2))
+
+df$model.serialized.size..bytes. = df$model.serialized.size..bytes / 1e6
+df.hat$model.serialized.size..bytes. = df.hat$model.serialized.size..bytes / 1e6 
+
+plot(df.hat$learning.evaluation.instances, df.hat$model.serialized.size..bytes., type="n", xlab="instances", ylab="accuracy",  main="Memory: Hoeffding Tree versus Adaptive Hoeffding Tree",ylim=c(0, 0.15))
+lines(df$learning.evaluation.instances, df$model.serialized.size..bytes., col="red", lwd=1)
+lines(df.hat$learning.evaluation.instances, df.hat$model.serialized.size..bytes., col="blue", lwd=1, lty=2)
+legend("topleft",legend=c("Hoeffding Tree", "Adaptive Hoeffding Tree"),col=c("red", "blue"),lty=rep(1,2))
+
+
+```
+```{r Hoeffding Tree Default Memory,fig.width=10, fig.height=6}
+df$model.serialized.size..bytes. = df$model.serialized.size..bytes / 1e6
+df.hat$model.serialized.size..bytes. = df.hat$model.serialized.size..bytes / 1e6 
+
+plot(df.hat$learning.evaluation.instances, df.hat$model.serialized.size..bytes., type="n", xlab="instances", ylab="accuracy",  main="Memory: Hoeffding Tree versus Adaptive Hoeffding Tree",ylim=c(0, 0.15))
+lines(df$learning.evaluation.instances, df$model.serialized.size..bytes., col="red", lwd=1)
+lines(df.hat$learning.evaluation.instances, df.hat$model.serialized.size..bytes., col="blue", lwd=1, lty=2)
+legend("topleft",legend=c("Hoeffding Tree", "Adaptive Hoeffding Tree"),col=c("red", "blue"),lty=rep(1,2))
+
+dev.off() 
+```
+

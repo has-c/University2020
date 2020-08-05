@@ -1,15 +1,15 @@
 ---
 title: 'Lab 1: Wikipedia searches'
-author: "David Welch"
-date: "29 July 2020"
+author: "Hasnain Cheena 19041106 hche737"
+date: "5 August 2020"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-library(dplyr)
 library(tidyverse)
+library(lubridate)
 ```
 
 Task description and data for candidates applying to be a Data Analyst in the [Discovery department](https://www.mediawiki.org/wiki/Wikimedia_Discovery) at [Wikimedia Foundation](https://wikimediafoundation.org/wiki/Home).
@@ -59,58 +59,97 @@ The following are possible values for an event's action field:
 
 This user's search query returned 7 results, they clicked on the first result, and stayed on the page between 40 and 50 seconds. (The next check-in would have happened at 50s.)
 
-```{r Load Data, echo=FALSE}
+
+
+# Task
+
+```{r Load Data}
 df = read_csv("events_log.csv")
+
+#convert timestamp to datetime format
+df = df %>%
+  mutate(datetime=parse_date_time(timestamp, c("ymd HMS")))
 ```
+## Question 1
 
-## Task
+### 1a) What is the overall clickthrough rate? 
 
-*(This is a subset of the interview task)*
+This section was computed by finding the number sessions with one or more one clicks. Then dividing the number of sessions with one or more clicks by the total number of sessions that occurred. The result is the overall clickthrough rate. 
 
-1. What is our daily overall clickthrough rate? How does it vary between the groups?
-```{r Task 1, echo=FALSE}
+```{r Task 1a}
 
-#daily click through rate
-daily.clickthrough = df %>%
-  group_by(session_id)
-  # filter(action=='visitPage') %>%
-  # summarise()
+overall_click_through_stats = df %>%
+  count(action, session_id, name="action_count") %>% 
+  filter(action == "visitPage") %>%
+  mutate(visit_page_flag =  action_count > 0) %>%
+  summarise(total_click_throughs = sum(visit_page_flag), 
+            total_sessions = length(unique(df$session_id)), 
+            overall_click_through_rate = total_click_throughs/total_sessions * 100) 
 
-#convert time stamp to date 
 
-
+round(overall_click_through_stats$overall_click_through_rate,1)       
+                          
 ```
+The overall clickthrough rate is 38.9%. 
 
-#click through rate - how many sessions did they click atleast on one thing 
-#visitPage once then they have clicked through 
-#clicked through is equals pages visited
+### 1b) How does the overall clickthrough rate vary between the groups?
 
-#click through is a search and visit page 
-#group by session id 
-#sum how many visit pages in each session
+In this section, the clickthrough rates were examined on a group level. The number of sessions observed per group was calculated. Then the number of sessions with one or more clicks was calculated on a group level and divided by the number of sessions per group. 
 
-#overall
-#day 
-#group
+```{r Task 1b}
+#find number of sessions per group
+number_of_sessions_per_group = df %>%
+  distinct(session_id, group) %>%
+  count(group, name="number_of_sessions")
 
-#how many visitPages are associated with each session id  
+#find number of clickthroughs per group
+number_sessions_with_clickthrough_per_group = df %>%
+  count(action, session_id, group, name="action_count") %>%
+  filter(action == "visitPage") %>%
+  mutate(visit_page_flag =  action_count > 0) %>%
+  group_by(group) %>%
+  summarise(total_click_throughs = sum(visit_page_flag))
 
-2. Which results do people tend to try first? [If necessary, you can restrict to sessions with just one search]
 
-```{r Task 2, echo=FALSE}
+# overall_click_through_rate_per_group
+overall_click_through_rate_per_group = inner_join(number_of_sessions_per_group, number_sessions_with_clickthrough_per_group, by="group") %>%
+  summarise(group=group, overall_click_through_rate = total_click_throughs/number_of_sessions * 100) 
 
+overall_click_through_rate_per_group
+                          
 ```
+The clickthrough rate greatly varies per group as can be seen from the results above. 
+Group 'a' has a clickthrough rate of 67.0% versus group 'b' only has a clickthrough rate of 17.5%. 
 
+## Question 2
+### Which results do people tend to try first? 
+Note that this section was computed by first restricting the problem to sessions with a single search (as allowed in the lab sheet). Then the positions of the first clicked result were counted. 
 
+```{r Task 2}
+#which results do people tend to try first
+#restrict to sessions with a single search
 
-## Bonus hints
+session_ids_single_search = df %>% 
+  select(session_id, action) %>%
+  group_by(session_id) %>%
+  count(action, name="count_of_action") %>%
+  filter(action == "searchResultPage" &  count_of_action==1) %>%
+  select(session_id)
 
-The function `ungroup()` removes the grouping on a pipeline, so you can analyse grouped summaries as a new variable
+#join to filter and only get single search sesssions
+df_restricted = inner_join(df, session_ids_single_search, by="session_id")
 
-`first(variable)` returns the first value of a variable, `last(variable)` returns the last value.  If a variable is constant, the first value is the value
+#find the distribution of result positions of clicked results
+distribution_of_clicked_result_positions = df_restricted %>% 
+  arrange(datetime) %>%
+  filter(action == "visitPage") %>%
+  select(datetime, session_id, action, result_position) %>%
+  group_by(session_id) %>%
+  summarise(position_of_first_result_clicked = first(result_position)) %>%
+  ungroup() %>%
+  count(position_of_first_result_clicked, name = "number_of_clicks")
+  
 
-`fill(variable)` fills in missing values with the previous value for that observation
-
-`arrange(variable)` sorts the data on variable
-
-`View()` gives a spreadsheet view of a table, useful in pipeline construction.
+distribution_of_clicked_result_positions
+```
+It can be seen that majority people tend to try the 1st result on the page. 
