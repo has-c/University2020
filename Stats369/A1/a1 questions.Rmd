@@ -8,6 +8,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(lubridate)
+library(s20x)
 ```
 
 Under Modules | Data | Bikes on Canvas you have data on the number of people counted cycling in Auckland and the amount of rain. 
@@ -80,8 +81,26 @@ ggplot(data=rainfall_cyclist_df, aes(x=`Total Cyclists`, y=`Mean Rainfall`)) + g
 
 4. Fit a regression model to predict the number of cyclists from year, season, day of the week, and rain. 
 
+```{r Q4}
+input.df = rainfall_cyclist_df %>%
+  mutate(month.no = month(timestamp),
+         season = factor(case_when(month.no < 3 | month.no > 11 ~ "Summer",
+                            month.no >= 3 & month.no < 6 ~ "Autumn",
+                            month.no >= 6 & month.no < 9 ~ "Winter",
+                            month.no >=9 & month.no < 12 ~ "Spring")),
+         dow = factor(wday(timestamp)),
+         year.no = factor(year(timestamp))) %>%
+  select(year.no, season, dow, `Mean Rainfall`, `Total Cyclists`)
+
+pairs20x(input.df) 
+
+cyclists.fit = lm(`Total Cyclists` ~ year.no + season + dow + `Mean Rainfall`, data=input.df)
+summary(cyclists.fit)
+```
+
 5. Based on your graphs and model, does rain have a big impact on the number of people cycling in Auckland?
 
+Based on the graphs and model - yes rain has a big significant impact on the number of people cycling in Auckland. 
  
 
 Upload your rmarkdown (.Rmd) file and the HTML or PDF output that it produces to Canvas. 
