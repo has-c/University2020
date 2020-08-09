@@ -35,7 +35,8 @@ head(bike.df)
 2. Compute the total number of cyclists counted for each day, and a suitable summary of the rainfall for each day, in the same data frame.
 ```{r Q2}
 total_cyclists_per_day = bike.df %>%
-  pivot_longer(data=., names(bike.df[-1]), names_to="Location", "values_to"="Number of Cyclists") %>% 
+  filter(!is.na(Date)) %>%
+  pivot_longer(data=., names(bike.df[-1]), names_to="Location", "values_to"="Number of Cyclists")  %>%
   separate(col=Date, sep=3, into=c("dow", "date")) %>%
   mutate(timestamp=dmy(date)) %>%
   group_by(timestamp) %>%
@@ -50,20 +51,31 @@ rainfall_cyclist_df = inner_join(mean_rainfall_per_day, total_cyclists_per_day, 
 ```
 
 3. Draw suitable graphs to display how the number of cyclists varies over time, over season, over day of the week, and with rain
-```{r Q2}
-total_cyclists_per_day = bike.df %>%
-  pivot_longer(data=., names(bike.df[-1]), names_to="Location", "values_to"="Number of Cyclists") %>% 
-  separate(col=Date, sep=3, into=c("dow", "date")) %>%
-  mutate(timestamp=dmy(date)) %>%
-  group_by(timestamp) %>%
-  summarise("Total Cyclists" = sum(`Number of Cyclists`, na.rm=TRUE))
+```{r Q3}
+#Number of cyclists verus time
+ggplot(data=rainfall_cyclist_df, aes(x=timestamp, y=`Total Cyclists`)) + geom_line()
 
-mean_rainfall_per_day = rain.df %>%
-  mutate(timestamp = ymd(`Date(NZST)`)) %>%
-  group_by(timestamp) %>%
-  summarise("Mean Rainfall" = mean(`Amount(mm)`, na.rm=TRUE))
+#Number of cyclists over season
+rainfall_cyclist_df %>%
+  mutate(month.no = month(timestamp),
+         season = case_when(month.no < 3 | month.no > 11 ~ "Summer",
+                            month.no >= 3 & month.no < 6 ~ "Autumn",
+                            month.no >= 6 & month.no < 9 ~ "Winter",
+                            month.no >=9 & month.no < 12 ~ "Spring")) %>%
+  group_by(season) %>%
+  summarise(mean.cyclists = mean(`Total Cyclists`, na.rm=TRUE)) %>%
+  ggplot(data=., aes(x=season, y=mean.cyclists)) + geom_bar(stat="identity")
 
-rainfall_cyclist_df = inner_join(mean_rainfall_per_day, total_cyclists_per_day, by="timestamp")
+#Number of cyclists versus day of the week
+rainfall_cyclist_df %>%
+  mutate(dow = wday(timestamp, label=TRUE)) %>%
+  group_by(dow) %>%
+  summarise(mean.cyclists = mean(`Total Cyclists`, na.rm=TRUE)) %>%
+  ggplot(data=., aes(x=dow, y=mean.cyclists)) + geom_bar(stat="identity")
+
+#Number of cyclists varies with rain
+ggplot(data=rainfall_cyclist_df, aes(x=`Total Cyclists`, y=`Mean Rainfall`)) + geom_point()
+
 ```
 
 4. Fit a regression model to predict the number of cyclists from year, season, day of the week, and rain. 
