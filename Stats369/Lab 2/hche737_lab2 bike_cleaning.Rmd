@@ -73,7 +73,7 @@ full_bikes_df = inner_join(name_table,allbikes, by="counter") %>%
          wday = factor(dow, levels=c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")),
          area_location = factor(counter_edited)) 
 
-#sumamrize 
+#summarise 
 bike_summary_df = full_bikes_df %>%
   filter(!(is.na(wday))) %>%
   group_by(area_location, wday) %>%
