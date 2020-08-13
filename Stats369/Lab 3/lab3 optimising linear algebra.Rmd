@@ -1,11 +1,15 @@
 ---
 title: 'Lab 3: optimising linear algebra'
+author: 'Hasnain Cheena, 190411106, hche737'
 date: "13 August 2020"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(leaps)
 ```
 
 Linear algebra is fundamental for data science. Standard CPUs aren't very good at it: they can spend nearly all the time getting data on and off the CPU and very little time doing productive calculations. Specially designed chips for matrix operations (GPUs) and higher-dimensional tensor operations (TPUs) are the future way around this problem, but optimising data flow is important even there.
@@ -20,21 +24,129 @@ Some useful code for setting up the design matrix and doing the cross-validation
 
 ## Tasks
 
-1. Read in the data and choose your own random sample of 500 rows with
+### Question 1
 
+1. Read in the data and choose your own random sample of 500 rows
+
+```{r Read in the data, cache=TRUE}
+df= read_csv('sgemm_product.csv.')
+
+set.seed(190411106)
+
+#use slice_sample to get random sample of 500 rows
+subsample.df= df %>%
+  slice_sample(n=500) %>%
+  mutate(log.time1 = log(`Run1 (ms)`),
+         log.time2 = log(`Run2 (ms)`))
 ```
-set.seed(your_id_number)
-my_sample<-sample(261400, 500)
-```
+### Question 2
 
 2. Using the `leaps` package, as in class, run backwards stepwise selection to predict timings from the **logarithm of time** for first run on models with all 14 predictors and all two-way interactions. Look at models with up to 20 variables. Plot the apparent error against the number of predictors. 
 
+```{r Task 2}
+
+#create model matrix with all 2 way interactions
+mf = cbind(subsample.df[, 1:14], log.time1 = subsample.df$log.time1)
+model.matrix <-model.matrix(log.time1~.^2, mf)[,-1]
+#search for models
+bsearch = regsubsets(model.matrix,subsample.df$log.time1,nvmax=20, method="back")
+summ = summary(bsearch)
+#plot apparent error versus number of parameters
+apparent.error = data.frame("p"=1:20, "apparent.error" = summ$rss/(500 - 1:20))
+ggplot(apparent.error, aes(x=p, y=apparent.error)) + geom_point() 
+```
+
+### Question 3
+
 3. Using cross-validation, select a tuning parameter $\lambda$ so that minimising $n\log\mathrm{RSS}+\lambda p$ gives good mean squared prediction error, and select a predictive model.  
+
+Note that in this analysis it is assumed that models of only upto 20 variables are considered and and all two-way interactions are included.
+
+```{r Task 3 - Select a model}
+y<-subsample.df$log.time1
+X<-model.matrix
+
+yhat<-function(xtrain, ytrain, xtest,lambda){  
+  n.variables = 20
+  search<-regsubsets(xtrain,ytrain, nvmax=n.variables, method="back")  
+  summ<-summary(search)  
+  aic<-nrow(xtrain)*log(summ$rss)+lambda*(1:n.variables)  
+  best<-which.min(aic)#lowest AIC  
+  betahat<-coef(search, best)#coefficients for the best model  
+  xinmodel<-cbind(1,xtest)[,summ$which[best,]]#predictors in that model  
+  yhat<-xinmodel%*%betahat
+}
+
+xvalMSPE<-function(lambda){  
+  folds<-sample(rep(1:10,10))  
+  fitted<-numeric(nrow(X))
+  
+  for(k in 1:10){    
+    train<-(1:nrow(X))[folds!=k]    
+    test<-(1:nrow(X))[folds==k]    
+    fitted[test]<-yhat(X[train,],y[train],X[test,], lambda)
+  }  
+  mean((y-fitted)^2)
+}
+
+lambdas<-seq(2,12,2)
+MSPE = sapply(lambdas, xvalMSPE)
+
+data.frame("lambda" = lambdas, "MSPE" = MSPE)
+```
+Can see from the output above that a good predictive model has a $\lambda = 4$. Next fit the model on the full subset of data. 
+
+```{r Task 3 - Extract best model parameters and fit full model}
+n.variables = 20
+best.lambda = 4
+#extract features and labels
+y<-subsample.df$log.time1
+X<-model.matrix
+#search for model
+search<-regsubsets(X,y, nvmax=n.variables, method="back")  
+summ<-summary(search)  
+#find best model for selected lambda
+penalised.aic<-nrow(X)*log(summ$rss)+best.lambda*(1:n.variables)  
+best<-which.min(penalised.aic)#lowest AIC  
+#coefficients of best model
+coefficients = coef(search, best)#coefficients for the best model
+coefficients
+```
+Coefficients of model selected are shown above. 
+
+### Question 4
 
 4. Estimate the actual mean squared prediction error of your model using the second replicate of the experiment (`log(Run2)`) in your sample data set.
 
+```{r Task 4}
+#features and labels of sample data
+y2<-subsample.df$log.time2
+X<-model.matrix
+
+betahat<-coef(search, best)#coefficients for the best model  
+xinmodel<-cbind(1,X)[,summ$which[best,]]#predictors in that model  
+yhat<-xinmodel%*%betahat
+
+mean((y2-yhat)^2)
+```
+Actual MSPE of selected model using the second replicate of the experiment and subsample of dataset is approximately 0.26ms.
+
+### Question 5
+
 5. Estimate the actual mean squared prediction error of your model using the second replicate of the experiment (`log(Run2)`) on all 261400 observations
 
-## Computational hints
+```{r Task 5}
+#log response variable
+df = df %>%
+  mutate(log.time2 = log(`Run2 (ms)`))
+mf = cbind(df[, 1:14], log.time2 = df$log.time2)
+#features and labels from entire dataset
+X <-model.matrix(log.time2~.^2, mf)[,-1]
+y2 = df$log.time2
 
-In `rmarkdown`, you can start a code chunk with `{r cache=TRUE}` instead of just `{r}`. It will then not be re-run unless something changes. This can save a lot of time when working with large datasets.
+xinmodel<-cbind(1,X)[,summ$which[best,]]#predictors in that model  
+yhat<-xinmodel%*%betahat
+
+mean((y2-yhat)^2)
+```
+Actual MSPE of selected model using the second replicate of the experiment using the full dataset is approximately 0.38ms.
