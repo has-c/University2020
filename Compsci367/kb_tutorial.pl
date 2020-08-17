@@ -5,8 +5,8 @@ female(victoria).
 parent(albert, edward).
 parent(victoria, edward).
 
-father(X,Y) :- 
+father(X,Y) :-
     parent(X,Y), male(X).
 
-mother(X,Y) :- 
+mother(X,Y) :-
     parent(X,Y), female(X).

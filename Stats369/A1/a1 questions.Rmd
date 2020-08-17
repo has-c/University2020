@@ -1,18 +1,19 @@
 ---
 title: "Assignment 1 2020"
-author: "David Welch"
-output: html_document
+author: "Hasnain Cheena, hche737, 190411106"
+output: 
+  html_document:
+    theme: cerulean
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
 library(tidyverse)
 library(lubridate)
-library(s20x)
 ```
 
-Under Modules | Data | Bikes on Canvas you have data on the number of people counted cycling in Auckland and the amount of rain. 
-```{r Load Data, echo=FALSE}
+## Load in data
+```{r Load Data}
 base.url = "../data/BIKES/"
 bike.data.files = list.files(base.url, pattern="cycle")
 rain.data.files = list.files(base.url, pattern="rain")
@@ -24,16 +25,35 @@ rain.df = rbind(read_csv(paste(base.url,rain.data.files[1], sep=""), skip=9),
                 read_csv(paste(base.url,rain.data.files[2], sep=""), skip=9))
 ```
 
-1.  If you try to convert the cycle count data to tidy format (which you don't have to do for this assignment, because it's hard), what is one obstacle you will encounter?
+## Question 1: If you try to convert the cycle count data to tidy format, what is one obstacle you will encounter?
 
-Lab 2 issue: manual reconcilation of the locations. You will aim to create a single column 'location' for all the counters. Some places like Quay St Vector and Quay Street Spark are the same but there is no automatic way to merge them. This will have to be done manually. The problem with doing this manually is that it introduces human error and can be done wrong.
+To tidy the data the the first step would be to pivot_longer as the cyclist count is split across multiple columns. This step is shown below: 
 
-Use the code as evidence of two places that are hard to automatically merge. 
-```{r Look at Data, echo=FALSE}
-head(bike.df)
+```{r Tidy Data}
+tidy.bike.df <- bike.df %>%
+  pivot_longer(data=.,values_to ="rider_count", names_to ="counter",names(bike.df)[-1]) %>%
+  distinct(counter) %>%
+  arrange(counter)
+head(tidy.bike.df)
 ```
+From the output above it can be seen that location names such as `Curran St total`, `Curran Street Total`, and `Curran Street Total Cyclists` should be the same. These names have to be merged. This problem occurs in other places throughout the data-set is a key obstacle that is encountered when tidying the data. 
 
-2. Compute the total number of cyclists counted for each day, and a suitable summary of the rainfall for each day, in the same data frame.
+## Question 2: Compute the total number of cyclists counted for each day, and a suitable summary of the rainfall for each day, in the same data frame.
+
+This question was solved by:
+
+First transforming the bike data:
+
+*   Applying `pivot_longer` to the data to collapse the locations into a single column 
+*   Creating day-of-week and timestamp columns
+*   Aggregating the data by timestamp and finding total number of cyclists per day per location 
+
+Second transforming the rain data:
+
+*   Create a timestamp column
+*   Aggregate by time stamp and find the average amount of rainfall per day
+
+Then join the two dataframes on the timestamp column common in both. 
 ```{r Q2}
 total_cyclists_per_day = bike.df %>%
   filter(!is.na(Date)) %>%
@@ -49,12 +69,35 @@ mean_rainfall_per_day = rain.df %>%
   summarise("Mean Rainfall" = mean(`Amount(mm)`, na.rm=TRUE))
 
 rainfall_cyclist_df = inner_join(mean_rainfall_per_day, total_cyclists_per_day, by="timestamp")
+head(rainfall_cyclist_df)
 ```
+The joined dataframe is shown above.
 
-3. Draw suitable graphs to display how the number of cyclists varies over time, over season, over day of the week, and with rain
+## Question 3: Draw suitable graphs to display how the number of cyclists varies over time, over season, over day of the week, and with rain
+
+This question was solved by:
+
+First plotting a line graph of showing how the number of cyclists varies over time 
+
+Second transforming the joined dataframe (from Q2) by:
+
+*   Creating a month number column 
+*   Using the month number column to create a season column
+*   Aggregate data by season and calculate mean number of cyclists per season
+*   Plot the average number of cyclists per season as a bar graph
+
+Third transforming the joined dataframe (from Q2) by:
+
+*   Creating a day-of-the-week factor column
+*   Aggregate data by day-of-the-week and calculate mean number of cyclists per day-of-the-week
+*   Plot the average number of cyclists per day-of-the-week as a bar graph 
+
+Finally plotting a scatterplot of number of cyclists versus the amount of rain.  
 ```{r Q3}
 #Number of cyclists verus time
-ggplot(data=rainfall_cyclist_df, aes(x=timestamp, y=`Total Cyclists`)) + geom_line()
+ggplot(data=rainfall_cyclist_df, aes(x=timestamp, y=`Total Cyclists`)) + geom_line() + 
+  ggtitle("Time versus Number of Cyclists") + 
+  labs(y="Number of Cyclists", x = "Time")
 
 #Number of cyclists over season
 rainfall_cyclist_df %>%
@@ -65,21 +108,32 @@ rainfall_cyclist_df %>%
                             month.no >=9 & month.no < 12 ~ "Spring")) %>%
   group_by(season) %>%
   summarise(mean.cyclists = mean(`Total Cyclists`, na.rm=TRUE)) %>%
-  ggplot(data=., aes(x=season, y=mean.cyclists)) + geom_bar(stat="identity")
+  ggplot(data=., aes(x=season, y=mean.cyclists)) + geom_bar(stat="identity") + 
+  ggtitle("Season versus Number of Cyclists") + 
+  labs(y="Number of Cyclists", x = "Season")
 
 #Number of cyclists versus day of the week
 rainfall_cyclist_df %>%
   mutate(dow = wday(timestamp, label=TRUE)) %>%
   group_by(dow) %>%
   summarise(mean.cyclists = mean(`Total Cyclists`, na.rm=TRUE)) %>%
-  ggplot(data=., aes(x=dow, y=mean.cyclists)) + geom_bar(stat="identity")
+  ggplot(data=., aes(x=dow, y=mean.cyclists)) + geom_bar(stat="identity") + 
+  ggtitle("Day of Week versus Number of Cyclists") + 
+  labs(y="Number of Cyclists", x = "Day of Week")
 
 #Number of cyclists varies with rain
-ggplot(data=rainfall_cyclist_df, aes(x=`Total Cyclists`, y=`Mean Rainfall`)) + geom_point()
+ggplot(data=rainfall_cyclist_df, aes(x=`Total Cyclists`, y=`Mean Rainfall`)) + geom_point() + 
+  ggtitle("Number of Cyclists versus Average Rainfall") + 
+  labs(y="Average Rainfall (mm)", x = "Number of Cyclists")
 
 ```
 
-4. Fit a regression model to predict the number of cyclists from year, season, day of the week, and rain. 
+## Question 4: Fit a regression model to predict the number of cyclists from year, season, day of the week, and rain.
+
+This question was solved by:
+
+First transforming the joined dataframe (from Q2) by creating month number, season, day-of-the-week and year number columns. 
+Then fitting a simple linear model to the data.
 
 ```{r Q4}
 input.df = rainfall_cyclist_df %>%
@@ -92,15 +146,15 @@ input.df = rainfall_cyclist_df %>%
          year.no = factor(year(timestamp))) %>%
   select(year.no, season, dow, `Mean Rainfall`, `Total Cyclists`)
 
-pairs20x(input.df) 
-
 cyclists.fit = lm(`Total Cyclists` ~ year.no + season + dow + `Mean Rainfall`, data=input.df)
-summary(cyclists.fit)
 ```
 
-5. Based on your graphs and model, does rain have a big impact on the number of people cycling in Auckland?
+## Question 5: Based on your graphs and model, does rain have a big impact on the number of people cycling in Auckland?
 
-Based on the graphs and model - yes rain has a big significant impact on the number of people cycling in Auckland. 
- 
+```{r Q5}
+summary(cyclists.fit)
+confint(cyclists.fit)
+```
 
-Upload your rmarkdown (.Rmd) file and the HTML or PDF output that it produces to Canvas. 
+Yes, examining the model summary output above it can be observed that we have evidence of a very strong relationship between average rainfall and the number of people cycling in Auckland. 
+We estimate that for each additional millimeter of rainfall, on average, the number of cyclists in Auckland decreases by 5007 to 5782.  

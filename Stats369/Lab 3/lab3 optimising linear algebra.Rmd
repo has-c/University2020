@@ -2,11 +2,13 @@
 title: 'Lab 3: optimising linear algebra'
 author: 'Hasnain Cheena, 190411106, hche737'
 date: "13 August 2020"
-output: html_document
+output: 
+  html_document:
+    theme: cerulean
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
 
 library(tidyverse)
 library(leaps)
@@ -24,9 +26,7 @@ Some useful code for setting up the design matrix and doing the cross-validation
 
 ## Tasks
 
-### Question 1
-
-1. Read in the data and choose your own random sample of 500 rows
+### Question 1: Read in the data and choose your own random sample of 500 rows
 
 ```{r Read in the data, cache=TRUE}
 df= read_csv('sgemm_product.csv.')
@@ -38,10 +38,9 @@ subsample.df= df %>%
   slice_sample(n=500) %>%
   mutate(log.time1 = log(`Run1 (ms)`),
          log.time2 = log(`Run2 (ms)`))
-```
-### Question 2
 
-2. Using the `leaps` package, as in class, run backwards stepwise selection to predict timings from the **logarithm of time** for first run on models with all 14 predictors and all two-way interactions. Look at models with up to 20 variables. Plot the apparent error against the number of predictors. 
+```
+### Question 2: Using the `leaps` package, as in class, run backwards stepwise selection to predict timings from the **logarithm of time** for first run on models with all 14 predictors and all two-way interactions. Look at models with up to 20 variables. Plot the apparent error against the number of predictors. 
 
 ```{r Task 2}
 
@@ -53,12 +52,12 @@ bsearch = regsubsets(model.matrix,subsample.df$log.time1,nvmax=20, method="back"
 summ = summary(bsearch)
 #plot apparent error versus number of parameters
 apparent.error = data.frame("p"=1:20, "apparent.error" = summ$rss/(500 - 1:20))
-ggplot(apparent.error, aes(x=p, y=apparent.error)) + geom_point() 
+ggplot(apparent.error, aes(x=p, y=apparent.error)) + geom_point() + 
+  ggtitle("Apparent Error versus Number of Parameters") + 
+  labs(y="Apparent Error", x = "Number of Parameters")
 ```
 
-### Question 3
-
-3. Using cross-validation, select a tuning parameter $\lambda$ so that minimising $n\log\mathrm{RSS}+\lambda p$ gives good mean squared prediction error, and select a predictive model.  
+### Question 3: Using cross-validation, select a tuning parameter $\lambda$ so that minimising $n\log\mathrm{RSS}+\lambda p$ gives good mean squared prediction error, and select a predictive model.  
 
 Note that in this analysis it is assumed that models of only upto 20 variables are considered and and all two-way interactions are included.
 
@@ -114,9 +113,7 @@ coefficients
 ```
 Coefficients of model selected are shown above. 
 
-### Question 4
-
-4. Estimate the actual mean squared prediction error of your model using the second replicate of the experiment (`log(Run2)`) in your sample data set.
+### Question 4: Estimate the actual mean squared prediction error of your model using the second replicate of the experiment (`log(Run2)`) in your sample data set.
 
 ```{r Task 4}
 #features and labels of sample data
@@ -131,9 +128,7 @@ mean((y2-yhat)^2)
 ```
 Actual MSPE of selected model using the second replicate of the experiment and subsample of dataset is approximately 0.26ms.
 
-### Question 5
-
-5. Estimate the actual mean squared prediction error of your model using the second replicate of the experiment (`log(Run2)`) on all 261400 observations
+### Question 5: Estimate the actual mean squared prediction error of your model using the second replicate of the experiment (`log(Run2)`) on all 261400 observations
 
 ```{r Task 5}
 #log response variable
