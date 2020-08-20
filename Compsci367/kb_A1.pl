@@ -112,3 +112,5 @@ slice_list(List, OutputList) :-
 codesFor(Genome, Len) :-
     translate(Genome, AminoSeq),
     sub_string(AminoSeq, _,Len,_,'KRSFIEDLLFNKV').
+
+    working_directory(_, 'C:/Users/hasna/OneDrive/Desktop/Git Repos/University2020/Compsci367/A1').

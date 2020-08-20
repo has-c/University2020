@@ -60,21 +60,21 @@ mapping('AGA','R').
 mapping('AGG','R').
 mapping('GGT','G').
 mapping('GGC','G').
-mapping('GGA','G').
+mapping('GGA','G'). 
 mapping('GGG','G').
 
-read_genome_file(Output) :-
+read_file(List) :-
     open('MT072688sequence.fasta', read, File),
     read_string(File, _, Body),
     string_chars(Body, FileList),   
-    delete(FileList, "\n", Output).
+    delete(FileList, '\n', List).
 
 %trim genome string 
 slice_list(List, SubList) :-
     length(List, N),
     Q is div(N,3),
     To is Q*3,
-    From =374,
+    From =367,
     sublist(List, From, To, SubList).
 
 sublist(List, From, To, SubList) :-
@@ -86,9 +86,11 @@ part([X,Y,Z|GenomeList], [AminoAcid|AminoAcidList]) :-
     mapping(Triplet, AminoAcid),
     part(GenomeList, AminoAcidList).
 
-codesFor(Genome,Amino) :- 
-    read_file(Output),
+codesFor(Amino) :- 
+    read_file(List),
     slice_list(List, StrippedList),
     part(StrippedList, AList),
     atomic_list_concat(AList,AminoSeq),atom(AminoSeq),
   	sub_string(AminoSeq, _,_,_,Amino).
+
+%working_directory(_, 'C:/Users/hasna/OneDrive/Desktop/Git Repos/University2020/Compsci367/A1'). 
