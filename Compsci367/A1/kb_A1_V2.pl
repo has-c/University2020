@@ -63,8 +63,10 @@ mapping('GGC','G').
 mapping('GGA','G'). 
 mapping('GGG','G').
 
-read_file(List) :-
-    open('MT072688sequence.fasta', read, File),
+read_file(Genome, List) :-
+    upcase_atom(Genome, UpperCaseGenome),
+    atom_concat(UpperCaseGenome, 'sequence.fasta', Filename),
+    open(Filename, read, File),
     read_string(File, _, Body),
     string_chars(Body, FileList),   
     delete(FileList, '\n', List).
@@ -86,8 +88,8 @@ part([X,Y,Z|GenomeList], [AminoAcid|AminoAcidList]) :-
     mapping(Triplet, AminoAcid),
     part(GenomeList, AminoAcidList).
 
-codesFor(Amino) :- 
-    read_file(List),
+codesFor(Genome,Amino) :- 
+    read_file(Genome,List),
     slice_list(List, StrippedList),
     part(StrippedList, AList),
     atomic_list_concat(AList,AminoSeq),atom(AminoSeq),
