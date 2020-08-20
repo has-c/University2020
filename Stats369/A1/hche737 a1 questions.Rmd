@@ -36,7 +36,7 @@ tidy.bike.df <- bike.df %>%
   arrange(counter)
 head(tidy.bike.df)
 ```
-From the output above it can be seen that location names such as `Curran St total`, `Curran Street Total`, and `Curran Street Total Cyclists` should be the same. These names have to be merged. This problem occurs in other places throughout the data-set is a key obstacle that is encountered when tidying the data. 
+From the output above it can be seen that location names such as `Curran St total`, `Curran Street Total`, and `Curran Street Total Cyclists` should be the same. These names have to be merged when tidying the data. This problem occurs in other places throughout the data-set is a key obstacle that is encountered when tidying the data. 
 
 ## Question 2: Compute the total number of cyclists counted for each day, and a suitable summary of the rainfall for each day, in the same data frame.
 
@@ -156,5 +156,4 @@ summary(cyclists.fit)
 confint(cyclists.fit)
 ```
 
-Yes, examining the model summary output above it can be observed that we have evidence of a very strong relationship between average rainfall and the number of people cycling in Auckland. 
-We estimate that for each additional millimeter of rainfall, on average, the number of cyclists in Auckland decreases by 5007 to 5782.  
+Yes, examining the model summary output above it can be observed that we have evidence of a very strong relationship between average rainfall and the number of people cycling in Auckland. The model summary shows that as the average amount of rain (in mm) increases, the expected number of cyclists in Auckland decreases. This is as we would expect. From the confidence interval summary we estimate that for each additional millimeter of rainfall, on average, the number of cyclists in Auckland decreases by 5008 to 5783.  

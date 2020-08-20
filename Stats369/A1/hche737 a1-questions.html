@@ -397,7 +397,7 @@ head(tidy.bike.df)</code></pre>
 ## 4 Curran St total                    
 ## 5 Curran Street Total                
 ## 6 Curran Street Total Cyclists</code></pre>
-<p>From the output above it can be seen that location names such as <code>Curran St total</code>, <code>Curran Street Total</code>, and <code>Curran Street Total Cyclists</code> should be the same. These names have to be merged. This problem occurs in other places throughout the data-set is a key obstacle that is encountered when tidying the data.</p>
+<p>From the output above it can be seen that location names such as <code>Curran St total</code>, <code>Curran Street Total</code>, and <code>Curran Street Total Cyclists</code> should be the same. These names have to be merged when tidying the data. This problem occurs in other places throughout the data-set is a key obstacle that is encountered when tidying the data.</p>
 </div>
 <div id="question-2-compute-the-total-number-of-cyclists-counted-for-each-day-and-a-suitable-summary-of-the-rainfall-for-each-day-in-the-same-data-frame." class="section level2">
 <h2>Question 2: Compute the total number of cyclists counted for each day, and a suitable summary of the rainfall for each day, in the same data frame.</h2>
@@ -555,7 +555,7 @@ cyclists.fit = lm(`Total Cyclists` ~ year.no + season + dow + `Mean Rainfall`, d
 ## dow6              378.70056  1341.49207
 ## dow7            -1151.91940  -189.44096
 ## `Mean Rainfall` -5782.68043 -5007.58873</code></pre>
-<p>Yes, examining the model summary output above it can be observed that we have evidence of a very strong relationship between average rainfall and the number of people cycling in Auckland. We estimate that for each additional millimeter of rainfall, on average, the number of cyclists in Auckland decreases by 5007 to 5782.</p>
+<p>Yes, examining the model summary output above it can be observed that we have evidence of a very strong relationship between average rainfall and the number of people cycling in Auckland. The model summary shows that as the average amount of rain (in mm) increases, the expected number of cyclists in Auckland decreases. This is as we would expect. From the confidence interval summary we estimate that for each additional millimeter of rainfall, on average, the number of cyclists in Auckland decreases by 5008 to 5783.</p>
 </div>
 
 
