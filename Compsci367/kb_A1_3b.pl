@@ -1,3 +1,8 @@
+
+%Remember to set the correct working directory
+%working_directory(_, 'C:/Users/hasna/OneDrive/Desktop/Git Repos/University2020/Compsci367/A1'). 
+
+%DNA Triplet Mapping to 
 mapping('TTT','F').
 mapping('TTC','F').
 mapping('TTA','L').
@@ -63,11 +68,16 @@ mapping('GGC','G').
 mapping('GGA','G').
 mapping('GGG','G').
 
+%open and read file
 read_genome_file(Output) :-
     open('MT072688sequence.fasta', read, File),
     read_string(File, _, Body),
     string_chars(Body, FileList),   
     delete(FileList, "\n", Output).
+
+%slice list given index positions
+sublist(List, From, To, SubList) :-
+    findall(E, (between(From, To, I), nth1(I, List, E)), SubList).
 
 %trim genome string 
 slice_list(List, SubList) :-
@@ -77,15 +87,14 @@ slice_list(List, SubList) :-
     From =374,
     sublist(List, From, To, SubList).
 
-sublist(List, From, To, SubList) :-
-    findall(E, (between(From, To, I), nth1(I, List, E)), SubList).
-
+%create triplets from genome list
 part([], []).
 part([X,Y,Z|GenomeList], [AminoAcid|AminoAcidList]) :-
     atom_chars(Triplet, [X,Y,Z]),
     mapping(Triplet, AminoAcid),
     part(GenomeList, AminoAcidList).
 
+%main
 codesFor(Genome,Amino) :- 
     read_file(Output),
     slice_list(List, StrippedList),
