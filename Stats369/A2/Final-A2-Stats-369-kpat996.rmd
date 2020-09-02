@@ -1,0 +1,188 @@
+---
+title: "Stats 369 Assignment 2"
+author: "Kaushal Patel"
+date: "22/08/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Question:
+In the USA, a significant part of the wages of many service workers come from tips, nominally voluntary payments by the customer in additional to the listed price.  For taxis in New York, tourist advice suggests a tip of 15-20%. You have data (Modules| Datasets |Taxis ) from two months of taxi trips in New York City, including information on time of day, day of the week, trip distance, price, number of passengers, locations of pickup and dropoff.  
+
+Using the data from week 2 of January 2016, construct a model that predicts the amount of a tip.  Evaluate the mean squared error of this model on the data from week 4 of January 2016.  Write a report that describes how you constructed the model and how accurate it is. 
+
+```{r cache=TRUE}
+library("tidyverse")
+#Read in the data
+week2 <- read_csv("week2.csv")
+week4 <- read_csv("week4.csv")
+```
+
+Below are some columns that I added to the dataset. These variables are much better to predict with. i.e how the tip amount differs throughout the week, the hour trip start was added because I believe that this is more important than the full time of when a ride takes place. Also, below is the data cleaning that has been done. Variables have been named making it easier to use in the model building, useful variables have been extracted and filtered out data which may lead a model astray. 
+
+```{r cache=TRUE}
+library("tidyverse")
+library("lubridate")
+
+#Get a subset of 10% of the rows of the data
+sm_week2 <- week2 %>% sample_n(200000)
+# Clean the data and create new columns
+sm_week2 <- week2 %>%
+  mutate(dropoff_datetime = tpep_dropoff_datetime,
+         pickup_datetime = tpep_pickup_datetime,
+         dow = wday(pickup_datetime,label=TRUE,abbr=TRUE, week_start = 1),                           
+         hour_trip_start = factor(hour(pickup_datetime)),   
+         tip_percentage = tip_amount/total_amount * 100,
+         trip_duration = as.numeric(difftime(dropoff_datetime,pickup_datetime,units="mins")),    
+         payment_type_label = fct_recode(factor(payment_type), 
+                                         "Credit Card"="1",
+                                         "Cash"="2",
+                                         "No Charge"="3",
+                                         "Other"="4"),
+         Ratecode_label = fct_recode(factor(RatecodeID),
+                                     "Standard rate" = "1",
+                                     "JFK" = "2",
+                                     "Newark" = "3",
+                                     "Nassau or Westchester" = "4",
+                                     "Negotiated fare" = "5",
+                                     "Group ride" = "6")) %>%
+  select(dropoff_datetime, pickup_datetime, trip_duration, VendorID, passenger_count, trip_distance, pickup_longitude, pickup_latitude, dropoff_latitude, dropoff_longitude, Ratecode_label, payment_type_label, fare_amount, tip_amount, tip_percentage, hour_trip_start, dow) %>%
+  filter(passenger_count != 0, trip_distance > 0, trip_duration != 0)
+head(sm_week2)
+```
+
+
+Below are basic linear models which influenced my decision making to see the relationship between the variables. Started by looking at the variables and seeing which variables would impact the model. These were used purely to help me understand how the variables impacted the tip.
+```{r cache=TRUE}
+# Testing variables with Tip to see if the variable (or sequence of variables) has an impact on the amount of tip given
+# Exploratory analysis prior to creating my predicition model
+tip_all.fit <- lm(sm_week2$tip_amount ~ sm_week2$trip_duration + sm_week2$trip_distance + sm_week2$VendorID + sm_week2$dow + sm_week2$hour_trip_start)
+summary(tip_all.fit)
+
+tip_all_wpayment.fit <- lm(sm_week2$tip_amount ~ sm_week2$trip_distance + sm_week2$VendorID + sm_week2$payment_type_label + sm_week2$Ratecode_label)
+summary(tip_all_wpayment.fit)
+
+tip_passenger_count.fit <- lm(sm_week2$tip_amount ~ sm_week2$passenger_count)
+summary(tip_passenger_count.fit)
+
+tip_durn_vendor.fit <- lm(sm_week2$tip_amount ~ sm_week2$trip_duration + sm_week2$VendorID)
+summary(tip_durn_vendor.fit)
+```
+
+
+```{r cache=TRUE}
+library("tidyverse")
+library("lubridate")
+
+# Finding the mean squared error of the week 2 model
+sm_week2.mse <- sm_week2 %>% select(trip_duration, VendorID, passenger_count, trip_distance, Ratecode_label, payment_type_label, hour_trip_start, tip_amount)
+
+set.seed(42)
+my_sample<-sample(2651287, 500000)
+
+lc_week2 <- sm_week2 %>% select(-tip_percentage)
+
+lc_week2.i <- lc_week2 %>% select(trip_duration, VendorID, passenger_count, trip_distance, Ratecode_label, 
+                                  payment_type_label,  fare_amount, tip_amount, hour_trip_start, dow)
+
+lc_week2.i <- lc_week2.i[my_sample,]
+lc_week4 <- week4[my_sample,]
+
+```
+
+In my prediction model, there are no variables to do with the date time and the longitude and the latitude. These variables were removed because of the created variables, day of the week and the hour start time. In terms of location, I chose to go along with the rate code, as this describes whether it is an airport run, or if the trip is a run for the Manhattan area. 
+
+```{r cache=TRUE}
+library("tidyverse")
+library("lubridate")
+library("leaps")
+
+
+#Creating a model frame with the desired variables and their interactions 
+mf<-model.frame(tip_amount~.+passenger_count:trip_distance+trip_distance:trip_duration+payment_type_label:passenger_count
+                +fare_amount:payment_type_label+hour_trip_start:fare_amount+hour_trip_start:passenger_count
+                +Ratecode_label:passenger_count+Ratecode_label:fare_amount+dow:hour_trip_start+dow:fare_amount+dow:payment_type_label
+                +dow:Ratecode_label, data=lc_week2.i)
+X<-model.matrix(tip_amount~., mf)[,-1]
+
+lc_week2.i <- lc_week2.i[-c(attr(mf,"na.action")),]
+subsets1.reg = regsubsets(X, lc_week2.i$tip_amount, nvmax = 20, method = "backward")
+subsets1.summary = summary(subsets1.reg)
+apparentErrors = subsets1.summary$rss / (nrow(lc_week2.i) - 1:20)
+#Plot of the apparent errors
+qplot(y = apparentErrors, x= 1:20)
+
+#Here we have relatively low apparent errors, which is ideal. 
+apparentErrors
+
+```
+This prediction model is quite accurate as shown through the low apparent errors (this is indicated in the R output).
+```{r cache=TRUE}
+library("tidyverse")
+library("lubridate")
+
+allyhat<-function(xtrain, ytrain, xtest,lambdas,nvmax=50){
+  n<-nrow(xtrain)
+  yhat<-matrix(nrow=nrow(xtest),ncol=length(lambdas))
+  search<-regsubsets(xtrain,ytrain, nvmax=nvmax, method="back")
+  summ<-summary(search)
+  for(i in 1:length(lambdas)){
+    penMSE<- n*log(summ$rss)+lambdas[i]*(1:nvmax)
+    best<-which.min(penMSE)  #lowest AIC
+    betahat<-coef(search, best) #coefficients
+    xinmodel<-cbind(1,xtest)[,summ$which[best,]] #predictors in that model
+    yhat[,i]<-xinmodel%*%betahat
+  }
+  yhat
+}
+
+y <- lc_week2.i$tip_amount
+## This code only partially works. I will assume that the value of lambda with the lowest MSPE is 2. Which I retrieved from the colmeans output. Lambda values goes; 2,4,6,8,10,12 from left to right. This is at the end of this r code block
+n<-nrow(X)
+folds<-sample(rep(1:10,length.out=n))
+lambdas<-c(2,4,6,8,10,12)
+fitted<-matrix(nrow=n,ncol=length(lambdas))
+for(k in 1:10){
+  train<- (1:n)[folds!=k]
+  test<-(1:n)[folds==k]
+  fitted[test,]<-allyhat(X[train,],y[train],X[test,],lambdas)
+}
+colMeans((y-fitted)^2, na.rm=TRUE)
+
+```
+
+```{r cache=TRUE}
+library("tidyverse")
+library("lubridate")
+
+search = regsubsets(X, y, nvmax = 20, method = "backward")
+summ = summary(search)
+aic = 500*log(summ$rss)+4*(1:20)
+best = which.min(aic)
+betahat = coef(search, best)
+betahat
+
+Xpred = cbind(1, X)[,summ$which[best,]]
+fitted = Xpred%*%betahat
+
+lc_week4 <- lc_week4[-c(attr(mf,"na.action")),]
+MSPEsample = sum((lc_week4$tip_amount - fitted)^2, na.rm=TRUE) / length(fitted)
+MSPEsample
+```
+
+The MSPEsample value that has been given is relatively low, we we can say that the prediction for the tips in week 4 is accurate. Also, as shown by the linear models.
+
+Why did I use a backward stepwise regression for calculating the MSPE?
+
+Defintion of backwards step wise regression:
+The backwards methods involves starting with all the potential explanatory variables, and then a cycle of deleting variables and testing the model. The variable whose loss gives the most statistically insignificant value of the fit model. This cycle continues until no further variables can be deleted without a statistically significant loss.
+
+How does MSE help?
+The mean squared error is an estimator, for a response variable of a model, which measures the average of the squares of the errors. It is a measure of the quality of the estimator, and the smaller the values the better.
+
+Relate these concepts to the taxi data and speculation to week 4 of the NYC Taxi dataset:
+The database is a very large one, with over 2 million rows of data per week and 19 separate columns. Not all of these columns are usuable build a model to predict the amount of tips. So we can take these out. Then by backwards step wise regression we can filter out the variables that are not signifcant on how much tip is given. Variables, such as the VendorID, are not included because along with other variables they do not make the model any better.
+
+However, it is important to note that the variables could be significant in their own right, but with the model  we have, they do not have any significance. We also followed occams razor where were have the most with the least. We have removed all variables which are not significant in predicting the amount of tip given, but we have a model with certain variables which help us estimate how much tip is given with a low predition error.
