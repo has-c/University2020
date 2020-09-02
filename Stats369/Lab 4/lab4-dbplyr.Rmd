@@ -1,0 +1,113 @@
+---
+title: "dbplyr and the Wikimedia interview"
+author: "Hasnain Cheena, 190411106"
+date: "20 August 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This week's lab is a re-run of the first lab, but using `dbplyr`.  You will need the `RSQLite` package.
+
+## Reading the data
+
+In the following code, replace `WIKI/DB` with the name of an empty folder that you want to put the database in 
+```{r}
+library(RSQLite)
+library(DBI)
+sqcon<- dbConnect(dbDriver("SQLite"), "data/db/sqlite.db")
+events <- read_csv("data/events_log.csv")
+sqevents <- copy_to(sqcon, events)
+```
+
+The object `sqevents` is the dbplyr "lazy" data frame 
+
+If something goes wrong you will need to shutdown the database server and you may need to delete the contents of the database folder (`WIKI/DB` in the example)
+
+## Main task 
+
+Repeat task 1 of the first lab on the `sqevents` data frame.  
+
+You will need to use `mutate` and `substr` rather than `separate` to extract information from the time stamp. You will also need to use `as.character` to convert the timestamp to a character string.
+
+When you are done, shut down the database server
+
+```{r Task 1}
+#find daily clickthrough rate
+byday <- sqevents %>% 
+  mutate(timestamp=as.character(timestamp),
+    year=substr(x=timestamp, start=1, stop=4),
+    month=substr(x=timestamp, start=5, stop=6),
+    day=substr(x=timestamp, start=7, stop=8)) %>%
+  group_by(session_id, month,day) %>% 
+  summarise(pages=sum(action=="visitPage", na.rm=TRUE)) %>% 
+  group_by(month,day) %>%
+  summarise(clickthrough_rate = mean(pages>0, na.rm = TRUE)) %>%
+  collect()
+byday
+
+#how does it vary per group
+bygroup <- sqevents %>% 
+  group_by(session_id, group) %>% 
+  summarise(pages=sum(action=="visitPage", na.rm=TRUE)) %>% 
+  group_by(group) %>%
+  summarise(clickthrough_rate = mean(pages>0, na.rm=TRUE)) %>%
+  collect()
+bygroup
+
+#shutdown the server
+DBI::dbDisconnect(sqcon, shutdown=TRUE)
+```
+
+
+## Timings
+
+```{r Task 2 setup, include=FALSE}
+sqcon<- dbConnect(dbDriver("SQLite"), "data/db/sqlite.db")
+events <- read_csv("data/events_log.csv")
+sqevents <- copy_to(sqcon, events)
+```
+
+Compare the speed of in-memory and SQLite versions of the code as if you were starting off with the data in a database. Use `system.time()` to help with this task, as we did in Lecture 11.
+
+To compare the speeds byday grouping was performed once more within both methods. 
+```{r Task 2, message=FALSE}
+
+#SQLite
+system.time(
+  sqevents %>% 
+  mutate(timestamp=as.character(timestamp),
+    year=substr(x=timestamp, start=1, stop=4),
+    month=substr(x=timestamp, start=5, stop=6),
+    day=substr(x=timestamp, start=7, stop=8)) %>%
+  group_by(session_id, month,day) %>% 
+  summarise(pages=sum(action=="visitPage", na.rm=TRUE)) %>% 
+  group_by(month,day) %>%
+  summarise(clickthrough_rate = mean(pages>0, na.rm = TRUE)) %>%
+  collect()
+)
+
+
+#In memory processing
+system.time(events.df <- sqevents %>% collect())
+system.time(
+  events.df %>% 
+  mutate(timestamp=as.character(timestamp),
+    year=substr(x=timestamp, start=1, stop=4),
+    month=substr(x=timestamp, start=5, stop=6),
+    day=substr(x=timestamp, start=7, stop=8)) %>%
+  group_by(session_id, month,day) %>% 
+  summarise(pages=sum(action=="visitPage", na.rm=TRUE)) %>% 
+  group_by(month,day) %>%
+  summarise(clickthrough_rate = mean(pages>0, na.rm = TRUE))
+)
+
+#shutdown the server
+DBI::dbDisconnect(sqcon, shutdown=TRUE)
+```
+
+Therefore, you can see the overall time elapsed when reading/processing from in-memory is 
+much slower than processing from the database. 

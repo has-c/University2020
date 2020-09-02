@@ -1,0 +1,58 @@
+---
+title: 'q6: 14 Marks total'
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+The data set strains.csv records the result of an experiment run over three years in which various plant strains were grown and their weight measured monthly. The weighing was somewhat imprecise so each measurement was taken twice for accuracy and is recorded in the form "m1:m2".
+
+We are interested in the variables strain type, month, year, and the two measurements taken. 
+
+## Part A (3 marks)
+
+Read in the data (using tidyverse commands) and give two reasons why the data is not tidy.
+
+```{r}
+df <- read_csv('strains.csv')
+```
+The data is not tidy because:
+
+* The date variable is split across multiple columns. To make it tidy this variable should be encapsulated in a single column using pivot_longer. 
+* The date columns also contain both measurements in the form of "m1:m2". This should be split out using the separate command.
+
+
+## Part B (6 marks)
+
+Use dplyr to put the data into tidy format and ensure the data type of each column is appropriate for the variable.
+
+```{r}
+tidy.df = df %>% 
+  pivot_longer(names(df)[-1], names_to = "date", values_to="weight") %>%
+  separate(weight,into=c("weight1", "weight2"), sep=":") %>%
+  pivot_longer(c("weight1", "weight2"), names_to="weight_type", values_to="weight")
+
+tidy.df
+```
+
+## Part C (5 marks)
+
+Using tidyverse commands, create a summary table showing the average weight (sensibly combining both measurements) for each strain across the whole experiment, sorted in increasing order of average weight.  
+
+```{r}
+weight.summary.df = tidy.df %>%
+  mutate(strain_factor = factor(strain), 
+         weight_num = as.numeric(weight)) %>%
+  group_by(strain_factor) %>%
+  summarise(avg_weight = mean(weight_num, na.rm=TRUE))
+
+weight.summary.df
+```
+
+
+
