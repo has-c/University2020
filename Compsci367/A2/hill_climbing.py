@@ -240,14 +240,54 @@ def hill_climbing_sideways(problem, max_sideways_moves):
     off by one errors, and don't forget to return early if the search finds
     a goal state.
     """
-    ######################
-    ### Your code here ###
-    ######################
+
+    number_of_nodes_expanded = 0
+    solved = False
+    best_state = ()
+    number_of_sideways_moves = 0
+
+    current = Node(problem=problem, state=problem.initial)
+    while True:
+
+        #if the goal state is reached then break
+        if current.goal_test():
+            solved = True
+            break
+
+        neighbours = current.expand()
+        number_of_nodes_expanded += 1
+
+        if not neighbours:
+            break
+
+        neighbour = current.best_of(neighbours)
+        if neighbour.value() < current.value():
+            #value of best neigbhour is less than current state
+            #terminate search
+            break
+        elif neighbour.value() == current.value():
+            #value of best neigbhour is equal to current state
+            #perform sideways moves
+            if number_of_sideways_moves == max_sideways_moves:
+                break
+            else:
+                #if number of sideways moves less than max number then 
+                #perform sideways moves
+                number_of_sideways_moves += 1
+                current = neighbour
+        else:
+            #value of neighbour is greater than current state
+            current = neighbour
+
+    best_state = current.state
+
+
+
     return {
-        "expanded": int,
-        "solved": bool,
-        "best_state": tuple,
-        "sideways_moves": int,
+        "expanded": number_of_nodes_expanded,
+        "solved": solved,
+        "best_state": best_state,
+        "sideways_moves": number_of_sideways_moves,
     }
 
 
