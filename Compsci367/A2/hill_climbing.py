@@ -203,13 +203,30 @@ def hill_climbing_instrumented(problem):
     recording the number of nodes expanded, and whether the problem was
     solved.
     """
-    ######################
-    ### Your code here ###
-    ######################
+    number_of_nodes_expanded = 0
+    solved = False
+    best_state = ()
+
+    current = Node(problem=problem, state=problem.initial)
+    while True:
+        if current.goal_test():
+            solved = True
+            break
+        neighbours = current.expand()
+        number_of_nodes_expanded += 1
+        if not neighbours:
+            break
+        neighbour = current.best_of(neighbours)
+        if neighbour.value() <= current.value():
+            break
+        current = neighbour
+
+    best_state = current.state
+
     return {
-        "expanded": int,
-        "solved": bool,
-        "best_state": tuple,
+        "expanded": number_of_nodes_expanded,
+        "solved": solved,
+        "best_state": best_state,
     }
 
 
