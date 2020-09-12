@@ -1,0 +1,262 @@
+---
+title: "Stats 369 - Lab 5"
+author: "Hasnain Cheena"
+date: "12/09/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Task 1: Generate simulated data sets
+
+In this task we will simulate a mock-up dataset where you know the underlying structure, so that you can use the dataset to examine and validate the behaviour of a model.
+
+### Step 1.1: Generate the data sets
+
+Run the following code chunk. As a warm-up, what do you expect the output would be when you run lm(Y~. data = dat_A)?
+
+* In the datasets produced, the number of variables (p) is equal than the number of observations (n), thus $n = p$. This means that OLS fails resulting in non-unique OLS coefficients ($\hat{\beta}$) and the variance of the fit being infinite. 
+The model summary output will show  
+
+```{r 1.1 Generate data}
+# load libraries
+library(glmnet)
+library(MASS)
+library(tidyverse)
+
+# set up parameters
+set.seed(369) 
+
+
+n <- 90  
+p <- 90  
+lambdas <- 2^ seq(6, -4, length = 100)  # lambda values.
+
+# set up correlation matrix between Xs.
+cor.mat <- matrix(0.75, nrow = p, ncol = p)
+diag(cor.mat) <- 1
+cor.mat[lower.tri(cor.mat)] <- t(cor.mat)[lower.tri(cor.mat)]
+
+# dat_A
+X1 <- mvrnorm(n, mu=rep(1, p), Sigma = cor.mat)
+colnames(X1) <- paste0('X', str_pad(1:p, nchar(p), 'left', '0'))
+
+n_betas <- 5
+betas <- as.vector(scale(sample(1:n_betas))) * 12
+related.ind <- sample(1:p, n_betas)
+
+y1 <- as.numeric(betas %*% t(X1[,related.ind]) + rnorm(n))
+
+dat_A <- cbind(data.frame(Y = y1), X1)
+
+# dat_B
+X2 <- mvrnorm(n, mu=rep(1, p), Sigma = cor.mat)
+colnames(X2) <- paste0('X', str_pad(1:p, nchar(p), 'left', '0'))
+
+all_betas <- sample(as.vector(scale(1:p))) * 0.1
+y2 <- as.numeric(all_betas %*% t(X2) + rnorm(n))
+
+dat_B <- cbind(data.frame(Y = y2), X2)
+```
+
+### Step 1.2: Understand the code
+
+Examine the code chunk from 1.1 above, what is the similarity and difference between the two data sets, dat_A and dat_B?
+
+The difference between dat_A and dat_B is 
+
+### Step 1.3: Split into train and test
+
+```{r Train Test Split, echo=FALSE}
+train_prop = 0.8
+smp_size = floor(train_prop * nrow(dat_A))
+
+train_idx = sample(seq_len(nrow(dat_A)), size=smp_size)
+train_A = dat_A[train_idx, ]
+test_A = dat_A[-train_idx, ]
+
+train_idx = sample(seq_len(nrow(dat_B)), size=smp_size)
+train_B = dat_B[train_idx, ]
+test_B = dat_B[-train_idx, ]
+```
+
+## Task 2: Fit Lasso Regression
+
+### Step 2.1 Fit Lasso model using cost-complexity model fitting strategy
+
+```{r Helper Functions}
+fit_lasso <- function (train){
+  
+  df = feature_label_split(train)
+  xval = cv.glmnet(as.matrix(df$X),df$y)
+  
+  return (xval)
+}
+
+feature_label_split <- function(dataset){
+  X = as.matrix(dataset[, -1])
+  y = dataset$Y
+  
+  return(list("X"= X, "y"=y))
+}
+```
+
+```{r Fit Lasso - Set A}
+setA_xval = fit_lasso(train_A)
+plot(setA_xval)
+setA_xval$lambda.min
+```
+Therefore, from cross-validation the value of $\lambda$ that gives the minimum MSPE is $\lambda = 0.05207654$.
+
+```{r Fit Lasso - Set B}
+setB_xval = fit_lasso(train_B)
+plot(setB_xval)
+setB_xval$lambda.min
+```
+
+### Step 2.2: Calculate test MSPE and number of non-zero coefficients in optimal model
+
+```{r Helper Functions}
+
+calc_MSPE <- function(train, test, xval){
+  
+  #split features and labels
+   train_df = feature_label_split(train)
+   test_df = feature_label_split(test)
+   
+  #perform test set predictions
+  lasso.fit = glmnet(as.matrix(train_df$X),train_df$y)
+  pred_y = predict(lasso.fit, as.matrix(test_df$X), s=xval$lambda.min)
+  
+  #calculate MSPE
+  MSPE = mean((test_df$y-pred_y)^2)
+  
+  return(MSPE)
+
+}
+    
+
+  
+number_of_nonzero_coefficients <- function(train, xval){
+  
+  train_df = feature_label_split(train)
+  
+  lasso.fit = glmnet(as.matrix(train_df$X),train_df$y)
+  betas= as.matrix(coef(lasso.fit, s=xval$lambda.min))
+  
+  beta_nonzero = sum(betas != 0)
+  
+  return(beta_nonzero)
+}
+```
+
+```{r Evaluation - Set A}
+#MSPE
+setA_MSPE <- calc_MSPE(train_A,test_A, setA_xval)
+#Number of non-zero coefficients
+non_zero_set_A =  number_of_nonzero_coefficients(train_A, setA_xval)
+
+setA_MSPE
+non_zero_set_A
+```
+
+```{r Evaluation - Set B}
+#MSPE
+setB_MSPE <- calc_MSPE(train_B,test_B, setB_xval)
+#Number of non-zero coefficients
+non_zero_set_B =  number_of_nonzero_coefficients(train_B, setB_xval)
+
+setA_MSPE
+non_zero_set_B
+```
+## Task 3: Fit Ridge Regression
+
+
+```{r Helper Functions}
+fit_ridge <- function (train){
+  
+  df = feature_label_split(train)
+  xval = cv.glmnet(as.matrix(df$X),df$y, alpha = 0)
+  
+  return (xval)
+}
+
+feature_label_split <- function(dataset){
+  X = as.matrix(dataset[, -1])
+  y = dataset$Y
+  
+  return(list("X"= X, "y"=y))
+}
+```
+
+```{r Fit Ridge - Set A}
+setA_xval = fit_ridge(train_A)
+plot(setA_xval)
+setA_xval$lambda.min
+```
+
+```{r Fit Ridge - Set B}
+setB_xval = fit_ridge(train_B)
+plot(setB_xval)
+setB_xval$lambda.min
+```
+
+### Step 3.2: 
+
+```{r Ridge - Helper Functions}
+
+calc_ridge_MSPE <- function(train, test, xval){
+  
+  #split features and labels
+   train_df = feature_label_split(train)
+   test_df = feature_label_split(test)
+   
+  #perform test set predictions
+  ridge_fit = glmnet(as.matrix(train_df$X),train_df$y, alpha=0)
+  pred_y = predict(ridge_fit, as.matrix(test_df$X), s=xval$lambda.min)
+  
+  #calculate MSPE
+  MSPE = mean((test_df$y-pred_y)^2)
+  
+  return(MSPE)
+
+}
+    
+
+  
+number_of_nonzero_coefficients_ridge <- function(train, xval){
+  
+  train_df = feature_label_split(train)
+  
+  ridge_fit = glmnet(as.matrix(train_df$X),train_df$y, alpha=0)
+  betas= as.matrix(coef(ridge_fit, s=xval$lambda.min))
+  
+  beta_nonzero = sum(betas != 0)
+  
+  return(beta_nonzero)
+}
+```
+
+```{r Evaluation - Set A}
+#MSPE
+setA_ridge_MSPE <- calc_ridge_MSPE(train_A,test_A, setA_xval)
+#Number of non-zero coefficients
+ridge_non_zero_setA =  number_of_nonzero_coefficients_ridge(train_A, setA_xval)
+
+setA_ridge_MSPE
+ridge_non_zero_setA
+```
+
+```{r Evaluation - Set B}
+#MSPE
+setB_ridge_MSPE <- calc_ridge_MSPE(train_B,test_B, setB_xval)
+#Number of non-zero coefficients
+ridge_non_zero_setB =  number_of_nonzero_coefficients_ridge(train_B, setB_xval)
+
+setB_ridge_MSPE
+ridge_non_zero_setB
+```
+
+## Task 4: Compare and Comment 
