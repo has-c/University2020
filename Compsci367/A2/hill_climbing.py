@@ -304,12 +304,53 @@ def hill_climbing_random_restart(problem, max_restarts):
     To get consistent results each time, call random.seed(YOUR_FAVOURITE_SEED)
     before calling this function.
     """
-    ######################
-    ### Your code here ###
-    ######################
+    number_of_nodes_expanded = 0
+    solved = False
+    number_of_random_restarts = 0
+
+    current = Node(problem=problem, state=problem.initial)
+    best_state = current.state
+    best_state_value = current.value()
+
+    while True:
+
+        #if the goal state is reached then break
+        if current.goal_test():
+            solved = True
+            break
+
+        neighbours = current.expand()
+        number_of_nodes_expanded += 1
+
+        if not neighbours:
+            break
+
+        neighbour = current.best_of(neighbours)
+        if neighbour.value() <= current.value():
+            #value of best neigbhour is less than or equal to current state
+            #perform random restart
+            if max_restarts == number_of_random_restarts:
+                break
+            else:
+                #keep track of best state found through all searches
+                if current.value() > best_state_value:
+                    best_state_value = current.value()
+                    best_state = current.state
+
+                #restart search
+                new_initial_state = problem.random_state()
+                current = Node(problem=problem, state=new_initial_state)
+                number_of_random_restarts += 1
+   
+        else:
+            #value of neighbour is greater than current state
+            current = neighbour
+
+    best_state = current.state
+
     return {
-        "expanded": int,
-        "solved": bool,
-        "best_state": tuple,
-        "restarts": int,
+        "expanded": number_of_nodes_expanded,
+        "solved": solved,
+        "best_state": best_state,
+        "restarts": number_of_random_restarts,
     }
