@@ -50,24 +50,26 @@ class NQueensProblem:
         Node.expand calls `result` with each action returned by `actions`.
         """
 
-        #Generate all possible states and check if the difference between the curent and future state is 1 move 
+        #Generate all possible actions 
+        #action (c, v)
+        #column of state 
+        #value at that column
+
         possible_actions = []
         number_of_queens = len(state)
 
         for i in range(0, number_of_queens):
-
-            future_state = list(state)
-            future_state[i] = 0
-
+            action = [i,0]
             for _ in range(0, number_of_queens):
+                
+                action = tuple(action)
+                future_state = self.result(state, action)
+                number_of_moves = self.differences(state,future_state)
+                if number_of_moves == 1:
+                    possible_actions.append(action)
 
-                number_of_differences = self.differences(state, future_state)
-                if number_of_differences == 1:
-                    possible_actions.append(future_state)
-
-                future_state = list(future_state)
-                future_state[i] += 1
-                future_state = tuple(future_state)
+                action = list(action)
+                action[1] += 1
 
         return possible_actions
 
@@ -78,7 +80,11 @@ class NQueensProblem:
         Node.expand calls `result` on each action returned by `actions`.
         """
 
-        return action
+        future_state = list(state)
+        future_state[action[0]] = action[1]
+        future_state = tuple(future_state)
+         
+        return future_state
 
     def goal_test(self, state):
         """Check if all columns filled, no conflicts."""
