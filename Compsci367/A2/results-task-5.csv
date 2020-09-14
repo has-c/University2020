@@ -1,0 +1,901 @@
+expanded,solved,type,elapsed_time,NoQueens
+3,False,hill climbing,0.012562990188598633,8
+104,False,hill climbing with sideways moves,0.23869562149047852,8
+27,True,random restart hill climbing,0.05644488334655762,8
+4,False,hill climbing,0.008979082107543945,8
+105,False,hill climbing with sideways moves,0.21722793579101562,8
+16,True,random restart hill climbing,0.030040502548217773,8
+4,False,hill climbing,0.013468742370605469,8
+7,True,hill climbing with sideways moves,0.0229034423828125,8
+23,True,random restart hill climbing,0.04297924041748047,8
+5,False,hill climbing,0.006555795669555664,8
+106,False,hill climbing with sideways moves,0.29416966438293457,8
+9,True,random restart hill climbing,0.024837017059326172,8
+3,False,hill climbing,0.006064653396606445,8
+5,True,hill climbing with sideways moves,0.01609349250793457,8
+19,True,random restart hill climbing,0.04971170425415039,8
+3,False,hill climbing,0.006274700164794922,8
+105,False,hill climbing with sideways moves,0.27233028411865234,8
+6,True,random restart hill climbing,0.012961864471435547,8
+3,False,hill climbing,0.0069315433502197266,8
+105,False,hill climbing with sideways moves,0.25981593132019043,8
+30,True,random restart hill climbing,0.0914463996887207,8
+4,False,hill climbing,0.010640859603881836,8
+8,True,hill climbing with sideways moves,0.019929885864257812,8
+87,False,random restart hill climbing,0.19917988777160645,8
+4,False,hill climbing,0.00829935073852539,8
+105,False,hill climbing with sideways moves,0.2214057445526123,8
+26,True,random restart hill climbing,0.05612778663635254,8
+6,False,hill climbing,0.010969400405883789,8
+106,False,hill climbing with sideways moves,0.22396039962768555,8
+20,True,random restart hill climbing,0.044820308685302734,8
+3,False,hill climbing,0.0059812068939208984,8
+103,False,hill climbing with sideways moves,0.31593847274780273,8
+43,True,random restart hill climbing,0.10693144798278809,8
+3,False,hill climbing,0.007123231887817383,8
+5,True,hill climbing with sideways moves,0.012728452682495117,8
+20,True,random restart hill climbing,0.03969597816467285,8
+4,False,hill climbing,0.008028030395507812,8
+104,False,hill climbing with sideways moves,0.2148442268371582,8
+58,True,random restart hill climbing,0.11519145965576172,8
+2,False,hill climbing,0.008847951889038086,8
+9,True,hill climbing with sideways moves,0.018346548080444336,8
+6,True,random restart hill climbing,0.011166095733642578,8
+5,False,hill climbing,0.01055002212524414,8
+105,False,hill climbing with sideways moves,0.2202615737915039,8
+38,True,random restart hill climbing,0.07173323631286621,8
+5,False,hill climbing,0.010145902633666992,8
+106,False,hill climbing with sideways moves,0.25702357292175293,8
+40,True,random restart hill climbing,0.10397219657897949,8
+7,False,hill climbing,0.013962984085083008,8
+107,False,hill climbing with sideways moves,0.24394631385803223,8
+37,True,random restart hill climbing,0.09095644950866699,8
+5,False,hill climbing,0.009972095489501953,8
+105,False,hill climbing with sideways moves,0.2400364875793457,8
+10,True,random restart hill climbing,0.01938605308532715,8
+4,False,hill climbing,0.006145954132080078,8
+104,False,hill climbing with sideways moves,0.23273539543151855,8
+7,True,random restart hill climbing,0.01142573356628418,8
+3,False,hill climbing,0.010227680206298828,8
+104,False,hill climbing with sideways moves,0.228271484375,8
+6,True,random restart hill climbing,0.010916709899902344,8
+4,False,hill climbing,0.005620002746582031,8
+106,False,hill climbing with sideways moves,0.29465270042419434,8
+18,True,random restart hill climbing,0.040251731872558594,8
+4,False,hill climbing,0.012978553771972656,8
+105,False,hill climbing with sideways moves,0.30687499046325684,8
+7,True,random restart hill climbing,0.018949031829833984,8
+3,True,hill climbing,0.0044519901275634766,8
+3,True,hill climbing with sideways moves,0.016585588455200195,8
+3,True,random restart hill climbing,0.008974790573120117,8
+5,True,hill climbing,0.010002613067626953,8
+5,True,hill climbing with sideways moves,0.008038759231567383,8
+5,True,random restart hill climbing,0.019051313400268555,8
+4,False,hill climbing,0.01296687126159668,8
+104,False,hill climbing with sideways moves,0.22098565101623535,8
+9,True,random restart hill climbing,0.019103527069091797,8
+3,False,hill climbing,0.005982160568237305,8
+104,False,hill climbing with sideways moves,0.22495436668395996,8
+35,True,random restart hill climbing,0.07021713256835938,8
+4,False,hill climbing,0.01014566421508789,8
+104,False,hill climbing with sideways moves,0.26339054107666016,8
+32,True,random restart hill climbing,0.10651540756225586,8
+5,False,hill climbing,0.016388654708862305,8
+7,True,hill climbing with sideways moves,0.022107839584350586,8
+14,True,random restart hill climbing,0.0503993034362793,8
+4,True,hill climbing,0.015600204467773438,8
+4,True,hill climbing with sideways moves,0.012965679168701172,8
+4,True,random restart hill climbing,0.01196742057800293,8
+5,False,hill climbing,0.018663644790649414,8
+6,True,hill climbing with sideways moves,0.010970354080200195,8
+27,True,random restart hill climbing,0.059454917907714844,8
+3,False,hill climbing,0.006988048553466797,8
+104,False,hill climbing with sideways moves,0.2954869270324707,8
+18,True,random restart hill climbing,0.04300880432128906,8
+5,False,hill climbing,0.011510133743286133,8
+14,True,hill climbing with sideways moves,0.04997873306274414,8
+36,True,random restart hill climbing,0.09836840629577637,8
+4,True,hill climbing,0.007540464401245117,8
+4,True,hill climbing with sideways moves,0.007590770721435547,8
+4,True,random restart hill climbing,0.008002758026123047,8
+4,False,hill climbing,0.008002281188964844,8
+6,True,hill climbing with sideways moves,0.01012420654296875,8
+22,True,random restart hill climbing,0.044461727142333984,8
+4,False,hill climbing,0.003859996795654297,8
+104,False,hill climbing with sideways moves,0.22099065780639648,8
+36,True,random restart hill climbing,0.08095073699951172,8
+3,False,hill climbing,0.012688159942626953,8
+7,True,hill climbing with sideways moves,0.019001245498657227,8
+14,True,random restart hill climbing,0.02630615234375,8
+5,False,hill climbing,0.009970903396606445,8
+105,False,hill climbing with sideways moves,0.24825072288513184,8
+9,True,random restart hill climbing,0.016981124877929688,8
+4,False,hill climbing,0.006658315658569336,8
+5,True,hill climbing with sideways moves,0.009909629821777344,8
+43,True,random restart hill climbing,0.09007596969604492,8
+3,False,hill climbing,0.00577235221862793,8
+5,False,hill climbing with sideways moves,0.012657403945922852,8
+16,True,random restart hill climbing,0.02796030044555664,8
+3,True,hill climbing,0.006766796112060547,8
+3,True,hill climbing with sideways moves,0.006663799285888672,8
+3,True,random restart hill climbing,0.006565093994140625,8
+5,False,hill climbing,0.010934591293334961,8
+105,False,hill climbing with sideways moves,0.21994996070861816,8
+38,True,random restart hill climbing,0.0948793888092041,8
+5,False,hill climbing,0.017515182495117188,8
+105,False,hill climbing with sideways moves,0.21198749542236328,8
+11,True,random restart hill climbing,0.015605449676513672,8
+3,False,hill climbing,0.006567239761352539,8
+103,False,hill climbing with sideways moves,0.21996712684631348,8
+26,True,random restart hill climbing,0.054607391357421875,8
+4,False,hill climbing,0.008066177368164062,8
+6,True,hill climbing with sideways moves,0.010915517807006836,8
+9,True,random restart hill climbing,0.020282268524169922,8
+4,False,hill climbing,0.007988929748535156,8
+6,False,hill climbing with sideways moves,0.010604381561279297,8
+22,True,random restart hill climbing,0.04270768165588379,8
+4,False,hill climbing,0.003734111785888672,8
+104,False,hill climbing with sideways moves,0.21276402473449707,8
+22,True,random restart hill climbing,0.03823208808898926,8
+3,False,hill climbing,0.004970073699951172,8
+103,False,hill climbing with sideways moves,0.20041608810424805,8
+86,True,random restart hill climbing,0.20104241371154785,8
+4,False,hill climbing,0.008962154388427734,8
+5,True,hill climbing with sideways moves,0.010002374649047852,8
+7,True,random restart hill climbing,0.013065814971923828,8
+5,False,hill climbing,0.010195493698120117,8
+105,False,hill climbing with sideways moves,0.22977805137634277,8
+52,True,random restart hill climbing,0.12899518013000488,8
+4,False,hill climbing,0.007978439331054688,8
+104,False,hill climbing with sideways moves,0.2674856185913086,8
+23,True,random restart hill climbing,0.06952953338623047,8
+5,True,hill climbing,0.01196742057800293,8
+5,True,hill climbing with sideways moves,0.011972188949584961,8
+5,True,random restart hill climbing,0.013181924819946289,8
+3,False,hill climbing,0.0059814453125,8
+103,False,hill climbing with sideways moves,0.2328650951385498,8
+47,True,random restart hill climbing,0.11405420303344727,8
+3,False,hill climbing,0.005983829498291016,8
+5,True,hill climbing with sideways moves,0.012045860290527344,8
+28,True,random restart hill climbing,0.07649779319763184,8
+5,False,hill climbing,0.00993800163269043,8
+105,False,hill climbing with sideways moves,0.25342440605163574,8
+33,True,random restart hill climbing,0.08804798126220703,8
+4,True,hill climbing,0.011538505554199219,8
+4,True,hill climbing with sideways moves,0.015025615692138672,8
+4,True,random restart hill climbing,0.00856924057006836,8
+3,False,hill climbing,0.007983207702636719,8
+5,False,hill climbing with sideways moves,0.011932373046875,8
+53,True,random restart hill climbing,0.10293269157409668,8
+6,True,hill climbing,0.012904882431030273,8
+6,True,hill climbing with sideways moves,0.013965606689453125,8
+6,True,random restart hill climbing,0.012156486511230469,8
+5,False,hill climbing,0.01403498649597168,8
+9,True,hill climbing with sideways moves,0.018948078155517578,8
+86,False,random restart hill climbing,0.2048816680908203,8
+3,False,hill climbing,0.003480195999145508,8
+104,False,hill climbing with sideways moves,0.20872950553894043,8
+24,True,random restart hill climbing,0.05294370651245117,8
+5,False,hill climbing,0.010983943939208984,8
+105,False,hill climbing with sideways moves,0.2524540424346924,8
+26,True,random restart hill climbing,0.04801225662231445,8
+3,False,hill climbing,0.006992816925048828,8
+104,False,hill climbing with sideways moves,0.20798635482788086,8
+11,True,random restart hill climbing,0.020995140075683594,8
+3,False,hill climbing,0.006968259811401367,8
+103,False,hill climbing with sideways moves,0.2538716793060303,8
+24,True,random restart hill climbing,0.07151150703430176,8
+4,False,hill climbing,0.01308584213256836,8
+6,True,hill climbing with sideways moves,0.01894092559814453,8
+18,True,random restart hill climbing,0.05802178382873535,8
+5,False,hill climbing,0.01811504364013672,8
+106,False,hill climbing with sideways moves,0.29192590713500977,8
+17,True,random restart hill climbing,0.04995298385620117,8
+4,False,hill climbing,0.008968353271484375,8
+105,False,hill climbing with sideways moves,0.2816033363342285,8
+9,True,random restart hill climbing,0.01772928237915039,8
+4,False,hill climbing,0.012158870697021484,8
+105,False,hill climbing with sideways moves,0.2954082489013672,8
+28,True,random restart hill climbing,0.05908036231994629,8
+4,False,hill climbing,0.007970809936523438,8
+104,False,hill climbing with sideways moves,0.2525608539581299,8
+14,True,random restart hill climbing,0.04192852973937988,8
+3,False,hill climbing,0.005913972854614258,8
+104,False,hill climbing with sideways moves,0.2776656150817871,8
+37,True,random restart hill climbing,0.09422540664672852,8
+5,False,hill climbing,0.010988473892211914,8
+5,False,hill climbing with sideways moves,0.008054494857788086,8
+21,True,random restart hill climbing,0.062126874923706055,8
+4,False,hill climbing,0.010976791381835938,8
+104,False,hill climbing with sideways moves,0.22678375244140625,8
+45,True,random restart hill climbing,0.08639669418334961,8
+4,False,hill climbing,0.007938623428344727,8
+104,False,hill climbing with sideways moves,0.2070145606994629,8
+14,True,random restart hill climbing,0.026264667510986328,8
+4,True,hill climbing,0.0005412101745605469,8
+4,True,hill climbing with sideways moves,0.014646530151367188,8
+4,True,random restart hill climbing,0.012972831726074219,8
+5,False,hill climbing,0.015711069107055664,8
+7,True,hill climbing with sideways moves,0.01719808578491211,8
+87,True,random restart hill climbing,0.2783620357513428,8
+4,False,hill climbing,0.015204429626464844,8
+104,False,hill climbing with sideways moves,0.23482728004455566,8
+24,True,random restart hill climbing,0.06714057922363281,8
+4,False,hill climbing,0.01296544075012207,8
+104,False,hill climbing with sideways moves,0.2972893714904785,8
+18,True,random restart hill climbing,0.034064531326293945,8
+3,False,hill climbing,0.004984855651855469,8
+103,False,hill climbing with sideways moves,0.20487236976623535,8
+16,True,random restart hill climbing,0.0319366455078125,8
+2,False,hill climbing,0.003985166549682617,8
+7,True,hill climbing with sideways moves,0.013962745666503906,8
+14,True,random restart hill climbing,0.027402400970458984,8
+3,False,hill climbing,0.009747505187988281,8
+103,False,hill climbing with sideways moves,0.20499920845031738,8
+28,True,random restart hill climbing,0.052872657775878906,8
+5,False,hill climbing,0.008974552154541016,8
+105,False,hill climbing with sideways moves,0.20805120468139648,8
+18,True,random restart hill climbing,0.0359044075012207,8
+3,False,hill climbing,0.005982875823974609,8
+104,False,hill climbing with sideways moves,0.2290956974029541,8
+9,True,random restart hill climbing,0.016965866088867188,8
+4,False,hill climbing,0.007474660873413086,8
+7,True,hill climbing with sideways moves,0.01859283447265625,8
+27,True,random restart hill climbing,0.05482029914855957,8
+4,False,hill climbing,0.006979703903198242,8
+5,True,hill climbing with sideways moves,0.008976221084594727,8
+40,True,random restart hill climbing,0.0809633731842041,8
+5,False,hill climbing,0.015956878662109375,8
+105,False,hill climbing with sideways moves,0.21385550498962402,8
+13,True,random restart hill climbing,0.0406343936920166,8
+4,False,hill climbing,0.016687393188476562,8
+104,False,hill climbing with sideways moves,0.27780818939208984,8
+8,True,random restart hill climbing,0.01595759391784668,8
+5,False,hill climbing,0.010995864868164062,8
+105,False,hill climbing with sideways moves,0.22558116912841797,8
+28,True,random restart hill climbing,0.05458545684814453,8
+4,False,hill climbing,0.008172273635864258,8
+104,False,hill climbing with sideways moves,0.20757150650024414,8
+39,True,random restart hill climbing,0.0757300853729248,8
+5,False,hill climbing,0.009981155395507812,8
+105,False,hill climbing with sideways moves,0.21558046340942383,8
+30,True,random restart hill climbing,0.056559085845947266,8
+4,False,hill climbing,0.0069806575775146484,8
+105,False,hill climbing with sideways moves,0.24585556983947754,8
+7,True,random restart hill climbing,0.018268585205078125,8
+4,False,hill climbing,0.010024547576904297,8
+7,True,hill climbing with sideways moves,0.019710063934326172,8
+13,True,random restart hill climbing,0.02702498435974121,8
+4,False,hill climbing,0.006981849670410156,8
+9,True,hill climbing with sideways moves,0.01695394515991211,8
+21,True,random restart hill climbing,0.04035806655883789,8
+4,False,hill climbing,0.0080108642578125,8
+7,True,hill climbing with sideways moves,0.012341976165771484,8
+17,True,random restart hill climbing,0.034932851791381836,8
+3,False,hill climbing,0.0040552616119384766,8
+5,True,hill climbing with sideways moves,0.010345697402954102,8
+23,True,random restart hill climbing,0.04325413703918457,8
+4,False,hill climbing,0.008873939514160156,8
+6,True,hill climbing with sideways moves,0.012964010238647461,8
+24,True,random restart hill climbing,0.0464015007019043,8
+5,False,hill climbing,0.010160684585571289,8
+6,True,hill climbing with sideways moves,0.011344194412231445,8
+39,True,random restart hill climbing,0.10794734954833984,8
+4,False,hill climbing,0.007906436920166016,8
+104,False,hill climbing with sideways moves,0.2178349494934082,8
+28,True,random restart hill climbing,0.09201431274414062,8
+4,False,hill climbing,0.012382030487060547,8
+104,False,hill climbing with sideways moves,0.26686525344848633,8
+12,True,random restart hill climbing,0.03366708755493164,8
+3,False,hill climbing,0.008978128433227539,8
+10,True,hill climbing with sideways moves,0.030902862548828125,8
+59,True,random restart hill climbing,0.15719079971313477,8
+3,True,hill climbing,0.006624698638916016,8
+3,True,hill climbing with sideways moves,0.0049860477447509766,8
+3,True,random restart hill climbing,0.005984306335449219,8
+3,False,hill climbing,0.005970954895019531,8
+103,False,hill climbing with sideways moves,0.2082996368408203,8
+18,True,random restart hill climbing,0.037207603454589844,8
+4,False,hill climbing,0.006979703903198242,8
+104,False,hill climbing with sideways moves,0.21103525161743164,8
+10,True,random restart hill climbing,0.02756476402282715,8
+4,False,hill climbing,0.010291099548339844,9
+105,False,hill climbing with sideways moves,0.32756733894348145,9
+37,True,random restart hill climbing,0.10999035835266113,9
+4,False,hill climbing,0.01100611686706543,9
+105,False,hill climbing with sideways moves,0.350449800491333,9
+9,True,random restart hill climbing,0.026534557342529297,9
+7,True,hill climbing,0.020455360412597656,9
+7,True,hill climbing with sideways moves,0.02148604393005371,9
+7,True,random restart hill climbing,0.020006418228149414,9
+4,True,hill climbing,0.007147312164306641,9
+4,True,hill climbing with sideways moves,0.020862102508544922,9
+4,True,random restart hill climbing,0.011965751647949219,9
+6,False,hill climbing,0.01424264907836914,9
+106,False,hill climbing with sideways moves,0.35250186920166016,9
+72,True,random restart hill climbing,0.23115921020507812,9
+6,False,hill climbing,0.01640152931213379,9
+106,False,hill climbing with sideways moves,0.339008092880249,9
+28,True,random restart hill climbing,0.08458232879638672,9
+4,False,hill climbing,0.012398242950439453,9
+7,True,hill climbing with sideways moves,0.02062821388244629,9
+10,True,random restart hill climbing,0.02937006950378418,9
+5,False,hill climbing,0.016484737396240234,9
+6,True,hill climbing with sideways moves,0.018927812576293945,9
+39,True,random restart hill climbing,0.11882233619689941,9
+4,False,hill climbing,0.017133235931396484,9
+105,False,hill climbing with sideways moves,0.4335451126098633,9
+15,True,random restart hill climbing,0.0507504940032959,9
+4,False,hill climbing,0.015965938568115234,9
+104,False,hill climbing with sideways moves,0.47069287300109863,9
+28,True,random restart hill climbing,0.08701467514038086,9
+5,True,hill climbing,0.014416694641113281,9
+5,True,hill climbing with sideways moves,0.016388893127441406,9
+5,True,random restart hill climbing,0.01557016372680664,9
+3,False,hill climbing,0.010023355484008789,9
+11,True,hill climbing with sideways moves,0.03286170959472656,9
+17,True,random restart hill climbing,0.05032849311828613,9
+3,False,hill climbing,0.009005546569824219,9
+104,False,hill climbing with sideways moves,0.35871291160583496,9
+34,True,random restart hill climbing,0.13858866691589355,9
+5,False,hill climbing,0.014922142028808594,9
+105,False,hill climbing with sideways moves,0.3276233673095703,9
+43,True,random restart hill climbing,0.15739679336547852,9
+3,False,hill climbing,0.01626300811767578,9
+6,True,hill climbing with sideways moves,0.03077554702758789,9
+34,True,random restart hill climbing,0.15202903747558594,9
+5,False,hill climbing,0.013134241104125977,9
+7,True,hill climbing with sideways moves,0.02384352684020996,9
+13,True,random restart hill climbing,0.03989362716674805,9
+4,False,hill climbing,0.011967182159423828,9
+5,True,hill climbing with sideways moves,0.015048027038574219,9
+15,True,random restart hill climbing,0.047033071517944336,9
+5,False,hill climbing,0.01730489730834961,9
+7,True,hill climbing with sideways moves,0.021009206771850586,9
+21,True,random restart hill climbing,0.06200695037841797,9
+4,False,hill climbing,0.012784957885742188,9
+5,True,hill climbing with sideways moves,0.015980958938598633,9
+36,True,random restart hill climbing,0.1040642261505127,9
+4,False,hill climbing,0.01842498779296875,9
+104,False,hill climbing with sideways moves,0.3304731845855713,9
+15,True,random restart hill climbing,0.045974016189575195,9
+4,False,hill climbing,0.011219263076782227,9
+104,False,hill climbing with sideways moves,0.33007001876831055,9
+66,True,random restart hill climbing,0.19725465774536133,9
+4,False,hill climbing,0.011925458908081055,9
+8,True,hill climbing with sideways moves,0.024935483932495117,9
+33,True,random restart hill climbing,0.10148978233337402,9
+6,False,hill climbing,0.017951488494873047,9
+7,True,hill climbing with sideways moves,0.021229028701782227,9
+24,True,random restart hill climbing,0.0729362964630127,9
+5,False,hill climbing,0.014501571655273438,9
+106,False,hill climbing with sideways moves,0.3822340965270996,9
+43,True,random restart hill climbing,0.12923216819763184,9
+3,False,hill climbing,0.008999347686767578,9
+7,True,hill climbing with sideways moves,0.020151138305664062,9
+52,True,random restart hill climbing,0.17481589317321777,9
+5,False,hill climbing,0.014813899993896484,9
+12,True,hill climbing with sideways moves,0.037763357162475586,9
+48,True,random restart hill climbing,0.15034914016723633,9
+4,False,hill climbing,0.008863687515258789,9
+104,False,hill climbing with sideways moves,0.33060598373413086,9
+55,True,random restart hill climbing,0.17600417137145996,9
+3,False,hill climbing,0.009071826934814453,9
+4,True,hill climbing with sideways moves,0.011968135833740234,9
+31,True,random restart hill climbing,0.0910036563873291,9
+5,False,hill climbing,0.013962507247924805,9
+8,True,hill climbing with sideways moves,0.024077653884887695,9
+15,True,random restart hill climbing,0.03842496871948242,9
+5,False,hill climbing,0.016084671020507812,9
+105,False,hill climbing with sideways moves,0.3193082809448242,9
+33,True,random restart hill climbing,0.0970163345336914,9
+5,False,hill climbing,0.008558034896850586,9
+106,False,hill climbing with sideways moves,0.33226799964904785,9
+10,True,random restart hill climbing,0.029345035552978516,9
+4,False,hill climbing,0.011968135833740234,9
+104,False,hill climbing with sideways moves,0.32428836822509766,9
+99,False,random restart hill climbing,0.29885315895080566,9
+5,False,hill climbing,0.015900135040283203,9
+105,False,hill climbing with sideways moves,0.3228793144226074,9
+12,True,random restart hill climbing,0.043851375579833984,9
+6,False,hill climbing,0.016104459762573242,9
+8,True,hill climbing with sideways moves,0.02792835235595703,9
+25,True,random restart hill climbing,0.0770866870880127,9
+5,True,hill climbing,0.016182899475097656,9
+5,True,hill climbing with sideways moves,0.015040159225463867,9
+5,True,random restart hill climbing,0.015591144561767578,9
+5,False,hill climbing,0.01595783233642578,9
+105,False,hill climbing with sideways moves,0.3228616714477539,9
+15,True,random restart hill climbing,0.0430598258972168,9
+3,False,hill climbing,0.012048006057739258,9
+5,True,hill climbing with sideways moves,0.01595783233642578,9
+30,True,random restart hill climbing,0.0889120101928711,9
+4,True,hill climbing,0.01196742057800293,9
+4,True,hill climbing with sideways moves,0.010900020599365234,9
+4,True,random restart hill climbing,0.012151241302490234,9
+4,False,hill climbing,0.012878894805908203,9
+4,False,hill climbing with sideways moves,0.011962652206420898,9
+46,True,random restart hill climbing,0.14085149765014648,9
+4,False,hill climbing,0.010970115661621094,9
+5,True,hill climbing with sideways moves,0.011239290237426758,9
+42,True,random restart hill climbing,0.1326756477355957,9
+5,False,hill climbing,0.0150909423828125,9
+8,True,hill climbing with sideways moves,0.023378372192382812,9
+41,True,random restart hill climbing,0.11865878105163574,9
+5,True,hill climbing,0.019034147262573242,9
+5,True,hill climbing with sideways moves,0.0232088565826416,9
+5,True,random restart hill climbing,0.010768890380859375,9
+4,False,hill climbing,0.014389753341674805,9
+104,False,hill climbing with sideways moves,0.39070630073547363,9
+27,True,random restart hill climbing,0.08096861839294434,9
+4,True,hill climbing,0.011396169662475586,9
+4,True,hill climbing with sideways moves,0.011967182159423828,9
+4,True,random restart hill climbing,0.010970592498779297,9
+6,False,hill climbing,0.017055749893188477,9
+7,True,hill climbing with sideways moves,0.02193140983581543,9
+11,True,random restart hill climbing,0.03201484680175781,9
+4,True,hill climbing,0.011967897415161133,9
+4,True,hill climbing with sideways moves,0.012928962707519531,9
+4,True,random restart hill climbing,0.007403373718261719,9
+5,False,hill climbing,0.01541757583618164,9
+105,False,hill climbing with sideways moves,0.3282303810119629,9
+42,True,random restart hill climbing,0.12722301483154297,9
+5,False,hill climbing,0.010386228561401367,9
+7,True,hill climbing with sideways moves,0.025683164596557617,9
+51,True,random restart hill climbing,0.15788006782531738,9
+4,False,hill climbing,0.01096963882446289,9
+104,False,hill climbing with sideways moves,0.32900404930114746,9
+62,True,random restart hill climbing,0.1809539794921875,9
+4,True,hill climbing,0.010968446731567383,9
+4,True,hill climbing with sideways moves,0.013962984085083008,9
+4,True,random restart hill climbing,0.01698780059814453,9
+5,True,hill climbing,0.014961957931518555,9
+5,True,hill climbing with sideways moves,0.015955209732055664,9
+5,True,random restart hill climbing,0.013155221939086914,9
+5,False,hill climbing,0.02060246467590332,9
+105,False,hill climbing with sideways moves,0.3679070472717285,9
+82,False,random restart hill climbing,0.2503652572631836,9
+4,False,hill climbing,0.020998239517211914,9
+104,False,hill climbing with sideways moves,0.49093127250671387,9
+52,True,random restart hill climbing,0.24605655670166016,9
+6,False,hill climbing,0.018944978713989258,9
+10,True,hill climbing with sideways moves,0.031287431716918945,9
+48,True,random restart hill climbing,0.145735502243042,9
+4,False,hill climbing,0.01285099983215332,9
+104,False,hill climbing with sideways moves,0.3229808807373047,9
+53,True,random restart hill climbing,0.15796947479248047,9
+4,False,hill climbing,0.014997243881225586,9
+6,True,hill climbing with sideways moves,0.01926898956298828,9
+99,True,random restart hill climbing,0.29166436195373535,9
+6,True,hill climbing,0.019045591354370117,9
+6,True,hill climbing with sideways moves,0.0184934139251709,9
+6,True,random restart hill climbing,0.017334938049316406,9
+3,False,hill climbing,0.004457950592041016,9
+6,True,hill climbing with sideways moves,0.022751808166503906,9
+7,True,random restart hill climbing,0.02111983299255371,9
+4,False,hill climbing,0.012172222137451172,9
+7,True,hill climbing with sideways moves,0.021116971969604492,9
+29,True,random restart hill climbing,0.09085345268249512,9
+4,False,hill climbing,0.011963129043579102,9
+7,True,hill climbing with sideways moves,0.02214193344116211,9
+94,True,random restart hill climbing,0.28444719314575195,9
+6,True,hill climbing,0.017349958419799805,9
+6,True,hill climbing with sideways moves,0.018630027770996094,9
+6,True,random restart hill climbing,0.017951488494873047,9
+6,False,hill climbing,0.017009735107421875,9
+106,False,hill climbing with sideways moves,0.3248882293701172,9
+18,True,random restart hill climbing,0.052985191345214844,9
+4,False,hill climbing,0.013545989990234375,9
+104,False,hill climbing with sideways moves,0.32853150367736816,9
+14,True,random restart hill climbing,0.041838645935058594,9
+5,False,hill climbing,0.013002634048461914,9
+105,False,hill climbing with sideways moves,0.40921854972839355,9
+30,True,random restart hill climbing,0.15231013298034668,9
+4,False,hill climbing,0.02402210235595703,9
+104,False,hill climbing with sideways moves,0.4143667221069336,9
+46,True,random restart hill climbing,0.14256978034973145,9
+7,False,hill climbing,0.021035194396972656,9
+8,True,hill climbing with sideways moves,0.02495718002319336,9
+14,True,random restart hill climbing,0.04296588897705078,9
+5,False,hill climbing,0.014917612075805664,9
+105,False,hill climbing with sideways moves,0.33231306076049805,9
+43,True,random restart hill climbing,0.17743444442749023,9
+4,False,hill climbing,0.02081155776977539,9
+105,False,hill climbing with sideways moves,0.3595101833343506,9
+19,True,random restart hill climbing,0.05838894844055176,9
+4,True,hill climbing,0.016290664672851562,9
+4,True,hill climbing with sideways moves,0.013459920883178711,9
+4,True,random restart hill climbing,0.010249614715576172,9
+5,False,hill climbing,0.020303964614868164,9
+105,False,hill climbing with sideways moves,0.32776427268981934,9
+34,True,random restart hill climbing,0.0993645191192627,9
+5,True,hill climbing,0.010991811752319336,9
+5,True,hill climbing with sideways moves,0.018697023391723633,9
+5,True,random restart hill climbing,0.01485300064086914,9
+5,False,hill climbing,0.015154600143432617,9
+6,True,hill climbing with sideways moves,0.019150733947753906,9
+13,True,random restart hill climbing,0.04201555252075195,9
+4,False,hill climbing,0.011967182159423828,9
+104,False,hill climbing with sideways moves,0.3239634037017822,9
+33,True,random restart hill climbing,0.09688830375671387,9
+5,True,hill climbing,0.013910770416259766,9
+5,True,hill climbing with sideways moves,0.015792131423950195,9
+5,True,random restart hill climbing,0.015619277954101562,9
+6,False,hill climbing,0.01795339584350586,9
+106,False,hill climbing with sideways moves,0.32100772857666016,9
+27,True,random restart hill climbing,0.08065128326416016,9
+3,False,hill climbing,0.00900411605834961,9
+103,False,hill climbing with sideways moves,0.3248460292816162,9
+36,True,random restart hill climbing,0.12601518630981445,9
+5,False,hill climbing,0.025022268295288086,9
+105,False,hill climbing with sideways moves,0.3339855670928955,9
+59,True,random restart hill climbing,0.18096470832824707,9
+6,False,hill climbing,0.016133785247802734,9
+7,True,hill climbing with sideways moves,0.021894454956054688,9
+30,True,random restart hill climbing,0.09184670448303223,9
+4,False,hill climbing,0.012965202331542969,9
+6,True,hill climbing with sideways moves,0.021549224853515625,9
+12,True,random restart hill climbing,0.06375432014465332,9
+5,False,hill climbing,0.023920536041259766,9
+7,True,hill climbing with sideways moves,0.038782358169555664,9
+55,True,random restart hill climbing,0.26689815521240234,9
+4,True,hill climbing,0.01196742057800293,9
+4,True,hill climbing with sideways moves,0.01224374771118164,9
+4,True,random restart hill climbing,0.010969400405883789,9
+6,False,hill climbing,0.015135526657104492,9
+106,False,hill climbing with sideways moves,0.3286862373352051,9
+47,True,random restart hill climbing,0.1390223503112793,9
+4,False,hill climbing,0.010969161987304688,9
+6,False,hill climbing with sideways moves,0.01827716827392578,9
+32,True,random restart hill climbing,0.0950157642364502,9
+6,True,hill climbing,0.02186107635498047,9
+6,True,hill climbing with sideways moves,0.01795196533203125,9
+6,True,random restart hill climbing,0.016311168670654297,9
+5,False,hill climbing,0.014476299285888672,9
+105,False,hill climbing with sideways moves,0.3319969177246094,9
+15,True,random restart hill climbing,0.04226064682006836,9
+5,True,hill climbing,0.021257877349853516,9
+5,True,hill climbing with sideways moves,0.014049530029296875,9
+5,True,random restart hill climbing,0.022834062576293945,9
+4,False,hill climbing,0.020077943801879883,9
+105,False,hill climbing with sideways moves,0.32425642013549805,9
+22,True,random restart hill climbing,0.06508660316467285,9
+3,True,hill climbing,0.008978605270385742,9
+3,True,hill climbing with sideways moves,0.008974075317382812,9
+3,True,random restart hill climbing,0.008124113082885742,9
+6,False,hill climbing,0.018865346908569336,9
+8,True,hill climbing with sideways moves,0.021124601364135742,9
+67,True,random restart hill climbing,0.19975709915161133,9
+4,False,hill climbing,0.013051509857177734,9
+104,False,hill climbing with sideways moves,0.46458959579467773,9
+7,True,random restart hill climbing,0.039418697357177734,9
+5,True,hill climbing,0.0242462158203125,9
+5,True,hill climbing with sideways moves,0.024759769439697266,9
+5,True,random restart hill climbing,0.02502131462097168,9
+4,False,hill climbing,0.017962932586669922,9
+4,False,hill climbing with sideways moves,0.01896071434020996,9
+12,True,random restart hill climbing,0.054988861083984375,9
+5,False,hill climbing,0.02271103858947754,9
+105,False,hill climbing with sideways moves,0.5296721458435059,9
+30,True,random restart hill climbing,0.15668845176696777,9
+3,True,hill climbing,0.014324426651000977,9
+3,True,hill climbing with sideways moves,0.014960289001464844,9
+3,True,random restart hill climbing,0.011049032211303711,9
+4,False,hill climbing,0.019853830337524414,9
+104,False,hill climbing with sideways moves,0.3929481506347656,9
+18,True,random restart hill climbing,0.05352139472961426,9
+5,False,hill climbing,0.015962600708007812,9
+8,True,hill climbing with sideways moves,0.02508258819580078,9
+8,True,random restart hill climbing,0.023964405059814453,9
+3,False,hill climbing,0.008654356002807617,9
+6,True,hill climbing with sideways moves,0.018401622772216797,9
+58,True,random restart hill climbing,0.1930842399597168,9
+5,True,hill climbing,0.013962030410766602,9
+5,True,hill climbing with sideways moves,0.011246442794799805,9
+5,True,random restart hill climbing,0.01824188232421875,9
+6,False,hill climbing,0.017978906631469727,9
+7,True,hill climbing with sideways moves,0.0182037353515625,9
+96,False,random restart hill climbing,0.2881624698638916,9
+4,False,hill climbing,0.012217283248901367,9
+105,False,hill climbing with sideways moves,0.3236532211303711,9
+25,True,random restart hill climbing,0.0880129337310791,9
+4,False,hill climbing,0.02700495719909668,10
+105,False,hill climbing with sideways moves,0.7434289455413818,10
+107,False,random restart hill climbing,0.6121373176574707,10
+6,False,hill climbing,0.027095556259155273,10
+106,False,hill climbing with sideways moves,0.5156826972961426,10
+36,True,random restart hill climbing,0.19341301918029785,10
+5,True,hill climbing,0.02228522300720215,10
+5,True,hill climbing with sideways moves,0.0330805778503418,10
+5,True,random restart hill climbing,0.04055452346801758,10
+7,False,hill climbing,0.0341794490814209,10
+107,False,hill climbing with sideways moves,0.5488014221191406,10
+11,True,random restart hill climbing,0.07849526405334473,10
+6,False,hill climbing,0.0371551513671875,10
+107,False,hill climbing with sideways moves,0.5903780460357666,10
+13,True,random restart hill climbing,0.061226606369018555,10
+5,False,hill climbing,0.022659778594970703,10
+106,False,hill climbing with sideways moves,0.6795923709869385,10
+106,False,random restart hill climbing,0.533160924911499,10
+5,False,hill climbing,0.023094654083251953,10
+6,True,hill climbing with sideways moves,0.027923107147216797,10
+53,True,random restart hill climbing,0.24949097633361816,10
+5,False,hill climbing,0.01962757110595703,10
+105,False,hill climbing with sideways moves,0.5655300617218018,10
+46,True,random restart hill climbing,0.20843768119812012,10
+3,False,hill climbing,0.011842966079711914,10
+105,False,hill climbing with sideways moves,0.6541275978088379,10
+15,True,random restart hill climbing,0.07432246208190918,10
+4,False,hill climbing,0.02626514434814453,10
+105,False,hill climbing with sideways moves,0.5110318660736084,10
+14,True,random restart hill climbing,0.06383991241455078,10
+6,False,hill climbing,0.02800893783569336,10
+107,False,hill climbing with sideways moves,0.6188204288482666,10
+32,True,random restart hill climbing,0.23891353607177734,10
+3,False,hill climbing,0.02033209800720215,10
+104,False,hill climbing with sideways moves,0.815845251083374,10
+57,True,random restart hill climbing,0.31239843368530273,10
+7,False,hill climbing,0.03204154968261719,10
+107,False,hill climbing with sideways moves,0.5189180374145508,10
+71,True,random restart hill climbing,0.3628051280975342,10
+3,False,hill climbing,0.02014946937561035,10
+103,False,hill climbing with sideways moves,0.4969971179962158,10
+67,True,random restart hill climbing,0.38530659675598145,10
+4,False,hill climbing,0.017954587936401367,10
+8,True,hill climbing with sideways moves,0.03689146041870117,10
+68,True,random restart hill climbing,0.3086860179901123,10
+4,False,hill climbing,0.01904606819152832,10
+105,False,hill climbing with sideways moves,0.4868464469909668,10
+98,False,random restart hill climbing,0.4384348392486572,10
+5,False,hill climbing,0.023952007293701172,10
+106,False,hill climbing with sideways moves,0.5844981670379639,10
+23,True,random restart hill climbing,0.10680150985717773,10
+6,False,hill climbing,0.025438785552978516,10
+106,False,hill climbing with sideways moves,0.4933788776397705,10
+12,True,random restart hill climbing,0.05384492874145508,10
+4,False,hill climbing,0.01795172691345215,10
+104,False,hill climbing with sideways moves,0.5044493675231934,10
+19,True,random restart hill climbing,0.08966803550720215,10
+5,False,hill climbing,0.020409107208251953,10
+106,False,hill climbing with sideways moves,0.5086648464202881,10
+53,True,random restart hill climbing,0.2468264102935791,10
+5,False,hill climbing,0.02422952651977539,10
+6,True,hill climbing with sideways moves,0.02625250816345215,10
+36,True,random restart hill climbing,0.1622915267944336,10
+7,False,hill climbing,0.031002044677734375,10
+107,False,hill climbing with sideways moves,0.5204026699066162,10
+100,True,random restart hill climbing,0.4576542377471924,10
+5,False,hill climbing,0.023840904235839844,10
+106,False,hill climbing with sideways moves,0.5538215637207031,10
+28,True,random restart hill climbing,0.1879591941833496,10
+2,False,hill climbing,0.00997781753540039,10
+103,False,hill climbing with sideways moves,0.6358840465545654,10
+9,True,random restart hill climbing,0.04097700119018555,10
+5,False,hill climbing,0.023051023483276367,10
+106,False,hill climbing with sideways moves,0.7723190784454346,10
+100,False,random restart hill climbing,0.6059005260467529,10
+4,False,hill climbing,0.02107691764831543,10
+104,False,hill climbing with sideways moves,0.5114262104034424,10
+35,True,random restart hill climbing,0.1559147834777832,10
+5,False,hill climbing,0.022507429122924805,10
+6,True,hill climbing with sideways moves,0.028339862823486328,10
+106,False,random restart hill climbing,0.6308736801147461,10
+5,True,hill climbing,0.02247142791748047,10
+5,True,hill climbing with sideways moves,0.02360677719116211,10
+5,True,random restart hill climbing,0.02194046974182129,10
+4,False,hill climbing,0.018593788146972656,10
+8,True,hill climbing with sideways moves,0.055006980895996094,10
+107,False,random restart hill climbing,0.5694382190704346,10
+6,False,hill climbing,0.039964914321899414,10
+12,True,hill climbing with sideways moves,0.0709536075592041,10
+92,True,random restart hill climbing,0.554368257522583,10
+5,False,hill climbing,0.03668069839477539,10
+105,False,hill climbing with sideways moves,0.5550918579101562,10
+9,True,random restart hill climbing,0.04567384719848633,10
+6,False,hill climbing,0.026927471160888672,10
+106,False,hill climbing with sideways moves,0.5276012420654297,10
+93,True,random restart hill climbing,0.480405330657959,10
+4,False,hill climbing,0.015043258666992188,10
+104,False,hill climbing with sideways moves,0.5393340587615967,10
+16,True,random restart hill climbing,0.07308769226074219,10
+4,False,hill climbing,0.016960620880126953,10
+105,False,hill climbing with sideways moves,0.6508889198303223,10
+15,True,random restart hill climbing,0.11108636856079102,10
+5,False,hill climbing,0.034230947494506836,10
+106,False,hill climbing with sideways moves,0.49162864685058594,10
+73,True,random restart hill climbing,0.32843828201293945,10
+3,False,hill climbing,0.013962984085083008,10
+7,False,hill climbing with sideways moves,0.03106236457824707,10
+79,True,random restart hill climbing,0.37687015533447266,10
+2,False,hill climbing,0.005017995834350586,10
+2,False,hill climbing with sideways moves,0.014090776443481445,10
+84,True,random restart hill climbing,0.3858451843261719,10
+6,True,hill climbing,0.0417325496673584,10
+6,True,hill climbing with sideways moves,0.0514523983001709,10
+6,True,random restart hill climbing,0.048511505126953125,10
+4,False,hill climbing,0.03301358222961426,10
+105,False,hill climbing with sideways moves,0.5869228839874268,10
+100,False,random restart hill climbing,0.4539310932159424,10
+4,False,hill climbing,0.0180661678314209,10
+104,False,hill climbing with sideways moves,0.4818747043609619,10
+33,True,random restart hill climbing,0.14949679374694824,10
+4,True,hill climbing,0.018009424209594727,10
+4,True,hill climbing with sideways moves,0.018445491790771484,10
+4,True,random restart hill climbing,0.018068790435791016,10
+3,False,hill climbing,0.013504505157470703,10
+5,True,hill climbing with sideways moves,0.02341437339782715,10
+34,True,random restart hill climbing,0.15633916854858398,10
+5,False,hill climbing,0.01947331428527832,10
+106,False,hill climbing with sideways moves,0.4956822395324707,10
+48,True,random restart hill climbing,0.22167682647705078,10
+4,False,hill climbing,0.017050743103027344,10
+105,False,hill climbing with sideways moves,0.5070443153381348,10
+99,False,random restart hill climbing,0.7185149192810059,10
+5,False,hill climbing,0.038050174713134766,10
+105,False,hill climbing with sideways moves,0.7402608394622803,10
+19,True,random restart hill climbing,0.09050440788269043,10
+4,False,hill climbing,0.01639556884765625,10
+104,False,hill climbing with sideways moves,0.5541009902954102,10
+10,True,random restart hill climbing,0.04578423500061035,10
+6,False,hill climbing,0.027178049087524414,10
+106,False,hill climbing with sideways moves,0.5152111053466797,10
+16,True,random restart hill climbing,0.07299947738647461,10
+6,False,hill climbing,0.023250102996826172,10
+106,False,hill climbing with sideways moves,0.7476017475128174,10
+21,True,random restart hill climbing,0.16252565383911133,10
+4,False,hill climbing,0.027359962463378906,10
+10,True,hill climbing with sideways moves,0.07959866523742676,10
+22,True,random restart hill climbing,0.13799524307250977,10
+6,False,hill climbing,0.02592945098876953,10
+107,False,hill climbing with sideways moves,0.5235204696655273,10
+62,True,random restart hill climbing,0.28863978385925293,10
+4,False,hill climbing,0.0196990966796875,10
+104,False,hill climbing with sideways moves,0.4967184066772461,10
+75,True,random restart hill climbing,0.3407096862792969,10
+4,False,hill climbing,0.01795172691345215,10
+5,True,hill climbing with sideways moves,0.029024124145507812,10
+96,True,random restart hill climbing,0.43492674827575684,10
+5,False,hill climbing,0.022206783294677734,10
+105,False,hill climbing with sideways moves,0.52626633644104,10
+20,True,random restart hill climbing,0.0961306095123291,10
+6,False,hill climbing,0.030055761337280273,10
+106,False,hill climbing with sideways moves,0.4930105209350586,10
+53,True,random restart hill climbing,0.2409217357635498,10
+4,False,hill climbing,0.01795172691345215,10
+105,False,hill climbing with sideways moves,0.6058175563812256,10
+67,True,random restart hill climbing,0.2990603446960449,10
+5,False,hill climbing,0.02301812171936035,10
+106,False,hill climbing with sideways moves,0.48798322677612305,10
+27,True,random restart hill climbing,0.1300489902496338,10
+5,False,hill climbing,0.023285865783691406,10
+105,False,hill climbing with sideways moves,0.510993480682373,10
+74,True,random restart hill climbing,0.37795114517211914,10
+4,False,hill climbing,0.023975133895874023,10
+105,False,hill climbing with sideways moves,0.505974531173706,10
+112,False,random restart hill climbing,0.5109655857086182,10
+4,False,hill climbing,0.018361568450927734,10
+104,False,hill climbing with sideways moves,0.4878542423248291,10
+100,False,random restart hill climbing,0.7329001426696777,10
+6,False,hill climbing,0.04499530792236328,10
+107,False,hill climbing with sideways moves,0.7345428466796875,10
+105,False,random restart hill climbing,0.5523357391357422,10
+6,False,hill climbing,0.027663230895996094,10
+106,False,hill climbing with sideways moves,0.5546834468841553,10
+32,True,random restart hill climbing,0.14742398262023926,10
+4,False,hill climbing,0.023868083953857422,10
+104,False,hill climbing with sideways moves,0.6544702053070068,10
+15,True,random restart hill climbing,0.09709501266479492,10
+5,False,hill climbing,0.02124333381652832,10
+106,False,hill climbing with sideways moves,0.5847377777099609,10
+18,True,random restart hill climbing,0.13493752479553223,10
+5,False,hill climbing,0.03805422782897949,10
+5,False,hill climbing with sideways moves,0.03999638557434082,10
+50,True,random restart hill climbing,0.38472962379455566,10
+5,False,hill climbing,0.036852359771728516,10
+106,False,hill climbing with sideways moves,0.6176269054412842,10
+118,False,random restart hill climbing,0.5769209861755371,10
+5,False,hill climbing,0.03006720542907715,10
+105,False,hill climbing with sideways moves,0.5487208366394043,10
+22,True,random restart hill climbing,0.107452392578125,10
+3,False,hill climbing,0.015217065811157227,10
+104,False,hill climbing with sideways moves,0.5622389316558838,10
+94,False,random restart hill climbing,0.4660770893096924,10
+4,False,hill climbing,0.01795220375061035,10
+104,False,hill climbing with sideways moves,0.5549209117889404,10
+28,True,random restart hill climbing,0.13506722450256348,10
+5,False,hill climbing,0.021996259689331055,10
+106,False,hill climbing with sideways moves,0.4880068302154541,10
+105,False,random restart hill climbing,0.5759396553039551,10
+4,False,hill climbing,0.018950223922729492,10
+105,False,hill climbing with sideways moves,0.5668137073516846,10
+106,False,random restart hill climbing,0.4889814853668213,10
+4,False,hill climbing,0.0170590877532959,10
+105,False,hill climbing with sideways moves,0.5385415554046631,10
+74,True,random restart hill climbing,0.3375270366668701,10
+5,False,hill climbing,0.022611141204833984,10
+106,False,hill climbing with sideways moves,0.5578494071960449,10
+9,True,random restart hill climbing,0.06196951866149902,10
+4,False,hill climbing,0.03004288673400879,10
+105,False,hill climbing with sideways moves,0.5189826488494873,10
+82,True,random restart hill climbing,0.49262404441833496,10
+4,False,hill climbing,0.018985986709594727,10
+105,False,hill climbing with sideways moves,0.6919543743133545,10
+19,True,random restart hill climbing,0.14694619178771973,10
+6,False,hill climbing,0.04609560966491699,10
+106,False,hill climbing with sideways moves,0.6100456714630127,10
+113,False,random restart hill climbing,0.5106861591339111,10
+5,False,hill climbing,0.021940231323242188,10
+106,False,hill climbing with sideways moves,0.6330690383911133,10
+77,True,random restart hill climbing,0.3565049171447754,10
+6,False,hill climbing,0.028249025344848633,10
+106,False,hill climbing with sideways moves,0.5039148330688477,10
+77,True,random restart hill climbing,0.48446130752563477,10
+3,False,hill climbing,0.014005899429321289,10
+105,False,hill climbing with sideways moves,0.5343852043151855,10
+14,True,random restart hill climbing,0.06960225105285645,10
+6,False,hill climbing,0.028197288513183594,10
+106,False,hill climbing with sideways moves,0.5484895706176758,10
+101,False,random restart hill climbing,0.5120482444763184,10
+6,False,hill climbing,0.026829242706298828,10
+7,True,hill climbing with sideways moves,0.03211641311645508,10
+80,True,random restart hill climbing,0.5728194713592529,10
+4,False,hill climbing,0.03301548957824707,10
+6,True,hill climbing with sideways moves,0.04844093322753906,10
+46,True,random restart hill climbing,0.35349369049072266,10
+5,True,hill climbing,0.038434743881225586,10
+5,True,hill climbing with sideways moves,0.037097930908203125,10
+5,True,random restart hill climbing,0.02291727066040039,10
+4,False,hill climbing,0.018784284591674805,10
+7,True,hill climbing with sideways moves,0.05637216567993164,10
+101,False,random restart hill climbing,0.503375768661499,10
+4,False,hill climbing,0.017951488494873047,10
+106,False,hill climbing with sideways moves,0.4954257011413574,10
+35,True,random restart hill climbing,0.16677570343017578,10
+5,False,hill climbing,0.02676677703857422,10
+6,True,hill climbing with sideways moves,0.028095722198486328,10
+87,True,random restart hill climbing,0.40386390686035156,10
+5,False,hill climbing,0.022451162338256836,10
+105,False,hill climbing with sideways moves,0.5010013580322266,10
+75,True,random restart hill climbing,0.3419060707092285,10
+6,False,hill climbing,0.029035091400146484,10
+106,False,hill climbing with sideways moves,0.703906774520874,10
+111,False,random restart hill climbing,0.5598890781402588,10
+6,False,hill climbing,0.024066925048828125,10
+106,False,hill climbing with sideways moves,0.5871593952178955,10
+64,True,random restart hill climbing,0.39471912384033203,10
+5,False,hill climbing,0.022511005401611328,10
+106,False,hill climbing with sideways moves,0.5245754718780518,10
+10,True,random restart hill climbing,0.0448918342590332,10
+5,False,hill climbing,0.020067930221557617,10
+105,False,hill climbing with sideways moves,0.5148015022277832,10
+54,True,random restart hill climbing,0.24397587776184082,10
+5,False,hill climbing,0.021940231323242188,10
+105,False,hill climbing with sideways moves,0.482529878616333,10
+80,True,random restart hill climbing,0.39394187927246094,10
+3,False,hill climbing,0.013962268829345703,10
+105,False,hill climbing with sideways moves,0.5568161010742188,10
+23,True,random restart hill climbing,0.1530284881591797,10
+7,False,hill climbing,0.048764705657958984,10
+108,False,hill climbing with sideways moves,0.6415245532989502,10
+12,True,random restart hill climbing,0.04990100860595703,10
+6,False,hill climbing,0.02706146240234375,10
+7,True,hill climbing with sideways moves,0.0330204963684082,10
+100,False,random restart hill climbing,0.4999980926513672,10
+4,False,hill climbing,0.018429994583129883,10
+104,False,hill climbing with sideways moves,0.4804837703704834,10
+10,True,random restart hill climbing,0.04704737663269043,10
+6,False,hill climbing,0.025263547897338867,10
+106,False,hill climbing with sideways moves,0.5195164680480957,10
+105,False,random restart hill climbing,0.47603750228881836,10
+5,False,hill climbing,0.02300262451171875,10
+107,False,hill climbing with sideways moves,0.6688454151153564,10
+103,False,random restart hill climbing,0.7309644222259521,10
+6,False,hill climbing,0.04601311683654785,10
+106,False,hill climbing with sideways moves,0.5029544830322266,10
+15,True,random restart hill climbing,0.06994390487670898,10
+4,False,hill climbing,0.01907205581665039,10
+104,False,hill climbing with sideways moves,0.5718460083007812,10
+105,False,random restart hill climbing,0.5025699138641357,10
+6,False,hill climbing,0.0269010066986084,10
+9,True,hill climbing with sideways moves,0.04095029830932617,10
+17,True,random restart hill climbing,0.07502269744873047,10

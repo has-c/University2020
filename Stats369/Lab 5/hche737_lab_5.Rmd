@@ -15,12 +15,13 @@ In this task we will simulate a mock-up dataset where you know the underlying st
 
 ### Step 1.1: Generate the data sets
 
-Run the following code chunk. As a warm-up, what do you expect the output would be when you run lm(Y~. data = dat_A)?
+*Run the following code chunk. As a warm-up, what do you expect the output would be when you run lm(Y~. data = dat_A)?*
 
-* In the datasets produced, the number of variables (p) is equal than the number of observations (n), thus $n = p$. This means that OLS fails resulting in non-unique OLS coefficients ($\hat{\beta}$) and the variance of the fit being infinite. 
-The model summary output will show  
+In the datasets produced, the number of independent variables (p) is equal than the number of observations (n). As a result there will be a large amount of variance in the model fitted. This causes overfitting and results in poor generalisation of the model. 
 
-```{r 1.1 Generate data}
+As a result of $n=p$, the fitted model will show $\beta_0$ to $\beta_{89}$ with estimated coefficients and $\beta_{90}$ with no estimated coefficient. 
+
+```{r 1.1 Generate data, warning=FALSE, message=FALSE}
 # load libraries
 library(glmnet)
 library(MASS)
@@ -28,7 +29,6 @@ library(tidyverse)
 
 # set up parameters
 set.seed(369) 
-
 
 n <- 90  
 p <- 90  
@@ -40,10 +40,10 @@ diag(cor.mat) <- 1
 cor.mat[lower.tri(cor.mat)] <- t(cor.mat)[lower.tri(cor.mat)]
 
 # dat_A
-X1 <- mvrnorm(n, mu=rep(1, p), Sigma = cor.mat)
-colnames(X1) <- paste0('X', str_pad(1:p, nchar(p), 'left', '0'))
+X1 <- mvrnorm(n, mu=rep(1, p), Sigma = cor.mat) #sample from a multivariate normal distribution 
+colnames(X1) <- paste0('X', str_pad(1:p, nchar(p), 'left', '0')) #add column names to the df
 
-n_betas <- 5
+n_betas <- 5 #
 betas <- as.vector(scale(sample(1:n_betas))) * 12
 related.ind <- sample(1:p, n_betas)
 
@@ -52,24 +52,27 @@ y1 <- as.numeric(betas %*% t(X1[,related.ind]) + rnorm(n))
 dat_A <- cbind(data.frame(Y = y1), X1)
 
 # dat_B
-X2 <- mvrnorm(n, mu=rep(1, p), Sigma = cor.mat)
-colnames(X2) <- paste0('X', str_pad(1:p, nchar(p), 'left', '0'))
+X2 <- mvrnorm(n, mu=rep(1, p), Sigma = cor.mat) #sample from a multivariate normal distribution 
+colnames(X2) <- paste0('X', str_pad(1:p, nchar(p), 'left', '0')) #add column names to the df
 
-all_betas <- sample(as.vector(scale(1:p))) * 0.1
-y2 <- as.numeric(all_betas %*% t(X2) + rnorm(n))
+all_betas <- sample(as.vector(scale(1:p))) * 0.1 #create betas and randomly sample (without replacement) to shuffle them
+y2 <- as.numeric(all_betas %*% t(X2) + rnorm(n)) #create Y variables, beta's mutiplied by x and add some random normal noise to it
 
-dat_B <- cbind(data.frame(Y = y2), X2)
+dat_B <- cbind(data.frame(Y = y2), X2) #create dataframe
 ```
 
 ### Step 1.2: Understand the code
 
-Examine the code chunk from 1.1 above, what is the similarity and difference between the two data sets, dat_A and dat_B?
+*Examine the code chunk from 1.1 above, what is the similarity and difference between the two data sets, dat_A and dat_B?*
 
-The difference between dat_A and dat_B is 
+The similarity between dat_A and dat_B is that they both have the same amount of predictor variables ($p=90$) and observations ($n=90$).
+
+However the difference between the two datasets is that in dat_A, selected independent variables are given more weighting than others. This is to simulate the effect that some variables are more important than others and thus show Lasso regression's ability to perform variable selection. In comparision, in dat_B all the independent variables are scaled by the same weight. This is to simulate multicollinearity between the independent variables, to show Ridge regression's robustness against multicollinearity.  
 
 ### Step 1.3: Split into train and test
+Split each one of the data sets into training (80%) and test (20%) sets. 
 
-```{r Train Test Split, echo=FALSE}
+```{r Train Test Split}
 train_prop = 0.8
 smp_size = floor(train_prop * nrow(dat_A))
 
@@ -84,9 +87,9 @@ test_B = dat_B[-train_idx, ]
 
 ## Task 2: Fit Lasso Regression
 
-### Step 2.1 Fit Lasso model using cost-complexity model fitting strategy
+### Step 2.1: Fit Lasso model using cost-complexity model fitting strategy
 
-```{r Helper Functions}
+```{r Lasso Helper Functions}
 fit_lasso <- function (train){
   
   df = feature_label_split(train)
@@ -105,20 +108,21 @@ feature_label_split <- function(dataset){
 
 ```{r Fit Lasso - Set A}
 setA_xval = fit_lasso(train_A)
-plot(setA_xval)
 setA_xval$lambda.min
 ```
-Therefore, from cross-validation the value of $\lambda$ that gives the minimum MSPE is $\lambda = 0.05207654$.
+
+Therefore, using cross-validation on the training set of dat_A the $\lambda$ that gives the minimum MSPE is $\lambda =$ `r setA_xval$lambda.min`.
 
 ```{r Fit Lasso - Set B}
 setB_xval = fit_lasso(train_B)
-plot(setB_xval)
 setB_xval$lambda.min
 ```
 
+Therefore, using cross-validation on the training set of dat_B the $\lambda$ that gives the minimum MSPE is $\lambda =$ `r setB_xval$lambda.min`.
+
 ### Step 2.2: Calculate test MSPE and number of non-zero coefficients in optimal model
 
-```{r Helper Functions}
+```{r Lasso Evaluation Helper Functions}
 
 calc_MSPE <- function(train, test, xval){
   
@@ -137,8 +141,6 @@ calc_MSPE <- function(train, test, xval){
 
 }
     
-
-  
 number_of_nonzero_coefficients <- function(train, xval){
   
   train_df = feature_label_split(train)
@@ -161,6 +163,7 @@ non_zero_set_A =  number_of_nonzero_coefficients(train_A, setA_xval)
 setA_MSPE
 non_zero_set_A
 ```
+Therefore, the MSPE found when evaluating the optimal lasso model on the test set of dat_A is `r setA_MSPE`. Furthermore, the number of non-zero coefficients is `r non_zero_set_A`. 
 
 ```{r Evaluation - Set B}
 #MSPE
@@ -168,13 +171,16 @@ setB_MSPE <- calc_MSPE(train_B,test_B, setB_xval)
 #Number of non-zero coefficients
 non_zero_set_B =  number_of_nonzero_coefficients(train_B, setB_xval)
 
-setA_MSPE
+setB_MSPE
 non_zero_set_B
 ```
+Therefore, the MSPE found when evaluating the optimal lasso model on the test set of dat_B is `r setB_MSPE`. Furthermore, the number of non-zero coefficients is `r non_zero_set_B`.
+
 ## Task 3: Fit Ridge Regression
 
+### Step 3.1: Fit Ridge model using cost-complexity model fitting strategy
 
-```{r Helper Functions}
+```{r Ridge Helper Functions}
 fit_ridge <- function (train){
   
   df = feature_label_split(train)
@@ -193,19 +199,20 @@ feature_label_split <- function(dataset){
 
 ```{r Fit Ridge - Set A}
 setA_xval = fit_ridge(train_A)
-plot(setA_xval)
 setA_xval$lambda.min
 ```
+Therefore, using cross-validation on the training set of dat_A the $\lambda$ that gives the minimum MSPE is $\lambda =$ `r setA_xval$lambda.min`.
 
 ```{r Fit Ridge - Set B}
 setB_xval = fit_ridge(train_B)
-plot(setB_xval)
 setB_xval$lambda.min
 ```
 
-### Step 3.2: 
+Therefore, using cross-validation on the training set of dat_B the $\lambda$ that gives the minimum MSPE is $\lambda =$ `r setB_xval$lambda.min`.
 
-```{r Ridge - Helper Functions}
+### Step 3.2: Calculate test MSPE and number of non-zero coefficients in optimal model
+
+```{r Ridge Evaluation Helper Functions}
 
 calc_ridge_MSPE <- function(train, test, xval){
   
@@ -225,7 +232,6 @@ calc_ridge_MSPE <- function(train, test, xval){
 }
     
 
-  
 number_of_nonzero_coefficients_ridge <- function(train, xval){
   
   train_df = feature_label_split(train)
@@ -239,7 +245,7 @@ number_of_nonzero_coefficients_ridge <- function(train, xval){
 }
 ```
 
-```{r Evaluation - Set A}
+```{r Evaluation Ridge - Set A}
 #MSPE
 setA_ridge_MSPE <- calc_ridge_MSPE(train_A,test_A, setA_xval)
 #Number of non-zero coefficients
@@ -248,8 +254,9 @@ ridge_non_zero_setA =  number_of_nonzero_coefficients_ridge(train_A, setA_xval)
 setA_ridge_MSPE
 ridge_non_zero_setA
 ```
+Therefore, the MSPE found when evaluating the optimal lasso model on the test set of dat_A is `r setA_ridge_MSPE`. Furthermore, the number of non-zero coefficients is `r ridge_non_zero_setA`.
 
-```{r Evaluation - Set B}
+```{r Evaluation Ridge - Set B}
 #MSPE
 setB_ridge_MSPE <- calc_ridge_MSPE(train_B,test_B, setB_xval)
 #Number of non-zero coefficients
@@ -258,5 +265,16 @@ ridge_non_zero_setB =  number_of_nonzero_coefficients_ridge(train_B, setB_xval)
 setB_ridge_MSPE
 ridge_non_zero_setB
 ```
+Therefore, the MSPE found when evaluating the optimal lasso model on the test set of dat_B is `r setB_ridge_MSPE`. Furthermore, the number of non-zero coefficients is `r ridge_non_zero_setB`.
 
 ## Task 4: Compare and Comment 
+
+Both the Lasso and Ridge models regularise OLS and aid with the overfitting ordinary OLS faces as a result of $n=p$. 
+
+*Compare Lasso and Ridge models for dat_A*
+
+From the results above, on dat_A the Lasso model achieves a lower MSPE on the test set than the Ridge model. Furthermore, the Lasso model uses many less predictor variables than the Ridge model (`r non_zero_set_A` variables compared to `r ridge_non_zero_setA`). The Lasso model may perform better than the Ridge regression model a result of its ability to perform variable selection, removing unecessary variables that may hinder performance. 
+
+*Compare Lasso and Ridge models for dat_B*
+
+From the results above, the Ridge model performs better on dat_B than the Lasso model as the Ridge model achieves a lower MSPE on the test set. Futhermore, the Lasso model uses many less predictor variables than the Ridge model (`r non_zero_set_B` variables compared to `r ridge_non_zero_setB`). The Ridge model may perform better on dat_B as it performs proportional shrinkage helping with the multicollinearity between the independent variables. 
