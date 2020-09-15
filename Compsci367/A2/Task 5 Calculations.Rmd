@@ -1,0 +1,47 @@
+---
+title: "Compsci 367 A2 Task 5"
+author: "Hasnain Cheena"
+date: "15/09/2020"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+```
+
+
+```{r Load data, echo=FALSE}
+results.df = read_csv("results-task-5.csv")
+
+no_of_games = 200
+```
+
+```{r Caclulate stats, echo=FALSE}
+summary.df = results.df %>%
+   mutate(type = as.factor(type),
+         NoQueens = as.factor(NoQueens)) %>%
+  group_by(type, NoQueens) %>%
+  mutate(percent_solved = sum(solved)*100/no_of_games,
+         avg_time = round(mean(elapsed_time),3), 
+         sd_time = round(sd(elapsed_time),3),
+         avg_nodes_expanded = round(mean(expanded),1),
+         sd_nodes_expanded = round(sd(expanded),1)) %>%
+  distinct(NoQueens, type, percent_solved, avg_time, sd_time, avg_nodes_expanded, sd_nodes_expanded) 
+
+summary.df = summary.df %>%
+  unite("time",avg_time:sd_time, sep=" ± ") %>%
+  unite("nodes", avg_nodes_expanded:sd_nodes_expanded, sep=" ± ")
+
+names(summary.df) = c("method", "# of queens", "Probability of solving", "Average time to solve +- std dev", "Average # of nodes expanded +- std dev")
+  
+
+
+
+
+
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
