@@ -18,9 +18,7 @@ def backtracking_search_instrumented(
     The key 'num_assignments' == the number of times csp.assign is called.
     The key 'num_backtracks' == the number of backtracks performed.
     """
-    ######################
-    ### Your code here ###
-    ######################
+    
     return {
         "assignment": dict or None,
         "num_assignments": int,

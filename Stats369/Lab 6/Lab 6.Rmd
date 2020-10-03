@@ -1,0 +1,133 @@
+---
+title: 'Stat 369 Lab 6: Autism trees'
+date: "24 September 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(rpart)
+
+set.seed(369)
+```
+
+This lab looks at data collected to try to detect autism spectrum disorder (ASD) biochemically. We use trees to detect ASD.
+
+Submit a knitted html or pdf of your answer to Canvas.
+
+## Tasks
+
+#### Read in Data
+```{r Read Data}
+vnames <- read_csv("S1Dataset.csv",n_max=0)
+autism<- read_csv("S1Dataset.csv",skip=2)
+names(autism)<-names(vnames)
+
+#note all SIB are NEU so recode SIB
+OriginalGroup = autism$Group
+autism$Group[autism$Group == "SIB"] = "NEU"
+```
+
+#### Task 1 
+1. Use `rpart()` to grow a tree that distinguishes the ASD and NEU groups, and give the confusion matrix and the proportion of people (from these two groups) correctly classified. Plot the tree (showing labels -- make sure you set the margin in the plot call to make room for the labels).
+
+```{r Task 1, fig.width=14, fig.height=6}
+#fit tree
+autism.tree = rpart(Group~., data=autism)
+
+#prune tree
+plotcp(autism.tree)
+autism.tree = prune(autism.tree, cp=0.2)
+
+#Confusion Matrix
+y_pred_prob = predict(autism.tree)
+s1 <- apply(y_pred_prob, 1, which.max)
+y_pred = colnames(y_pred_prob)[s1]
+conf_matrix = with(autism, table(actual=Group, predicted=y_pred))
+conf_matrix
+
+#proportion of people correctly classified from ASD and NEU groups
+number_of_people_in_both = sum(conf_matrix)
+number_of_correct_pred_in_both = conf_matrix[1,1] + conf_matrix[2,2]
+prop = number_of_correct_pred_in_both/number_of_people_in_both
+prop
+
+#plot a tree
+plot(autism.tree, margin=0.1);text(autism.tree)
+```
+Using the cp plot above, the tree has been pruned at cp=0.2 as this is the simplest model that is within one standard error of the on with the lowest error.
+
+2. The dataset makes the classifier look good, because the number of ASD and neurotypical participants are equal.  In reality, ASD affects about 1.5% of people.  Run `rpart()` with the prior argument (see the help page), to build a tree based on population prior probabilities of 0.015 and 0.985. Report the confusion matrix and the proportion of ASD and NEU groups correctly classified. Plot the tree.
+
+
+```{r Task Two, fig.width=14, fig.height=6}
+prior = c(0.015, 0.985)
+autism.tree_prior = rpart(Group~., data=autism, 
+                    parms=list(prior=prior))
+
+#prune tree
+plotcp(autism.tree_prior)
+autism.tree_prior = prune(autism.tree_prior, cp=0.24)
+
+#Confusion Matrix
+y_pred_prob = predict(autism.tree_prior)
+max_idx <- apply(y_pred_prob, 1, which.max)
+y_pred = colnames(y_pred_prob)[max_idx]
+conf_matrix = with(autism, table(actual=Group, predicted=y_pred))
+conf_matrix
+
+#proportion of people correctly classified from ASD and NEU groups
+number_of_people_in_both = sum(conf_matrix)
+number_of_correct_pred_in_both = conf_matrix[1,1] + conf_matrix[2,2]
+prop = number_of_correct_pred_in_both/number_of_people_in_both
+prop
+
+#plot a tree
+plot(autism.tree_prior, margin=0.1);text(autism.tree_prior)
+
+```
+Tree was pruned at cp=0.24 as this is the simplest model that is within one standard error of the on with the lowest error. As a result of the prior, the classification accuracy has decreased from previously. 
+
+
+3. Suppose that false negative classifications (missing ASD) are thought to be more important than false positive (suspecting ASD). Run `rpart()` with the `prior` argument as in the previous question and also with the `loss` argument saying that false negatives are 100 times as bad as false positives.
+Report the confusion matrix and the proportion of ASD and NEU  groups correctly classified. Plot the tree. Did you get the result you expected? 
+
+```{r Task Three, fig.width=14, fig.height=6}
+prior = c(0.015, 0.985)
+loss=matrix(c(0,1,100,0), nrow =2)
+autism.tree_prior_loss = rpart(Group~., data=autism, 
+                    parms=list(prior=prior, loss=loss))
+
+#prune tree
+plotcp(autism.tree_prior_loss)
+autism.tree_prior_loss = prune(autism.tree_prior_loss, cp=0.22)
+
+#Confusion Matrix
+y_pred_prob = predict(autism.tree_prior_loss)
+max_idx <- apply(y_pred_prob, 1, which.max)
+y_pred = colnames(y_pred_prob)[max_idx]
+conf_matrix = with(autism, table(actual=Group, predicted=y_pred))
+conf_matrix
+
+#proportion of people correctly classified from ASD and NEU groups
+number_of_people_in_both = sum(conf_matrix)
+number_of_correct_pred_in_both = conf_matrix[2,1]
+prop = number_of_correct_pred_in_both/number_of_people_in_both
+prop
+
+#plot a tree
+plot(autism.tree_prior_loss, margin=0.1);text(autism.tree_prior_loss)
+```
+Tree was pruned at cp=0.22 as this is the simplest model that is within one standard error of the on with the lowest error. The loss function with a penalty of 100, results in a tree that never predicts ASD, because a false negative of ASD (being NEU) is much more important to predict. 
+
+4. Use this final tree to predict for the SIB group (all of whom are actually neurotypical). What proportion are correctly classified?
+
+```{r Task Four, fig.width=14, fig.height=6}
+autismSIBGroup = autism[OriginalGroup == "SIB", ]
+
+sib_y_pred = predict(autism.tree_prior_loss, newdata=autismSIBGroup[, 2:ncol(autismSIBGroup)])
+
+prop_correct = sum(sib_y_pred[,2])/nrow(sib_y_pred)
+prop_correct
+```

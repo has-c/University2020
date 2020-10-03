@@ -11,11 +11,11 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 ```
 
-
+# Table of Results
 ```{r Load data, echo=FALSE}
 results.df = read_csv("results-task-5.csv")
 
-no_of_games = 200
+no_of_games = 500
 ```
 
 ```{r Caclulate stats, echo=FALSE}
@@ -35,13 +35,13 @@ summary.df = summary.df %>%
   unite("nodes", avg_nodes_expanded:sd_nodes_expanded, sep=" ± ")
 
 names(summary.df) = c("method", "# of queens", "Probability of solving", "Average time to solve +- std dev", "Average # of nodes expanded +- std dev")
-  
-
-
-
-
-
-
+data.frame(summary.df)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+#Discussion of results 
+
+a)how you think the number of expanded nodes, the amount of time, and the probability will change as the number of queens increased
+
+b) how you determined the number of queens to run
+
+c) how you determined the number of problems you need to run for each of them

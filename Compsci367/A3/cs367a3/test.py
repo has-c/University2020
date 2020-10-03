@@ -29,7 +29,7 @@ from textbook.problems import (
     Zebra,
 )
 
-from instrumented_solvers_answer import (
+from instrumented_solvers import (
     min_conflicts_instrumented,
     backtracking_search_instrumented,
 )

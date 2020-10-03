@@ -1,0 +1,45 @@
+---
+title: 'Stat 369 Lab 6: Autism trees'
+date: "24 September 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(rpart)
+```
+
+This lab looks at data collected to try to detect autism spectrum disorder (ASD) biochemically. We use trees to detect ASD.
+
+Submit a knitted html or pdf of your answer to Canvas.
+
+## Tasks
+
+#### Read in Data
+```{r Read Data}
+vnames <- read_csv("S1Dataset.csv",n_max=0)
+autism<- read_csv("S1Dataset.csv",skip=2)
+names(autism)<-names(vnames)
+```
+
+#### Task 1 
+1. Use `rpart()` to grow a tree that distinguishes the ASD and NEU groups, and give the confusion matrix and the proportion of people (from these two groups) correctly classified. Plot the tree (showing labels -- make sure you set the margin in the plot call to make room for the labels).
+
+```{r Task 1}
+autism.tree = rpart(Group~., data=autism)
+autism.tree
+```
+
+
+2. The dataset makes the classifier look good, because the number of ASD and neurotypical participants are equal.  In reality, ASD affects about 1.5% of people.  Run `rpart()` with the prior argument (see the help page), to build a tree based on population prior probabilities of 0.015 and 0.985. Report the confusion matrix and the proportion of ASD and NEU groups correctly classified. Plot the tree.
+
+```{r setup, Read Data}
+
+```
+
+3. Suppose that false negative classifications (missing ASD) are thought to be more important than false positive (suspecting ASD). Run `rpart()` with the `prior` argument as in the previous question and also with the `loss` argument saying that false negatives are 10 times as bad as false positives.
+Report the confusion matrix and the proportion of ASD and NEU  groups correctly classified. Plot the tree. Did you get the result you expected? 
+
+
+4. Use this final tree to predict for the SIB group (all of whom are actually neurotypical). What proportion are correctly classified?
