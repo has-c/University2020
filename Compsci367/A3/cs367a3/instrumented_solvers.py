@@ -75,11 +75,43 @@ def min_conflicts_instrumented(csp, max_steps=100_000):
     The key 'num_assignments' == the number of times csp.assign is called.
     The key 'num_repair_assignments' == the number of assignments made outside of generating the initial assignment of variables.
     """
-    ######################
-    ### Your code here ###
-    ######################
+
+    number_of_initial_assignments = 0
+    num_repair_assignments = 0
+    number_of_total_assignments = 0
+
+    # Generate a complete assignment for all variables (probably with conflicts)
+    csp.current = current = {}
+    for var in csp.variables:
+        val = min_conflicts_value(csp, var, current)
+        csp.assign(var, val, current)
+    
+    number_of_initial_assignments = csp.nassigns
+
+    # Now repeatedly choose a random conflicted variable and change it
+    for _ in range(max_steps):
+        conflicted = csp.conflicted_vars(current)
+        if not conflicted:
+
+            num_repair_assignments = csp.nassigns - number_of_initial_assignments
+            number_of_total_assignments = csp.nassigns
+
+            return {
+                "assignment": current,
+                "num_assignments": number_of_total_assignments,
+                "num_repair_assignments": num_repair_assignments,
+            }
+        var = random.choice(conflicted)
+        val = min_conflicts_value(csp, var, current)
+        csp.assign(var, val, current)
+
+    
+
+    num_repair_assignments = csp.nassigns - number_of_initial_assignments
+    number_of_total_assignments = csp.nassigns
+    
     return {
-        "assignment": dict or None,
-        "num_assignments": int,
-        "num_repair_assignments": int,
+        "assignment": None,
+        "num_assignments": number_of_total_assignments,
+        "num_repair_assignments": num_repair_assignments,
     }
