@@ -176,6 +176,7 @@ def get_test_results() -> Results:
             max_steps=MAX_STEPS,
         ),
         problems=get_test_problems(),
+        num_trials=10,
     )
 
 
