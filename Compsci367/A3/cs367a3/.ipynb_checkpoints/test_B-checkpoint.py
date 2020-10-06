@@ -8,7 +8,7 @@ import re
 from functools import partial, wraps
 from typing import Callable, Dict, Any, TypeVar
 
-from instrumented_solvers import (
+from instrumented_solvers_B import (
     min_conflicts_instrumented,
     backtracking_search_instrumented,
 )
@@ -247,6 +247,7 @@ def get_trial_results(
     results = [
         solver(problem_constructor()) for _ in range(num_trials)
     ]
+    print(results)
     return {
         key: [result[key] for result in results] for key in results[0]
     }

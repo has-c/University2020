@@ -1,9 +1,6 @@
 from textbook.backtracking_search_solver import *
 from textbook.min_conflicts_solver import *
-
-#####################
-# Your imports here #
-#####################
+import time
 
 
 def backtracking_search_instrumented(
@@ -52,6 +49,7 @@ def backtracking_search_instrumented(
         return None, number_of_assignments, number_of_backtracks
 
     #back tracking search instrumented main
+    t0 = time.time() #start timing
     number_of_assignments = 0
     number_of_backtracks = 0
     try:
@@ -61,11 +59,15 @@ def backtracking_search_instrumented(
         number_of_backtracks = steps.number_of_backtracks
         result = None
     assert result is None or csp.goal_test(result)
+    
+    t1 = time.time() #end time
+    elapsed_time = t1-t0 
 
     return {
         "assignment": result,
         "num_assignments": number_of_assignments,
-        "num_backtracks": number_of_backtracks
+        "num_backtracks": number_of_backtracks,
+        "time": elapsed_time
     }
 
 
@@ -75,6 +77,8 @@ def min_conflicts_instrumented(csp, max_steps=100_000):
     The key 'num_assignments' == the number of times csp.assign is called.
     The key 'num_repair_assignments' == the number of assignments made outside of generating the initial assignment of variables.
     """
+
+    t0 = time.time() #start time
 
     number_of_initial_assignments = 0
     num_repair_assignments = 0
@@ -92,14 +96,21 @@ def min_conflicts_instrumented(csp, max_steps=100_000):
     for _ in range(max_steps):
         conflicted = csp.conflicted_vars(current)
         if not conflicted:
+            
+            
 
             num_repair_assignments = csp.nassigns - number_of_initial_assignments
             number_of_total_assignments = csp.nassigns
+            
+            t1 = time.time() #end time
+            elapsed_time = t1 - t0
 
             return {
                 "assignment": current,
                 "num_assignments": number_of_total_assignments,
                 "num_repair_assignments": num_repair_assignments,
+                "time": elapsed_time
+                
             }
         var = random.choice(conflicted)
         val = min_conflicts_value(csp, var, current)
@@ -108,8 +119,12 @@ def min_conflicts_instrumented(csp, max_steps=100_000):
     num_repair_assignments = csp.nassigns - number_of_initial_assignments
     number_of_total_assignments = csp.nassigns
 
+    t1 = time.time() #end time
+    elapsed_time = t1 - t0
+
     return {
         "assignment": None,
         "num_assignments": number_of_total_assignments,
         "num_repair_assignments": num_repair_assignments,
+        "time": elapsed_time
     }
