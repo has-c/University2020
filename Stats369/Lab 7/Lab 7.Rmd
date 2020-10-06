@@ -1,0 +1,83 @@
+---
+title: 'Lab 7: Spam with Random Forests'
+author: "Hasnain Cheena"
+date: "06/10/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(ranger)
+library(tidyverse)
+```
+
+```{r Read in Data}
+load("spam.rda")
+
+#create feature-label df
+word.df = data.frame(wordmatrix)
+col.names = make.names(names(word.df))
+names(word.df) = col.names
+spam.df = cbind(word.df, df['is_spam'])
+```
+
+## Task 1
+
+
+```{r Task 1}
+forest.size.df = data.frame()
+sizes = rep(c(seq(1,9), seq(10,50,10), seq(100,600,100)),2)
+
+for(size in sizes){
+  
+  spam.forest = ranger(is_spam~. , data=spam.df, importance="impurity", num.trees = size)
+  forest.size.df = rbind(forest.size.df, c(size, spam.forest$prediction.error))
+  
+}
+
+names(forest.size.df) = c("size", "OOB Error Rate")
+
+```
+
+## Task 2
+
+You can also embed plots, for example:
+
+```{r Task 2}
+forest.size.df %>%
+  group_by(size) %>%
+  summarise("Avg OOB Error Rate" = mean(`OOB Error Rate`)) %>%
+  ggplot(aes(x=size, y=`Avg OOB Error Rate`)) + geom_point() + geom_line() + labs(title = "OOB Error Rate vs Size", y="OOB Error Rate", x="Size")
+
+
+```
+## Task 3
+
+```{r Task 3}
+forest.predictor.numbers.df = data.frame()
+mtry.values = c(2,5,10,20,30,40,50,200)
+
+for(mtry in mtry.values){
+  
+  spam.forest = ranger(is_spam~. , data=spam.df, importance="impurity", mtry=mtry)
+  forest.predictor.numbers.df = rbind(forest.predictor.numbers.df, c(mtry, spam.forest$prediction.error))
+  
+}
+
+names(forest.predictor.numbers.df) = c("mtry", "OOB Error Rate")
+```
+
+## Task 4
+
+```{r Task 4}
+forest.predictor.numbers.df %>%
+  ggplot(aes(x=mtry, y=`OOB Error Rate`)) + geom_point() + geom_line() + labs(title = "OOB Error Rate vs Number of Predictors at each split", y="OOB Error Rate", x="Number of Predictors at each node")
+```
+The default value of $mtry$ is the rounded down square root of the number of variables. In this case that value is 25 $(\sqrt{630} \approx 25)$.
+It is a reasonable choice in this case as the OOB Error rate is at a minimum between mtry values of 20 and 30 .
+
+## Task 5
+
+How do the results compare to A3 rpart? 
+
