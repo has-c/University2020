@@ -1,0 +1,52 @@
+---
+title: "Compsci 367 A3 Part B"
+author: "Hasnain Cheena"
+date: "7/10/2020"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+```
+
+# Table of Results
+```{r Load data, echo=FALSE}
+results.df = read.csv("results.csv")
+```
+
+```{r Caclulate stats, echo=FALSE}
+
+#round all columns to 2sf
+results.df = results.df %>%
+  mutate(avg.runtime = signif(avg.runtime, 2),
+         sd.runtime = signif(sd.runtime, 2),
+         avg.backtracks = signif(avg.backtracks,2),
+         sd.backtracks = signif(sd.backtracks,2),
+         avg.assignments = signif(avg.assignments,2),
+         sd.assignments = signif(sd.assignments,2),
+         avg.repair = signif(avg.repair,2),
+         sd.repair = signif(sd.repair,2))
+
+summary.df = results.df %>%
+  unite("time",avg.runtime:sd.runtime, sep=" ± ") %>%
+  unite("assignments", avg.assignments:sd.assignments, sep=" ± ") %>%
+  unite("backtracks", avg.backtracks:sd.backtracks, sep=" ± ") %>%
+  unite("repair", avg.repair:sd.repair, sep=" ± ") %>%
+  select(problem, solver, assignments, time, backtracks, repair, prob.sucess) %>%
+  arrange(problem)
+
+
+names(summary.df) = c("# queens or Map for 4-colour", "method", "Average # of assignments +- std dev", "Average time to solve +- std dev","Average # of backtracks +- std dev", "Average # of repair assignments +- std dev", "Probability of Success")
+
+data.frame(summary.df)
+```
+
+#Discussion of results 
+
+a)how you think the number of expanded nodes, the amount of time, and the probability will change as the number of queens increased
+
+b) how you determined the number of queens to run
+
+c) how you determined the number of problems you need to run for each of them
