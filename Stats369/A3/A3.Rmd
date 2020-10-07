@@ -1,0 +1,53 @@
+---
+title: "Stats 369 Assignment 3"
+author: "Hasnain Cheena"
+date: "07/10/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(ranger)
+library(tidyverse)
+library(rpart)
+```
+
+```{r Read in Data}
+load("spam.rda")
+
+#create feature-label df
+word.df = data.frame(wordmatrix)
+col.names = make.names(names(word.df))
+names(word.df) = col.names
+spam.df = cbind(word.df, df['is_spam'])
+```
+
+## Task 1
+Use rpart to fit and prune (if necessary) a tree predicting spam/non-spam from the common word counts in the wordmatrix matrix. Report the accuracy with a confusion matrix. Plot the fitted tree (without all the labels) and comment on its shape.
+
+```{r Task 1}
+spam.tree = rpart(factor(is_spam) ~. , data=spam.df)
+
+#plot cp to see if pruning is needed
+plotcp(spam.tree)
+printcp(spam.tree)
+#prune tree
+spam.tree.pruned = prune(spam.tree, cp=0.021)
+
+#confusion matrix
+y_pred_prob = predict(spam.tree.pruned)
+max_idx <- apply(y_pred_prob, 1, which.max)
+y_pred = colnames(y_pred_prob)[max_idx]
+conf_matrix = with(spam.df, table(actual=is_spam, predicted=y_pred))
+conf_matrix
+
+#plot pruned tree
+plot(spam.tree.pruned)
+
+```
+From plot and output you can see the tree can be pruned back to cp=0.021 as this is the simplest model that is within one standard error of the tree with the lowest error. Thus the tree was pruned at the specified cp. 
+
+Comment on tree shape: 
+
+## Task 2
