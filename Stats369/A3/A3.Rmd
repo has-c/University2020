@@ -51,3 +51,97 @@ From plot and output you can see the tree can be pruned back to cp=0.021 as this
 Comment on tree shape: 
 
 ## Task 2
+
+Compute yi and ni
+yi = number of occurrences in spam 
+ni = number of occurrences in non-spam messages
+
+Choose the threshold so the proportion of spam predicted is the same as the proportion observed.
+
+```{r Task 2}
+#Find Yi and Ni for calculating word occurences
+common_word_occurance = data.frame()
+not_spam_entries.df = word.df[spam.df$is_spam == FALSE, ]
+spam_entries.df = word.df[spam.df$is_spam == TRUE, ]
+common_words_fixed = names(word.df)
+for (word in common_words_fixed){
+  
+  ni = sum(not_spam_entries.df[, word])
+  yi = sum(spam_entries.df[, word])
+  
+  ei = log(yi + 1) - log(ni + 1) #evidence
+  
+  row = c(word, yi, ni, ei)
+  common_word_occurance = rbind(common_word_occurance, row)
+  
+}
+names(common_word_occurance) = c("word", "yi", "ni", "ei")
+
+#compute total evidence
+naive_bayes_classification = data.frame()
+for (idx in 1:nrow(word.df)){
+  message = word.df[idx, ]
+  total_ei = as.numeric(message) %*% as.numeric(common_word_occurance$ei)
+  naive_bayes_classification = rbind(naive_bayes_classification, c(message, data.frame(total_ei = c(total_ei))))
+}
+```
+
+
+```{r Task 2 - Coarse Threshold and Prediction}
+
+#proportion of observed spam
+actual_spam = sum(spam.df$is_spam == TRUE)
+
+
+#brief check - choose threshold
+threshold_values = seq(round(min(naive_bayes_classification$total_ei),0), round(max(naive_bayes_classification$total_ei),0))
+#perform classification - TRUE if spam and FALSE if not spam
+threshold.df = data.frame()
+for (threshold in threshold_values){
+  num_spam_pred = sum(naive_bayes_classification$total_ei < threshold)
+  threshold.df = rbind(threshold.df, c(threshold, num_spam_pred))
+}
+names(threshold.df) = c("threshold", "number of spam predicted")
+
+c("actual spam" = actual_spam)
+threshold.df[347:348, ]
+```
+
+To a threshold following the constraint "the proportion of spam predicted is the same as the proportion observed" the following approach was used:
+
+$$ \frac{TP + FP}{number \space of  \space observations} = \frac{actual \space spam}{number \space of \space observations} $$
+$$ TP + FP = actual \space spam $$
+From a brief check you can see threshold values of -47 and -48 seem to predict the approximately same amount of actual spam. Thus we then fine tune the search to find the right value. 
+
+```{r Task 2 - Fine Threshold and Prediction}
+
+#more fine tuned check - choose threshold
+threshold_values = seq(-48, -47, 0.001)
+#perform classification - TRUE if spam and FALSE if not spam
+threshold.df = data.frame()
+for (threshold in threshold_values){
+  num_spam_pred = sum(naive_bayes_classification$total_ei < threshold)
+  threshold.df = rbind(threshold.df, c(threshold, num_spam_pred))
+}
+names(threshold.df) = c("threshold", "number of spam predicted")
+
+threshold.df[threshold.df$`number of spam predicted` == actual_spam, ]
+
+```
+Thus a threshold of -47.625 produces the condition where the proportion of spam predicted is the same as the proportion observed.
+
+```{r Task 2 - Confusion Matrix}
+
+threshold = -47.625
+naive_bayes_classification$is_spam = naive_bayes_classification$total_ei < threshold
+
+#confusion matrix
+conf_matrix = table(actual=spam.df$is_spam, predicted=naive_bayes_classification$is_spam)
+conf_matrix
+
+```
+
+## Task 3
+Read the description at the UCI archive of how the dataset was constructed. Why is spam/non-spam accuracy likely to be higher with this dataset than in real life? What can you say about the generalisability of the classifier to particular populations of text users?
+
+
