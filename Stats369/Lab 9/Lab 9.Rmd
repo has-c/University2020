@@ -1,0 +1,114 @@
+---
+title: "Lab 9"
+author: "Hasnain Cheena"
+date: "21/10/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+
+#install_tensorflow()
+#install_keras()
+library(keras)
+library(tidyverse)
+```
+
+## Read in Data
+
+Data was train test split using a 80-20 split. Then the data was scaled. 
+```{r Import Data}
+df= read_csv('sgemm_product.csv.')
+df["id"] = seq(1, dim(df)[[1]])
+set.seed(190411106)
+
+#use slice_sample to get random sample of 500 rows
+subsample.df= df %>%
+  slice_sample(n=500) %>%
+  mutate(log.time1 = log(`Run1 (ms)`),
+         log.time2 = log(`Run2 (ms)`))
+
+#create train test sets
+train.df = subsample.df%>% slice_sample(prop=0.8)
+test.df = anti_join(subsample.df, train.df, by="id")
+
+#split into features and labels
+train.features = train.df[,1:14]
+training.labels = train.df$log.time1
+training.data = cbind(train.features, training.labels)
+test.features = test.df[, 1:14]
+test.labels = test.df$log.time1
+test.data = cbind(test.features, test.labels)
+
+#scale data
+means = apply(training.data, 2, mean)
+std = apply(training.data, 2, sd)
+training.data <- scale(training.data, center = means, scale = std)
+test.data <- scale(test.data, center = means, scale = std)
+```
+
+## Question 1
+Fit a network with one hidden layer, 8 nodes, ReLU activation, and squared error loss to predict the log times from Run 1.  Compare to the results from Lab 3.
+
+The neural network was trained for 100 epochs with the conditions given in the question.
+
+```{r Question 1, message=FALSE, warning=FALSE}
+
+
+#build model
+time.nn = keras_model_sequential() %>%
+  layer_dense(units=8,  activation = "relu",
+              input_shape = dim(training.data)[[2]]) %>%
+   layer_dense(units = 1)
+
+#compile model
+time.nn %>%
+  compile(
+    optimizer = optimizer_rmsprop(),
+    loss = "mse",
+    metrics = list("mean_squared_error")
+  )
+
+#train model
+time.nn %>% fit(training.data, training.labels,
+                    epochs = 100,
+                    verbose = 0)
+
+#fit model on test data
+result <- time.nn %>% evaluate(test.data, test.labels, verbose=0)
+result
+```
+In Lab 3, the MSPE from the best model was approximately 0.32. Using the neural network with 1 hidden layer the MSPE is `r result[1]`, which is a substantial decrease. However, keep since cross-validation was not run the model may be overfitting. 
+
+## Question 2
+Add a second hidden layer after the first with 4 nodes and repeat part 1
+
+
+```{r Question 2, message=FALSE,warning=FALSE}
+#build model
+time.nn = keras_model_sequential() %>%
+  layer_dense(units=8,  activation = "relu",
+              input_shape = dim(training.data)[[2]]) %>%
+  layer_dense(units=4, activation="relu") %>%
+  layer_dense(units = 1)
+
+#compile model
+time.nn %>%
+  compile(
+    optimizer = optimizer_rmsprop(),
+    loss = "mse",
+    metrics = list("mean_squared_error")
+  )
+
+#train model
+time.nn %>% fit(training.data, training.labels,
+                    epochs = 100,
+                    verbose = 0)
+
+#fit model on test data
+result <- time.nn %>% evaluate(test.data, test.labels, verbose=0)
+result
+```
+
+In Lab 3, the MSPE from the best model was approximately 0.32. Using the neural network with 2 hidden layers the MSPE drops to `r result[1]` which is a again substantial decrease (even from the neural network fitted in Question 1 with only 1 hidden layer). However, keep since cross-validation was not run the model may be overfitting. 

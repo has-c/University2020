@@ -1,0 +1,107 @@
+---
+title: "Stats 369 Lab 8"
+author: "Hasnain Cheena"
+date: "14/10/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(xgboost)
+library(tidyverse)
+
+set.seed(369)
+```
+
+## Load data and fit XGBoost Model
+
+```{r cars}
+data(agaricus.train, package='xgboost')
+data(agaricus.test, package='xgboost')
+
+#fit model
+bst = xgboost(data = agaricus.train$data, label = agaricus.train$label, 
+               max_depth = 2, eta = 1, nthread = 2, nrounds = 2, 
+               objective = "binary:logistic")
+```
+```{r predict}
+#predict
+pred = predict(bst, agaricus.test$data)
+
+#calculate accuracy
+pred[pred<0.5] = 0
+pred[pred>0.5] = 1
+acc = sum(pred == agaricus.test$label)/length(pred)
+acc
+```
+
+
+### Question 1
+What do `max_depth=2`, `eta=1` and `nrounds=2` do?
+
+* The `max_depth` parameter alters the maximum depth of the tree. Setting `max_depth=2` means that the depth of the tree constructed will have two levels. 
+* The `eta` parameter adjusts the learning rate. Setting `eta=1` means that the feature weights will not shrink after each round. 
+* The `nrounds` parameter controls the number of boosting iterations. Setting `nrounds = 2` means that there will be two trees in the model. 
+
+### Question 2
+```{r XGB Tree}
+xgb.plot.tree(feature_names = colnames(agaricus.train$data), model = bst)
+```
+
+### Question 3
+
+```{r CV}
+#perform cv
+xgb.cv(data = agaricus.train$data, label = agaricus.train$label, num_class=2, nfold=10, nrounds=15)
+```
+Thus you can see at round 10 train and test error is at a minimum. Therefore set `nrounds =10`
+
+```{r New model}
+#fit new model
+adjusted_bst = xgboost(data = agaricus.train$data, label = agaricus.train$label, 
+               max_depth = 2, eta = 1, nthread = 2, nrounds = 10, 
+               objective = "binary:logistic")
+#plot tree
+xgb.plot.tree(feature_names = colnames(agaricus.train$data), model = adjusted_bst)
+
+#predict and calculate accuracy
+adj_pred = predict(adjusted_bst, agaricus.test$data)
+adj_pred[adj_pred<0.5] = 0
+adj_pred[adj_pred>0.5] = 1
+adj_acc = sum(adj_pred == agaricus.test$label)/length(adj_pred)
+adj_acc
+```
+Accuracy of model 1 is 97% and accuracy of model 2 is 100%. Therefore, they both have very high accuracy. However, model 1 is much simpler than model 2. 
+
+### Question 4
+How does the first model classify their edibility?
+
+```{r Q4, message=FALSE}
+#import mushroom properties
+df = read_csv("mushroom.test")
+df$mushroom_A = paste(df$attribute, "=", df$A, sep="")
+df$mushroom_B = paste(df$attribute, "=", df$B, sep="")
+df$mushroom_C = paste(df$attribute, "=", df$C, sep="")
+
+#create mushroom matrix 
+mushroom.matrix = matrix(0, ncol = 126, nrow = 3)
+colnames(mushroom.matrix) = dimnames(agaricus.train$data)[[2]]
+mushroom.matrix[1, df$mushroom_A] = 1
+mushroom.matrix[2, df$mushroom_B] = 1
+mushroom.matrix[3, df$mushroom_C] = 1
+
+pred = predict(bst, mushroom.matrix)
+pred
+```
+The output above shows the model predicts the same probability for all 3 mushrooms. Thus model predicts that are all mushrooms are edible. However, this is not true.
+
+ 
+### Question 5
+The mushrooms are A: Amanita phalloides, B: Amanita virosa, C: Volvariella volvacea. Look up their common names.
+
+* A: is known as the death cap. It is poisonous. 
+* B: is known as destroying angel. It is poisonous. 
+* C: straw mushroom. It is edible. 
+
+ 
