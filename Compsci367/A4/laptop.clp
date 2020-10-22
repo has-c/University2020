@@ -53,8 +53,8 @@
   (declare (salience 10))
   =>
   (printout t crlf crlf)
-  (printout t "Laptop Start-up Problem Diagnosis Expert System")
-  (printout t "This expert system that diagnoses some simple problems when your laptop won't start")
+  (printout t "Laptop Start-up Problem Diagnosis Expert System: ")
+  (printout t "This expert system diagnoses some simple problems when your laptop won't start")
   (printout t crlf crlf))
 
 (defrule print-repair ""
@@ -99,7 +99,7 @@
    (power-cord-status yes)
    (not (repair ?))
    =>
-   (assert (wall-outlet-switch-status (yes-or-no-p "Is switch on the wall outlet turned on? (yes/no)? "))))
+   (assert (wall-outlet-switch-status (yes-or-no-p "Is switch on the wall turned on? (yes/no)? "))))
 
 (defrule determine-LED-charger-status""
    (wall-outlet-switch-status yes)
