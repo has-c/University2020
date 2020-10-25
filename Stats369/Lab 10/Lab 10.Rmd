@@ -7,20 +7,109 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
 ```
 
 ## Load in Data
 
-```{r cars}
-summary(cars)
+```{r Load Data, cache=TRUE}
+#GLOVE
+base_path = "C:\\Users\\Hasnaij\\Desktop\\University2020\\Stats369/Lab 10\\"
+con = dplyr::src_sqlite(file.path(base_path, 'words2.db')) # specify db name
+glove = tbl(con, 'glove') # table name
+
+#GOOD and BAD words
+pos_words <- scan(file.path(base_path, 'positive-words.txt'),
+blank.lines.skip = TRUE, comment.char = ";" , what = "")
+neg_words <- scan(file.path(base_path, 'negative-words.txt'),
+blank.lines.skip = TRUE, comment.char = ";" , what = "")
+
+# bag those into training words. 1: positive; 0: negative
+train_words <- tibble(word = c(pos_words, neg_words),
+                      pos = rep(1:0, c(length(pos_words),
+                                       length(neg_words))))
+
+# copy to db
+train_words = copy_to(con, train_words, name = 'train_words' ,temporary = TRUE)
+
+train.df = inner_join(train_words, glove, by = c('word' = 'Word')) %>% collect() # joining with glove
 ```
 
-## Including Plots
+## Setup Glove
+Create function to return sentiment of text. 
+```{r Load Data, cache=TRUE}
+predict_sentiment <- function(db_con = con,
+                              db_name = 'glove',
+                              text,
+                              model = fit) {
+  
+  glove <- tbl(db_con, db_name)
+  word_tbl <- copy_to(
+    db_con,
+    tibble(word =
+             tolower(
+               strsplit(text,
+                        "[[:blank:],.!?;:'\"]")[[1]]
+             )),
+    name = "temp_words"
+    ,
+    overwrite = TRUE,
+    temporary = TRUE
+  
+    )
+  word_x <- inner_join(word_tbl, glove, by = c('word' = 'Word')) %>%
+    collect() %>%
+    select(-word) %>%
+    as.matrix()
+  if (nrow(word_x) == 0)
+    return(0)
+  senti <- predict(model$glmnet.fit, word_x, s = model$lambda.min)
+  mean(senti)
+}
 
-You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## Question 1
+
+Load the dataset and explore the frequency of text sentence by (key) characters. Find the top 5 characters who say the most lines of texts. Use suitable graphs to show their frequency count change over each season.
+
+```{r Load in GOT data, cache=TRUE, message=FALSE}
+got_df = read_csv(file.path(base_path, "Game_of_Thrones_Script.csv"))
+
+#Top 5 characters how say the most lines of text
+top_5_characters = got_df %>% 
+  group_by(Name) %>%
+  tally(name="dialog_count", sort=TRUE) %>%
+  head(5)
+top_5_characters
+
+#how frequency count changes over each season
+search_mask = got_df$Name %in% top_5_characters$Name #find where the top 5 characters have spoke
+top_5_got_df = got_df[search_mask, ] %>%
+  mutate(Name=factor(Name),
+         Season_fact = factor(Season),
+         Season_no = recode(Season_fact,
+                      "Season 1" = "1",
+                      "Season 2" = "2",
+                      "Season 3" = "3",
+                      "Season 4" = "4",
+                      "Season 5" = "5",
+                      "Season 6" = "6",
+                      "Season 7" = "7",
+                      "Season 8" = "8"))
+#plot
+top_5_got_df %>%
+  group_by(Season_no, Name) %>%
+  tally(name="dialog_count") %>%
+  ggplot(aes(x=Season_no, y=dialog_count)) +
+  geom_point() +
+  facet_wrap(~Name, nrow=3) +
+  labs(title="Top 5 GOT Characters Dialog Frequency Count per Season", x="Season Number", y="Number of lines")
+  
+
+
+```
+## Question 2
+
