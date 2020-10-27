@@ -1,0 +1,215 @@
+---
+title: "Assignment 4"
+author: "Kaushal Patel"
+date: "10/17/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(xgboost)
+library(tidyverse)
+```
+
+## YRBS
+<br />
+The Youth Risk Behavior Survey asks a sample of high school students in the US about behaviours that are related to health risks (the PDF documentation file is on Canvas). In the file `yrbs.rda` (also on Canvas) you have two objects:
+<br />
+- `x` is a matrix of 94 variables from the 2015 YRBS
+<br />
+- `r` is a 0-7 variable coding race/ethnicity, with levels 0=American Indian/Alaskan Native, 1=Asian, 2=Black/African American, 3=Native Hawaiian or other Pacific Islander, 4=White, 5=Hispanic/Latino, 6=multiple race and Hispanic/Latino, 7=multiple-race but not Hispanic/Latino.  That is, `r+1` is the variable defined on page 99 of the documentation.
+<br />
+<br />
+**Task 1: Build a classifier to predict labels `r` from `x` with xgboost, and show the confusion matrix**
+<br />
+```{r}
+set.seed(16/10/19) # Reproducability
+load("yrbs-1.rda")
+
+# Remove lines where the r data has NA
+rm.lines <- which(is.na(r))
+r1 <- r[-rm.lines]
+x1 <- x[-rm.lines,]
+
+# Cross validated the model over 5 folds to find the optimal minimal error
+xgb.cv(data = x1, label=r1, num_class = 8, max_depth = 6, nrounds = 20, eta=0.5, nfold= 5, objective="multi:softmax")
+
+# Building a boosted tree for multi class prediction for the number of rounds established by the cross validation above - 14 rounds
+bst <- xgboost(data = x1, label = r1, max_depth = 6, eta = 0.5, nrounds = 14, num_class = 8, objective = "multi:softmax")
+
+# Creating the confusion matrix
+table(predict(bst, newdata = x1), r1)
+
+```
+<br />
+We have somewhat good accuracy for our confusion matrix. 
+<br />
+<br />
+**Task 2: Describe and visualise which variables are most important in the prediction.**
+<br />
+```{r}
+# Finding the  important variables from the YRBS - Rank the variables in order of importance
+important <- xgb.importance(model = bst)
+important
+
+# Visualise the varaibles, and show the top 6
+xgb.ggplot.importance(important)
+xgb.ggplot.importance(important, top_n = 6)
+```
+<br />
+As we see above, question 97 has the most importance for classifying youth most at risk. The interpretation of the importance output is as follows:
+<br />
+Gain shows the contribution of each feature to the model, as shown in the output above, q97 is the most important predictive feature. 
+<br />
+Cover is a metric of the number of observations related to each feature.
+<br />
+Frequency percentage representing the relative number of times a feature have been used in trees.
+<br />
+<br />
+In the first model we see all of the features are plotted, they are all clustered into 3 groups, these groups are created through having featurs that are of similar gain, cover and frequency together. We can clearly see that questions 97 and 9 are very important to predict youth most at risk. This is across ALL races. 
+<br />
+The final model shows the importance of the top 6 features on the predicitive model.  
+<br />
+<br />
+**Task 3: Describe and display the relationships between the most important variables and the label categories -- which category/categories is each of the most important variables useful for predicting? Can you produce a summary of the most distinctive predictors for each label category?**
+<br />
+```{r}
+# Make x a data frame so we can use it to plot, and get a list of the top 6 questions
+x.df <- as.data.frame(x1)
+top_q <- paste0("q", c(97, 9, 99, 13, 7, 8))
+top_q.df <- x.df %>% select(top_q)
+# Make all entries which have value NA, have a value of "Missing"
+top_q.df[is.na(top_q.df)] <- "Missing"
+
+# Recode outputs for q97 to have the survey values, and make the column a factor type
+top_q.df[,1] <- as.factor(top_q.df[,1])
+levels(top_q.df[,1]) <- c("0", "1", "2", "3", "4", "5 or more", "Missing")
+
+# Recode outputs for q9 to have the survey value, and make the column a factor type
+top_q.df[,2] <- as.factor(top_q.df[,2])
+levels(top_q.df[,2]) <- c("Never", "Rarely", "Sometimes", "Most of the time", "Always", "Missing")
+
+# Recode outputs for q99 to have the survey values, and make the column a factor type
+top_q.df[,3] <- as.factor(top_q.df[,3])
+levels(top_q.df[,3]) <- c("Very well", "Well", "Not well", "Not at all", "Missing")
+
+# Recode outputs for q13 to have the survey values, and make the column a factor type
+top_q.df[,4] <- as.factor(top_q.df[,4])
+levels(top_q.df[,4]) <- c("0 days", "1 day", "2 or 3 days", "4 or 5 days", "6 or more days", "Missing")
+
+# Since we have weights (q7) for the data, we just change the columndata to type factor
+top_q.df[,5] <- as.factor(top_q.df[,5])
+
+# Recode outputs for q8 to have the survey values, and make the column a factor type
+top_q.df[,6] <- as.factor(top_q.df[,6])
+levels(top_q.df[,6]) <- c("Have not rode a bike", "Never wore a helmet", "Rarely wore a helmet", "Sometimes wore a helmet", "Most of the time wore a helmet", "Always wpre a helmet", "Missing")
+
+# Append the race value to the end of the matrix and recode the numbers to the name of the race, and make it a factor type
+top_q.df1 <- cbind(top_q.df, "Race" = r1)
+
+top_q.df1[,7] <- as.factor(top_q.df1[,7])
+levels(top_q.df1[, 7]) <- c("American Indian/ Alaskan Native", "Asian", "Black/ African American", "Native Hawaiian or other Pacific Islander", "White", "Hispanic/ Latino", "Multiple race and Hispanic/ Latino", "Multiple-race but not Hispanic/ Latino")
+
+# Plot of the responses to question 97, broken up by the races
+top_q.df1 %>% ggplot(aes(x=q97)) + geom_bar(aes(fill=Race)) + xlab("Number of times") + ylab("People Count") + ggtitle("During the past 12 months, how many times have you had a sunburn?") + theme(axis.text.x=element_text(angle=45, hjust=1))
+
+# Plot of the responses to question 9, broken up by the races
+top_q.df1 %>% ggplot(aes(x=q9)) + geom_bar(aes(fill=Race)) + xlab("") + ylab("People Count") + ggtitle("How often do you wear a seat belt when riding in a car driven by someone else?") + theme(axis.text.x=element_text(angle=45, hjust=1))
+
+# Plot of the responses to question 99, broken up by the races
+top_q.df1  %>% ggplot(aes(x=q99)) + geom_bar(aes(fill=Race)) + xlab("") + ylab("People Count") + ggtitle("How well do you speak English?") + theme(axis.text.x=element_text(angle=45, hjust=1))
+
+# Plot of the responses to question 13, broken up by the races
+top_q.df1 %>% ggplot(aes(x=q13)) + geom_bar(aes(fill=Race)) + xlab("") + ylab("People Count") + ggtitle("During the past 30 days, on how many days did you carry a weapon?") + theme(axis.text.x=element_text(angle=45, hjust=1))
+
+# Plot of the responses to question 7, broken up by the races
+top_q.df2 <- top_q.df1
+levels(top_q.df2$q7)[118] <- NA
+as.numeric()
+
+top_q.df2$q7 <- as.numeric(top_q.df2$q7)
+top_q.df2  %>% ggplot(aes(x=q7)) + geom_bar(aes(fill=Race)) + xlab("Weight (kg's)") + ylab("People Count") + ggtitle("How much do you weigh without your shoes on?") + theme(axis.text.x=element_text(angle=45, hjust=1)) + scale_x_continuous(breaks = seq(0, 120, 10))
+# Note: The warning is saying that the NA values have not been shown, this is intentional --> 1140 of the responses did not come with the weight of the high school student.
+
+# Plot of the responses to question 8, broken up by the races
+top_q.df1 %>% ggplot(aes(x=q8)) + geom_bar(aes(fill=Race)) + xlab("") + ylab("People Count") + ggtitle("If you rode a bicycle in the past 12 months, how often did you wear a helmet?") + theme(axis.text.x=element_text(angle=45, hjust=1))
+```
+<br />
+```{r}
+# A vector of all of the races
+races <- c("American Indian/Alaskan Native", "Asian", "Black/African American", "Native Hawaiian or other Pacific Islander", "White", "Hispanic/Latino", "Multiple race and Hispanic/Latino", "Multiple-race but not Hispanic/Latino")
+
+# For each of the races, below is the plot of top 6 variable for each of them.
+for (i in 0:7) {
+  race <- xgb.importance(model = bst, trees = seq(i, by=8, length.out = 20))
+  xgb.plot.importance(race, top_n = 6, main=paste0("Top 6 Survey Question for ", races[i+1]), xlab="Importance")
+}
+```
+<br />
+Below are the top questions from above:
+<br />
+* Question 7: How much do you weigh without your shoes on? 
+<br />
+* Question 8: When you rode a bicycle during the past 12 months, how often did you wear a helmet?
+<br />
+* Question 9: How often do you wear a seat belt when riding in a car driven by someone else?
+<br />
+* Question 10: During the past 30 days, how many times did you ride in a car or other vehicle driven by someone who had been drinking alcohol?
+<br />
+* Question 13: During the past 30 days, on how many days did you carry a weapon such as a gun, knife, or club?
+<br />
+* Question 28: During the past 12 months, did you make a plan about how you would attempt suicide?
+<br />
+* Question 37: During the past 30 days, on how many days did you use chewing tobacco, snuff, or dip, such as Redman, Levi Garrett, Beechnut, Skoal, Skoal Bandits, or Copenhagen?
+<br />
+* Question 42: How old were you when you had your first drink of alcohol other than a few sips?
+<br />
+* Question 48: How old were you when you tried marijuana for the first time?
+<br />
+* Question 70: Which of the following are you trying to do about your weight?
+<br />
+* Question 74: During the past 7 days, how many times did you eat potatoes?
+<br />
+* Question 76: During the past 7 days, how many times did you eat other vegetables?
+<br />
+* Question 78: During the past 7 days, how many glasses of milk did you drink?
+<br />
+* Question 79: During the past 7 days, on how many days did you eat breakfast?
+<br />
+* Question 80: During the past 7 days, on how many days were you physically active for a total of at least 60 minutes per day?
+<br />
+* Question 81: On an average school day, how many hours do you watch TV?
+<br />
+* Question 82: On an average school day, how many hours do you play video or computer games or use a computer for something that is not school work?
+<br />
+* Question 88: On an average school night, how many hours of sleep do you get?
+<br />
+* Question 89: During the past 12 months, how would you describe your grades in school?
+<br />
+* Question 95: During the past 7 days, on how many days did you do exercises to strengthen or tone your muscles, such as push-ups, sit-ups, or weight lifting?
+<br />
+* Question 97: During the past 12 months, how many times have you had a sunburn?
+<br />
+* Question 99: How well do you speak English?
+<br />
+<br /> 
+The charts above show the top questions asked which predict high school students who are most at health risk. This has been further drilled into by races/ ethinic group and have the top questions to look out for. Further insight has been drawn out from answers provided for different questions, what these answers were, and the break-down by race. 
+<br />
+<br />
+**Task 4:  Comment on whether (or not) task 3 would be ethically problematic if intended to be published, and for what reasons**
+<br />
+The task above is not ethically problematic. All that has been done is a visualisation of the data, we cannot specifically pinpoint which students or which schools have been surveyed. This is further supported in the data, where questions 1 to 5 have been removed. These questions are to do with race, age, sex and grade, ensuring that more privacy of the students is kept. 
+<br />
+<br />
+The data is sourced from a government agency, therefore it does have some credibility and we have a relatively accuracte prediction, however there is still a chance of inaccurate answers, both from students answering falsely and input error by those tasked with entering the survey resuls. There is a responsibility that the data is used properly, and the visualisations above do not have any hidden agenda, it is a simple and easy to understand visualisation that can be helpful in predicting which high school students need help, and thus can get help earlier. 
+<br />
+<br />
+On the other hand, we do have missing / NA values in the data, meaning that the answer to some questions have not been included in the model, which affects the accuracy of the model. This further supports the statement that task 3 is good, but should not be looked into too deeply. The response (y axis) for all the models above further gives information about how many people approximately gave a certain answer, and that we have a large number of responses from the survey
+<br />
+<br />
+In conclusion, the purpose of the visualisation was to give more clarity to the data, it is honest and is fit for the purpose to educate and assist decision makers help youth at health risk. 
+<br />
+<br />
+(Points sourced and applied from lecture 26: data ethics)
+<br />
+<br />
