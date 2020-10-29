@@ -1,0 +1,45 @@
+---
+title: "Stats 369 Assignment 4"
+author: "Hasnain Cheena"
+date: "29/10/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(xgboost)
+library(tidyverse)
+```
+
+# YRBS 
+
+Pre-question stuff goes here.
+
+## Load in the data
+
+```{r Load in data}
+set.seed(369) 
+load("yrbs.rda")
+
+#remove observations where labels are NA
+missing_labels = is.na(r)
+features = x[!missing_labels, ]
+labels = r[!missing_labels]
+```
+
+## Question 1 
+Build a classifier to predict labels r from x with xgboost, and show the confusion matrix
+
+```{r XGBOOST Q1}
+
+```
+
+## Question 2 
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
